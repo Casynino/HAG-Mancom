@@ -3,6 +3,7 @@ import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { ComponentProps, CSSProperties, ReactNode } from 'react'
 import { ArrowRight, ChevronRight, Inbox } from 'lucide-react'
+import { AfricaNetwork } from '@/components/africa-network'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -231,6 +232,43 @@ export function EmptyState({
   )
 }
 
+/**
+ * The colour each department wears.
+ *
+ * Derived from the eyebrow the page already passes, rather than a prop every
+ * page has to remember to set — a header that has to be told its own colour
+ * eventually gets one wrong. Records are cool, operations are warm, oversight
+ * is grave, and the assistant is the one place the live gold appears, because
+ * it is the one part of the platform that proposes rather than records.
+ */
+const DEPARTMENT_TONE: Record<string, 'brand' | 'live' | 'ok' | 'warn' | 'risk'> = {
+  'Technical Office': 'brand',
+  'AI Document Studio': 'live',
+  'Director Portal': 'warn',
+  Engineer: 'brand',
+  'Your account': 'brand',
+  Analytics: 'ok',
+  Compliance: 'ok',
+  Repository: 'brand',
+  Administrator: 'warn',
+  Oversight: 'risk',
+  'Brand training': 'live',
+  Notifications: 'brand',
+}
+
+/**
+ * The header every page opens with.
+ *
+ * It was a bare eyebrow and a title on the page background, which is why every
+ * screen in the platform started the same flat way. It is now a banded object
+ * lit from two corners, with a hairline along the top edge that catches the
+ * light the way a physical panel does — and in the department's own colour, so
+ * somebody who works in one recognises where they are before reading a word.
+ *
+ * `stats` is for the two or three figures that describe the page itself — how
+ * many records, what they are worth — which otherwise get promoted into cards
+ * they do not deserve.
+ */
 export function PageHeader({
   eyebrow,
   title,
@@ -244,28 +282,65 @@ export function PageHeader({
   action?: ReactNode
   stats?: Array<{ label: string; value: ReactNode }>
 }) {
+  const tone = (typeof eyebrow === 'string' && DEPARTMENT_TONE[eyebrow]) || 'brand'
+
+  const wash = {
+    brand: ['bg-brand-600/25', 'bg-live-500/15'],
+    live: ['bg-live-500/30', 'bg-brand-600/15'],
+    ok: ['bg-ok-600/25', 'bg-brand-600/15'],
+    warn: ['bg-warn-600/25', 'bg-brand-600/15'],
+    risk: ['bg-risk-600/22', 'bg-brand-600/15'],
+  }[tone]
+
+  const rule = {
+    brand: 'via-brand-500/50',
+    live: 'via-live-400/50',
+    ok: 'via-ok-500/50',
+    warn: 'via-warn-500/50',
+    risk: 'via-risk-500/50',
+  }[tone]
+
+  const chip = {
+    brand: 'bg-brand-600/15 text-brand-700',
+    live: 'bg-live-400/20 text-live-700',
+    ok: 'bg-ok-600/15 text-ok-700',
+    warn: 'bg-warn-600/15 text-warn-700',
+    risk: 'bg-risk-600/15 text-risk-700',
+  }[tone]
+
   return (
     <div className="rise relative isolate overflow-hidden rounded-2xl border border-ink-200 bg-panel px-5 py-5 sm:px-7 sm:py-6">
-      {/* A band of colour rather than a suggestion of one. Two washes from
-          opposite corners give it depth without a photograph competing with the
-          type, and the hairline at the top edge catches the light the way a
-          physical panel does. */}
       <span
-        className="pointer-events-none absolute -top-24 -left-16 size-[26rem] rounded-full bg-brand-600/25 blur-[80px]"
+        className={cn(
+          'pointer-events-none absolute -top-24 -left-16 size-[26rem] rounded-full blur-[80px]',
+          wash[0],
+        )}
         aria-hidden="true"
       />
       <span
-        className="pointer-events-none absolute -right-24 -bottom-28 size-[22rem] rounded-full bg-live-500/20 blur-[80px]"
+        className={cn(
+          'pointer-events-none absolute -right-24 -bottom-28 size-[22rem] rounded-full blur-[80px]',
+          wash[1],
+        )}
         aria-hidden="true"
       />
       <span
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-live-400/40 to-transparent"
+        className={cn(
+          'pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent',
+          rule,
+        )}
         aria-hidden="true"
       />
+
       <div className="relative flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div className="min-w-0">
           {eyebrow ? (
-            <span className="inline-flex items-center rounded-full bg-live-400/15 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-live-700 uppercase">
+            <span
+              className={cn(
+                'inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] uppercase',
+                chip,
+              )}
+            >
               {eyebrow}
             </span>
           ) : null}
@@ -456,8 +531,14 @@ export function WelcomeBanner({
 }) {
   return (
     <div className="relative isolate overflow-hidden rounded-2xl bg-sidebar px-5 py-6 sm:px-7 sm:py-8">
-      {/* Two soft washes rather than a flat fill, so the band has depth without
-          becoming a photograph competing with the type. */}
+      {/*
+       * HA GROUP's own footprint, turning slowly behind the greeting: the nine
+       * cities they actually have offices in, joined to Dar es Salaam. It is
+       * drawn rather than photographed because it is a real claim about the
+       * business, and because a stock photograph of a hard hat says nothing a
+       * person signing in does not already know.
+       */}
+      <AfricaNetwork className="pointer-events-none absolute inset-0 size-full opacity-70" />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 -left-16 size-[26rem] rounded-full bg-brand-600/35 blur-[90px]"
@@ -465,6 +546,11 @@ export function WelcomeBanner({
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-24 -bottom-32 size-[24rem] rounded-full bg-live-500/20 blur-[90px]"
+      />
+      {/* A wash back over the left third so the type never sits on the network. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-sidebar via-sidebar/70 to-transparent"
       />
 
       <div className="relative flex flex-wrap items-end justify-between gap-x-6 gap-y-5">

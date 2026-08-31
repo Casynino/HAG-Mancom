@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -165,10 +166,23 @@ export function AppNav({
       {/* ---------------- Desktop sidebar ---------------- */}
       <aside className="hidden w-64 shrink-0 flex-col bg-sidebar lg:flex">
         <div className="flex items-center gap-3 px-5 py-5">
-          {/* The gold mark is the one warm note in the frame, and the fastest
-              thing to find when glancing at a screen across a desk. */}
-          <span className="font-display flex size-10 shrink-0 items-center justify-center rounded-xl bg-live-400 text-sm font-bold text-sidebar">
-            HAG
+          {/*
+           * HA GROUP's own mark, taken from their invoices — not the "HAG"
+           * lettering that stood here, which was scaffolding I never replaced.
+           * The mark is drawn in black, so it is knocked out to white for the
+           * navy sidebar; the sidebar is dark in both themes, so this is a fixed
+           * filter rather than the theme-dependent one the public header uses.
+           */}
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
+            <Image
+              src="/brand/ha-group-logo-transparent.png"
+              alt=""
+              width={301}
+              height={254}
+              priority
+              className="h-6 w-auto"
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
           </span>
           <span className="min-w-0">
             <span className="font-display block truncate text-sm font-bold tracking-wide text-white">
