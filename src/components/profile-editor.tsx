@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { Lock, UserCog } from 'lucide-react'
 import { Badge, Field, Input, Notice, Panel, PanelHeader, SectionBar } from '@/components/ui'
+import { PasswordInput } from '@/components/password-input'
 import { errorsFor, FormResult, SubmitButton } from '@/components/form'
 import { updateOwnProfileAction } from '@/server/profile-actions'
 import { changePasswordAction } from '@/server/auth-actions'
@@ -118,10 +119,9 @@ export function ProfileEditor({
             required
             errors={errorsFor(passwordState, 'currentPassword')}
           >
-            <Input
+            <PasswordInput
               id="currentPassword"
               name="currentPassword"
-              type="password"
               autoComplete="current-password"
               required
             />
@@ -134,10 +134,9 @@ export function ProfileEditor({
             hint="At least 12 characters. Longer beats complicated."
             errors={errorsFor(passwordState, 'newPassword')}
           >
-            <Input
+            <PasswordInput
               id="newPassword"
               name="newPassword"
-              type="password"
               autoComplete="new-password"
               required
               minLength={12}
@@ -150,10 +149,9 @@ export function ProfileEditor({
             required
             errors={errorsFor(passwordState, 'confirmPassword')}
           >
-            <Input
+            <PasswordInput
               id="confirmPassword"
               name="confirmPassword"
-              type="password"
               autoComplete="new-password"
               required
             />

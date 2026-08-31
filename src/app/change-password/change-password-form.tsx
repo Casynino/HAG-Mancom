@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { Field, Input, Panel } from '@/components/ui'
+import { PasswordInput } from '@/components/password-input'
 import { errorsFor, FormResult, SubmitButton } from '@/components/form'
 import { changePasswordAction } from '@/server/auth-actions'
 
@@ -19,10 +20,9 @@ export function ChangePasswordForm() {
           required
           errors={errorsFor(state, 'currentPassword')}
         >
-          <Input
+          <PasswordInput
             id="currentPassword"
             name="currentPassword"
-            type="password"
             autoComplete="current-password"
             required
           />
@@ -35,10 +35,9 @@ export function ChangePasswordForm() {
           required
           errors={errorsFor(state, 'newPassword')}
         >
-          <Input
+          <PasswordInput
             id="newPassword"
             name="newPassword"
-            type="password"
             autoComplete="new-password"
             minLength={12}
             required
@@ -51,10 +50,9 @@ export function ChangePasswordForm() {
           required
           errors={errorsFor(state, 'confirmPassword')}
         >
-          <Input
+          <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
-            type="password"
             autoComplete="new-password"
             required
           />

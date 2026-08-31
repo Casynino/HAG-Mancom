@@ -70,9 +70,13 @@ export default async function SignInPage() {
           </p>
         </div>
 
-        {/* The form keeps the light surface it has everywhere else, so the
-            inputs read as inputs rather than as part of the artwork. */}
-        <div className="rounded-2xl border border-white/10 bg-panel p-5 shadow-2xl sm:p-6">
+        {/*
+         * One frame. The form used to wrap itself in a Panel and this page
+         * wrapped it in a card, so the inputs sat inside two nested boxes on a
+         * third ground — three borders competing over a two-field form. The
+         * form is bare now and this is the only surface.
+         */}
+        <div className="rounded-2xl border border-white/12 bg-panel p-5 shadow-2xl sm:p-6">
           <SignInForm />
         </div>
 
