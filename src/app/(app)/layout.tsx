@@ -149,6 +149,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           hasPermission(actor.roles, 'asset.upload_own_signature'),
       },
       {
+        href: '/admin/brand-training',
+        label: 'Brand training',
+        short: 'Train',
+        icon: 'sparkles',
+        group: 'Administration',
+        show: hasPermission(actor.roles, 'config.manage'),
+      },
+      {
         href: '/admin/users',
         label: 'People and roles',
         short: 'People',

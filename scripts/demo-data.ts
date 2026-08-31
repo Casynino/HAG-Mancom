@@ -83,7 +83,10 @@ async function main() {
         name: 'Adam Nzinza',
         title: 'Technical Officer',
         phone: '+255 692 833 236',
-        roles: ['technical_officer'],
+        // Both, as on HA GROUP's own screens: he runs the Technical Office and
+        // administers the platform. Keeping them separate would leave the demo
+        // with no account that can reach Company settings or Brand training.
+        roles: ['technical_officer', 'administrator'],
       },
       {
         email: 'director@hpcagroup.africa',
