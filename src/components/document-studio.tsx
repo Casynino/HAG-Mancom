@@ -260,8 +260,8 @@ export function DocumentStudio({
                 'No reference is allocated yet — an abandoned draft never burns a number in the sequence.',
               ],
               [
-                'You price it',
-                'Quantities and unit prices. Every total is computed on the server from approved rates, never typed.',
+                'You price it, then submit',
+                'Totals are computed on the server from approved rates, never typed. Submitting is what allocates the reference and captures the exact version the approver will decide on.',
               ],
               [
                 'The assistant drafts wording',
@@ -269,7 +269,7 @@ export function DocumentStudio({
               ],
               [
                 'A Director approves',
-                'That is the moment the reference is allocated and the signature and stamp are applied.',
+                'The signature and stamp are applied, and the PDF and DOCX are rendered and stored against that version.',
               ],
               [
                 'It becomes immutable',

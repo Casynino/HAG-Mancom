@@ -162,6 +162,41 @@ async function main() {
       )
     }
 
+    /*
+     * Approving is not enough. The finance engine loads the entity marked
+     * DEFAULT, and its default address — approving three entities and leaving
+     * none of them default leaves every document blocked with a message about
+     * missing settings, which is exactly what happened the first time this ran.
+     * Phase 0 found the company name printed three different ways; nominating
+     * one is the decision that resolves it.
+     */
+    await c.query(`update public.legal_entities set is_default = false`)
+    await c.query(
+      `update public.legal_entities set is_default = true
+        where name = 'HA GROUP TZ LTD' and state = 'approved'`,
+    )
+
+    const defaultEntity = await c.query<{ id: string }>(
+      `select id from public.legal_entities where is_default and state = 'approved' limit 1`,
+    )
+    if (defaultEntity.rows.length > 0) {
+      const entityId = defaultEntity.rows[0]!.id
+      await c.query(`update public.entity_addresses set is_default = false`)
+      await c.query(
+        `update public.entity_addresses set is_default = true
+          where id = (
+            select id from public.entity_addresses
+             where legal_entity_id = $1 and state = 'approved'
+             order by created_at limit 1)`,
+        [entityId],
+      )
+      await c.query(
+        `update public.bank_accounts set is_default = true
+          where legal_entity_id = $1 and state = 'approved' and currency = 'TZS'`,
+        [entityId],
+      )
+    }
+
     // ---------------------------------------------------------------- client
     const clientRow = await c.query<{ id: string }>(
       `insert into public.clients
@@ -561,6 +596,38 @@ async function main() {
      * my attention" — the first question the dashboard exists to answer — has
      * no answer. This is the letter HA GROUP actually sent.
      */
+    /*
+     * HQ_2670052, left with the Director so the approval path can be walked
+     * end to end. A quotation needs no signature under HA GROUP's own approval
+     * policy, so this one completes; the letter below needs one and stops — the
+     * two together show both halves of the rule.
+     *
+     * Its printed figures do not quite reconcile, and are reproduced as printed
+     * rather than silently corrected. 13 x 2,032,529.14 is 26,422,878.82, not
+     * the 26,422,878.78 shown; and the second line's stated total implies a
+     * quantity of 12 against the 13 printed. Both are recorded in the internal
+     * notes. This is exactly the class of error the platform's server-side
+     * arithmetic exists to stop happening again.
+     */
+    docs.push({
+      type: 'quotation',
+      reference: null,
+      title: 'QUOTATION FOR MAINTENANCE SERVICES — JUNE 2026 (HQ_2670052)',
+      scope: 'MAINTENANCE SERVICES — JUNE 2026',
+      clientRef: 'FMs',
+      date: '2026-07-15',
+      status: 'pending_approval',
+      quantity: '13',
+      unitPrice: '2032529.14',
+      subTotal: '53086596.73',
+      chargesBeforeVat: '10617319.35',
+      taxableTotal: '63703916.07',
+      vat: '11466704.90',
+      grandTotal: '75170620.97',
+      po: null,
+      line: 'June 2026 Maintenance Services',
+    })
+
     docs.push({
       type: 'official_letter',
       reference: null,
@@ -643,6 +710,46 @@ async function main() {
            values ($1, 0, 'ADMIN', 'Administration', 20, $2, true)`,
           [docId, d.chargesBeforeVat],
         )
+      }
+
+      /*
+       * Submitting for approval captures a version — a snapshot of exactly what
+       * the approver is being asked to decide on. The approval action refuses
+       * without one ("no submitted version to decide on"), and rightly: a
+       * Director must approve a specific captured state, not a moving target.
+       * Setting the status by SQL skipped that capture, so it is written here.
+       */
+      if (d.status !== 'draft') {
+        const snapshot = {
+          reference: d.reference,
+          documentType: d.type,
+          title: d.title,
+          scope: d.scope,
+          currency: 'TZS',
+          lines: [{ description: d.line, quantity: d.quantity, unitPrice: d.unitPrice }],
+          subTotal: d.subTotal,
+          chargesBeforeVat: d.chargesBeforeVat,
+          taxableTotal: d.taxableTotal,
+          taxAmount: d.vat,
+          grandTotal: d.grandTotal,
+          capturedBy: 'demo data script',
+        }
+
+        await c.query(
+          `insert into public.document_versions
+             (document_id, version, status_at_capture, snapshot, content_hash,
+              change_summary, created_by)
+           values ($1, 1, 'pending_approval', $2, $3,
+                   'Submitted for approval (loaded by the demo data script).', $4)
+           on conflict do nothing`,
+          [
+            docId,
+            JSON.stringify(snapshot),
+            createHash('sha256').update(JSON.stringify(snapshot)).digest('hex'),
+            officer,
+          ],
+        )
+        await c.query(`update public.documents set current_version = 1 where id = $1`, [docId])
       }
 
       /*

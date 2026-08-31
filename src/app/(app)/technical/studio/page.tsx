@@ -87,7 +87,7 @@ export default async function StudioPage() {
       <PageHeader
         eyebrow="AI Document Studio"
         title="Generate a company document"
-        description="Answer a few questions. The assistant drafts the wording; the platform does every calculation, allocates the reference at approval, and applies the seal."
+        description="Answer a few questions. The assistant drafts the wording; the platform does every calculation, allocates the reference on submission, and applies the seal at approval."
       />
 
       <DocumentStudio

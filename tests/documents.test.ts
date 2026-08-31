@@ -496,7 +496,18 @@ describe('signatures and stamps', () => {
 })
 
 describe('document versions', () => {
-  it('are append-only', async () => {
+  /**
+   * What a version records cannot change. What it does not yet know — where its
+   * rendered files ended up — can be filled in exactly once.
+   *
+   * The distinction is not academic. A blanket append-only rule made approval
+   * impossible: the sealed PDF can only be rendered after the seal rows exist,
+   * which requires the version row to exist first, so the storage pointer must
+   * be written afterwards. Under the blanket rule that write was refused and,
+   * because Postgres reports an RLS-filtered UPDATE as zero rows rather than an
+   * error, it failed silently and every download 404'd.
+   */
+  it('refuse any change to what was approved', async () => {
     const id = await newDocument('draft')
     await o.query(
       `insert into document_versions (document_id, version, status_at_capture, snapshot, content_hash)
@@ -510,7 +521,52 @@ describe('document versions', () => {
         id,
       ]),
     )
-    expect(err.message).toMatch(/append-only/)
+    expect(err.message).toMatch(/cannot be altered|append-only|permission denied/)
+  })
+
+  it('cannot be deleted', async () => {
+    const id = await newDocument('draft')
+    await o.query(
+      `insert into document_versions (document_id, version, status_at_capture, snapshot, content_hash)
+       values ($1, 1, 'draft', '{"a":1}'::jsonb, 'h2')`,
+      [id],
+    )
+    const err = await expectFailure(o, null, (c) =>
+      c.query('delete from document_versions where document_id = $1', [id]),
+    )
+    expect(err.message).toMatch(/cannot be deleted|append-only/)
+  })
+
+  it('accept the rendered artefact once, then refuse to replace it', async () => {
+    const id = await newDocument('draft')
+    await o.query(
+      `insert into document_versions (document_id, version, status_at_capture, snapshot, content_hash)
+       values ($1, 1, 'draft', '{"a":1}'::jsonb, 'h3')`,
+      [id],
+    )
+
+    // First write: the render has just finished and reports where it stored it.
+    await o.query(
+      `update document_versions set pdf_storage_key = $1, pdf_byte_size = $2
+        where document_id = $3`,
+      ['documents/x/v1.pdf', 1234, id],
+    )
+    const { rows } = await o.query(
+      'select pdf_storage_key, pdf_byte_size from document_versions where document_id = $1',
+      [id],
+    )
+    expect(rows[0].pdf_storage_key).toBe('documents/x/v1.pdf')
+    expect(Number(rows[0].pdf_byte_size)).toBe(1234)
+
+    // Second write: swapping the approved artefact for a different file is
+    // exactly what immutability exists to prevent.
+    const err = await expectFailure(o, null, (c) =>
+      c.query('update document_versions set pdf_storage_key = $1 where document_id = $2', [
+        'documents/x/substituted.pdf',
+        id,
+      ]),
+    )
+    expect(err.message).toMatch(/already recorded and cannot be replaced/)
   })
 
   it('allow only one approved version per document', async () => {

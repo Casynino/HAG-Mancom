@@ -206,9 +206,29 @@ function divideRoundHalfUp(numerator: bigint, denominator: bigint): bigint {
   return negative ? -rounded : rounded
 }
 
-/** Groups thousands for display. Formatting only — never parsed back. */
+/**
+ * Groups thousands for display. Formatting only — never parsed back.
+ *
+ * A string is normalised to `decimalPlaces` rather than trusted. Postgres
+ * returns numerics at the column's own scale — `numeric(18,4)` hands back
+ * "75170620.9700" — and passing that straight through printed four decimal
+ * places on the approvals list and, worse, on the rendered PDF. A function
+ * whose entire job is formatting should not require its caller to have
+ * pre-formatted the input.
+ */
 export function formatAmount(value: Decimal | string, decimalPlaces = 2): string {
-  const text = value instanceof Decimal ? value.toFixed(decimalPlaces) : value
+  let text: string
+  if (value instanceof Decimal) {
+    text = value.toFixed(decimalPlaces)
+  } else {
+    try {
+      text = Decimal.from(value).toFixed(decimalPlaces)
+    } catch {
+      // Not a number we can parse. Show it as given rather than throwing in a
+      // render path — a wrong-looking figure is recoverable, a blank page is not.
+      text = value
+    }
+  }
   const negative = text.startsWith('-')
   const unsigned = negative ? text.slice(1) : text
   const [whole = '0', fraction] = unsigned.split('.')

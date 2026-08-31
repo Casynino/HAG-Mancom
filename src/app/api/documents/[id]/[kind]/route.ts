@@ -35,6 +35,16 @@ export async function GET(
     return NextResponse.json({ error: 'Not found.' }, { status: 404 })
   }
 
+  /*
+   * A malformed id must not reach Postgres. `where id = 'x'` on a uuid column
+   * raises 22P02, which surfaces as an unhandled server error rather than the
+   * 404 a bad URL deserves — and a stack trace is not something to hand back
+   * to whoever typed the URL.
+   */
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return NextResponse.json({ error: 'Not found.' }, { status: 404 })
+  }
+
   try {
     const result = await asActor(async (db, actor) => {
       const [doc] = await db.select().from(documents).where(eq(documents.id, id)).limit(1)
