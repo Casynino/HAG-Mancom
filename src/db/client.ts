@@ -116,6 +116,30 @@ export async function withUser<T>(userId: string, fn: (tx: Database) => Promise<
   })
 }
 
+/*
+ * A note for whoever profiles a slow page next.
+ *
+ * Everything above runs in ONE transaction, and that is not incidental: the
+ * third argument to set_config makes the setting transaction-local, which is
+ * what keeps one request's identity from leaking into another's on a pooled
+ * connection. It is the whole reason RLS can be trusted here.
+ *
+ * The consequence is that a `Promise.all` inside a callback does not run in
+ * parallel. A transaction is one connection, so those queries queue. The
+ * dashboard issues about ten and they go one after another.
+ *
+ * This is cheap where it matters and expensive where it does not. Vercel runs
+ * in iad1 and Neon in us-east-2, roughly 12ms apart, so ten serial queries cost
+ * a tenth of a second in production. From a laptop in Tanzania the same round
+ * trip measured 310ms — a bare `select 1` costs the same as any real query —
+ * so the same page takes five to nine seconds in development and looks broken.
+ *
+ * Do not restructure this into parallel connections to fix a number you
+ * measured locally. Each would need its own set_config, and you would be
+ * trading the guarantee that makes RLS safe for latency the deployment does not
+ * actually have. Measure against production first.
+ */
+
 /**
  * Run work with no user identity. RLS still applies and will hide anything that
  * requires one. Used only for the pre-authentication path and for scripts.

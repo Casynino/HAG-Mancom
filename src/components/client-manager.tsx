@@ -248,8 +248,8 @@ export function ClientManager({ clients }: { clients: ClientRow[] }) {
         </Panel>
       ) : null}
 
-      <Panel className="divide-y divide-ink-100">
-        {filtered.length === 0 ? (
+      {filtered.length === 0 ? (
+        <Panel>
           <EmptyState
             title={query ? 'No clients match that search' : 'No clients yet'}
             description={
@@ -258,55 +258,67 @@ export function ClientManager({ clients }: { clients: ClientRow[] }) {
                 : 'Add the companies HA GROUP works for. Projects and documents hang off these records.'
             }
           />
-        ) : (
-          filtered.map((c) => (
-            <div key={c.id} className="flex flex-wrap items-start gap-3 px-4 py-3.5 sm:px-5">
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-medium text-ink-900">{c.legalName}</p>
-                  {c.status !== 'active' ? (
-                    <Badge tone="neutral">
-                      {c.status === 'archived' ? 'Archived' : 'Inactive'}
-                    </Badge>
+        </Panel>
+      ) : (
+        <div className="grid gap-4 xl:grid-cols-2">
+          {filtered.map((c, cardIndex) => (
+            <div
+              key={c.id}
+              className="rise relative overflow-hidden rounded-xl border border-ink-200 bg-panel p-4 shadow-sm sm:p-5"
+              style={{ '--i': cardIndex } as React.CSSProperties}
+            >
+              <span
+                className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-brand-600/[0.07] to-transparent"
+                aria-hidden="true"
+              />
+              <div className="relative flex flex-wrap items-start gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium text-ink-900">{c.legalName}</p>
+                    {c.status !== 'active' ? (
+                      <Badge tone="neutral">
+                        {c.status === 'archived' ? 'Archived' : 'Inactive'}
+                      </Badge>
+                    ) : null}
+                  </div>
+                  <p className="mt-0.5 text-sm text-ink-500">
+                    {[c.city, c.contactPerson, c.contactPhone].filter(Boolean).join(' · ') ||
+                      'No contact details on file'}
+                  </p>
+                  <p className="mt-1 text-xs text-ink-400 tabular">
+                    {c.tin ? `TIN ${c.tin}` : 'No TIN'}
+                    {c.vrn ? ` · VRN ${c.vrn}` : ''} · {c.projectCount} project
+                    {c.projectCount === 1 ? '' : 's'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setEditing(editing === c.id ? null : c.id)}
+                    className="tap flex items-center gap-1.5 rounded px-2 text-sm text-ink-700 hover:bg-ink-50"
+                    aria-expanded={editing === c.id}
+                  >
+                    <Pencil className="size-4" aria-hidden="true" />
+                    {editing === c.id ? 'Cancel' : 'Edit'}
+                  </button>
+
+                  {c.status === 'active' ? (
+                    <form action={archiveAction}>
+                      <input type="hidden" name="clientId" value={c.id} />
+                      <SubmitButton variant="ghost" size="sm" pendingLabel="Archiving…">
+                        <Archive className="size-4" aria-hidden="true" />
+                        Archive
+                      </SubmitButton>
+                    </form>
                   ) : null}
                 </div>
-                <p className="mt-0.5 text-sm text-ink-500">
-                  {[c.city, c.contactPerson, c.contactPhone].filter(Boolean).join(' · ') ||
-                    'No contact details on file'}
-                </p>
-                <p className="mt-1 text-xs text-ink-400 tabular">
-                  {c.tin ? `TIN ${c.tin}` : 'No TIN'}
-                  {c.vrn ? ` · VRN ${c.vrn}` : ''} · {c.projectCount} project
-                  {c.projectCount === 1 ? '' : 's'}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setEditing(editing === c.id ? null : c.id)}
-                  className="tap flex items-center gap-1.5 rounded px-2 text-sm text-ink-700 hover:bg-ink-50"
-                  aria-expanded={editing === c.id}
-                >
-                  <Pencil className="size-4" aria-hidden="true" />
-                  {editing === c.id ? 'Cancel' : 'Edit'}
-                </button>
-
-                {c.status === 'active' ? (
-                  <form action={archiveAction}>
-                    <input type="hidden" name="clientId" value={c.id} />
-                    <SubmitButton variant="ghost" size="sm" pendingLabel="Archiving…">
-                      <Archive className="size-4" aria-hidden="true" />
-                      Archive
-                    </SubmitButton>
-                  </form>
-                ) : null}
               </div>
 
               {editing === c.id ? (
                 <form
                   action={editAction}
-                  className="w-full space-y-4 rounded border border-ink-200 bg-ink-50 p-3"
+                  className="relative mt-4 w-full space-y-4 rounded-lg border border-ink-200 bg-ink-50 p-3.5"
                   noValidate
                 >
                   <FormResult state={editState} />
@@ -316,9 +328,9 @@ export function ClientManager({ clients }: { clients: ClientRow[] }) {
                 </form>
               ) : null}
             </div>
-          ))
-        )}
-      </Panel>
+          ))}
+        </div>
+      )}
 
       <p className="text-xs text-ink-400">
         Clients are archived, never deleted — historical quotations and invoices must always resolve

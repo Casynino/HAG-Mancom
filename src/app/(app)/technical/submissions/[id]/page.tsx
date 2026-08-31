@@ -138,11 +138,9 @@ export default async function ReviewSubmissionPage({
   return (
     <>
       <PageHeader
-        eyebrow={
-          <Link href="/technical" className="hover:underline">
-            ← Review queue
-          </Link>
-        }
+        back={{ href: '/technical', label: 'Technical Office' }}
+        eyebrow="Technical Office"
+        tone="brand"
         title={s.title}
         description={`${data.clientName} · ${data.projectName} (${data.projectRef})`}
         action={

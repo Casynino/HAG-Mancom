@@ -2,7 +2,15 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { desc, eq } from 'drizzle-orm'
 import { clients, deliveries, projects } from '@/db/schema'
-import { Badge, EmptyState, PageHeader, Panel, SectionBar } from '@/components/ui'
+import {
+  Badge,
+  EmptyState,
+  PageHeader,
+  Panel,
+  RecordCard,
+  RecordGrid,
+  SectionBar,
+} from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -91,38 +99,63 @@ type Row = {
 }
 
 function Group({ title, rows, muted }: { title: string; rows: Row[]; muted?: boolean }) {
+  const scope: Record<string, string> = {
+    'Awaiting signatures':
+      'Both signatures are needed. Until then no invoice can be raised against this work.',
+    Settled: 'Signed by both sides, or cancelled. Kept either way — a delivery note is evidence.',
+  }
+
   return (
-    <section className="space-y-2">
-      <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">{title}</h2>
-      <Panel className="divide-y divide-ink-100">
-        {rows.map((row) => {
-          const status = DELIVERY_STATUS[row.status] ?? {
-            label: row.status,
-            tone: 'neutral' as const,
-          }
-          return (
-            <Link
-              key={row.id}
-              href={`/technical/deliveries/${row.id}`}
-              className={`block px-4 py-3.5 hover:bg-ink-50 sm:px-5 ${muted ? 'opacity-70' : ''}`}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge tone={status.tone}>{status.label}</Badge>
-                <span className="text-sm text-ink-600">{formatDate(row.deliveryDate)}</span>
-              </div>
-              <p className="mt-1 font-medium text-ink-900">{row.clientName}</p>
-              <p className="mt-0.5 text-sm text-ink-500">
-                {row.projectName}
-                {row.location ? ` · ${row.location}` : ''}
-              </p>
-              <p className="mt-1.5 text-xs text-ink-400">
-                {row.handoverSignatureKey ? '✓' : '○'} HA GROUP ·{' '}
-                {row.receiverSignatureKey ? '✓' : '○'} client
-              </p>
-            </Link>
-          )
-        })}
-      </Panel>
+    <section className="space-y-3">
+      <SectionBar
+        label={title}
+        scope={scope[title]}
+        tone={title.startsWith('Awaiting') ? 'warn' : 'ok'}
+      />
+      <div className={muted ? 'opacity-70' : undefined}>
+        <RecordGrid>
+          {rows.map((row, i) => {
+            const status = DELIVERY_STATUS[row.status] ?? {
+              label: row.status,
+              tone: 'neutral' as const,
+            }
+            const both = Boolean(row.handoverSignatureKey && row.receiverSignatureKey)
+            return (
+              <RecordCard
+                key={row.id}
+                index={i}
+                href={`/technical/deliveries/${row.id}`}
+                accent={both ? 'ok' : row.status === 'cancelled' ? undefined : 'warn'}
+                chips={
+                  <>
+                    <Badge tone={status.tone}>{status.label}</Badge>
+                    <span className="text-xs text-ink-500">{formatDate(row.deliveryDate)}</span>
+                  </>
+                }
+                title={row.clientName}
+                meta={`${row.projectName}${row.location ? ` · ${row.location}` : ''}`}
+                note={
+                  /* Which side has signed. Two ticks is what releases an invoice,
+                     so it is stated rather than left to be inferred. */
+                  <p className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                    <span
+                      className={row.handoverSignatureKey ? 'text-ok-700' : 'text-ink-400'}
+                    >
+                      {row.handoverSignatureKey ? '✓' : '○'} HA GROUP signed
+                    </span>
+                    <span
+                      className={row.receiverSignatureKey ? 'text-ok-700' : 'text-ink-400'}
+                    >
+                      {row.receiverSignatureKey ? '✓' : '○'} client signed
+                    </span>
+                  </p>
+                }
+                footer={both ? 'Complete — an invoice may be raised' : 'Not yet fully signed'}
+              />
+            )
+          })}
+        </RecordGrid>
+      </div>
     </section>
   )
 }

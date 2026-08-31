@@ -132,11 +132,9 @@ export default async function ApprovalPage({ params }: { params: Promise<{ id: s
   return (
     <>
       <PageHeader
-        eyebrow={
-          <Link href="/approvals" className="hover:underline">
-            ← Approvals
-          </Link>
-        }
+        back={{ href: '/approvals', label: 'Approvals' }}
+        eyebrow="Director Portal"
+        tone="warn"
         title={doc.title}
         description={`${data.clientName} · ${data.projectName}`}
         action={

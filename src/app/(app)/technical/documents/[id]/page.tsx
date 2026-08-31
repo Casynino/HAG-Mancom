@@ -161,11 +161,9 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
   return (
     <>
       <PageHeader
-        eyebrow={
-          <Link href="/technical/documents" className="hover:underline">
-            ← Documents
-          </Link>
-        }
+        back={{ href: '/technical/documents', label: 'Documents' }}
+        eyebrow="Technical Office"
+        tone="brand"
         title={doc.title}
         description={`${data.clientName} · ${data.projectName} (${data.projectRef})`}
         action={

@@ -227,7 +227,8 @@ export function DocumentCreateForm({
             ) : null}
 
             <p className="text-xs text-ink-500">
-              The document number is allocated when the document is submitted for approval, not now — an abandoned draft never burns a number.
+              The document number is allocated when the document is submitted for approval, not now
+              — an abandoned draft never burns a number.
             </p>
 
             <SubmitButton pendingLabel="Creating…">Create draft</SubmitButton>

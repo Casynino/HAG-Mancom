@@ -108,11 +108,9 @@ export default async function SubmissionDetailPage({
   return (
     <>
       <PageHeader
-        eyebrow={
-          <Link href="/engineer" className="hover:underline">
-            ← My site work
-          </Link>
-        }
+        back={{ href: '/engineer', label: 'My site work' }}
+        eyebrow="Engineer"
+        tone="brand"
         title={s.title}
         description={`${data.clientName} · ${data.projectName} (${data.projectRef})`}
         action={

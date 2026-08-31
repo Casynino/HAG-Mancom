@@ -160,11 +160,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   return (
     <>
       <PageHeader
-        eyebrow={
-          <Link href="/technical/projects" className="hover:underline">
-            ← Projects
-          </Link>
-        }
+        back={{ href: '/technical/projects', label: 'Projects' }}
+        eyebrow="Technical Office"
+        tone="brand"
         title={data.project.name}
         description={`${data.client.legalName} · ${data.project.reference}`}
         action={

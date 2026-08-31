@@ -32,11 +32,13 @@ export default function ContactPage() {
           fill
           priority
           sizes="100vw"
-          className="pointer-events-none object-cover opacity-20"
+          className="pointer-events-none object-cover"
+          style={{ opacity: 'calc(var(--hero-photo-opacity) * 0.8)' }}
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-shell via-shell/85 to-shell/30"
+          className="pointer-events-none absolute inset-0"
+          style={{ backgroundImage: 'var(--hero-scrim)' }}
         />
         <div className="relative mx-auto max-w-6xl px-5 pt-28 pb-20 sm:px-8 sm:pt-32 sm:pb-24">
           <p className="text-xs font-semibold tracking-[0.18em] text-live-400 uppercase">

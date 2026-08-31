@@ -76,11 +76,9 @@ export default async function DeliveryPage({ params }: { params: Promise<{ id: s
   return (
     <>
       <PageHeader
-        eyebrow={
-          <Link href={`/technical/projects/${data.projectId}`} className="hover:underline">
-            ← {data.projectName}
-          </Link>
-        }
+        back={{ href: `/technical/projects/${data.projectId}`, label: data.projectName }}
+        eyebrow="Technical Office"
+        tone="brand"
         title={`Delivery — ${formatDate(d.deliveryDate)}`}
         description={`${data.clientName}${d.location ? ` · ${d.location}` : ''}`}
         action={<Badge tone={status.tone}>{status.label}</Badge>}

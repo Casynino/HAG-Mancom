@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { ComponentProps, CSSProperties, ReactNode } from 'react'
-import { ArrowRight, ChevronRight, Inbox } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronRight, Inbox } from 'lucide-react'
 import { AfricaNetwork } from '@/components/africa-network'
 
 export function cn(...inputs: ClassValue[]) {
@@ -275,14 +275,25 @@ export function PageHeader({
   description,
   action,
   stats,
+  back,
+  tone: toneProp,
 }: {
   eyebrow?: ReactNode
   title: ReactNode
   description?: ReactNode
   action?: ReactNode
   stats?: Array<{ label: string; value: ReactNode }>
+  /**
+   * Where this page came from. Detail pages used to put a back link in the
+   * eyebrow slot, which meant a navigation control rendered as a department
+   * chip and no page below the top level ever had a colour. It sits above the
+   * chip now, as a link, which is what it is.
+   */
+  back?: { href: string; label: string }
+  /** Overrides the tone derived from the eyebrow, for pages whose eyebrow is not a plain string. */
+  tone?: 'brand' | 'live' | 'ok' | 'warn' | 'risk'
 }) {
-  const tone = (typeof eyebrow === 'string' && DEPARTMENT_TONE[eyebrow]) || 'brand'
+  const tone = toneProp ?? ((typeof eyebrow === 'string' && DEPARTMENT_TONE[eyebrow]) || 'brand')
 
   const wash = {
     brand: ['bg-brand-600/25', 'bg-live-500/15'],
@@ -334,6 +345,15 @@ export function PageHeader({
 
       <div className="relative flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div className="min-w-0">
+          {back ? (
+            <Link
+              href={back.href}
+              className="mb-2.5 inline-flex items-center gap-1.5 text-sm text-ink-500 transition-colors hover:text-ink-800"
+            >
+              <ArrowLeft className="size-3.5" aria-hidden="true" />
+              {back.label}
+            </Link>
+          ) : null}
           {eyebrow ? (
             <span
               className={cn(
