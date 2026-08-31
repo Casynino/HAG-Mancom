@@ -7,7 +7,7 @@ import { and, eq, isNull, sql } from 'drizzle-orm'
 import { notifications } from '@/db/schema'
 import { AppNav, type NavItem } from '@/components/app-nav'
 import { pageContext } from '@/lib/authz/guard'
-import { hasPermission, ROLE_LABELS } from '@/lib/authz/roles'
+import { defaultRouteFor, hasPermission, ROLE_LABELS } from '@/lib/authz/roles'
 
 /**
  * Signed-in shell.
@@ -30,8 +30,32 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // `satisfies` rather than a plain annotation: the trailing .filter() means the
   // array literal is not contextually typed by `NavItem[]`, so 'Operations'
   // would widen to string and the group union would go unchecked.
+  const homeHref = hasPermission(actor.roles, 'submission.view_all')
+    ? '/dashboard'
+    : defaultRouteFor(actor.roles)
+
   const items: NavItem[] = (
     [
+      {
+        /*
+         * Home is first in every portal, because it is where signing in lands
+         * you and a navigation whose first item is not the landing page makes
+         * people hunt for the way back.
+         *
+         * Its destination is role-dependent. Most people get the command
+         * centre. An Engineer cannot: that page reports on everybody's work,
+         * and `submission.view_all` is exactly the permission an Engineer must
+         * not hold — they see their own site reports and no one else's. So
+         * their Home is their own portal, and the duplicate Operations entry
+         * pointing at the same place is dropped below rather than shown twice.
+         */
+        href: homeHref,
+        label: 'Home',
+        short: 'Home',
+        icon: 'gauge',
+        group: 'Overview',
+        show: true,
+      },
       {
         href: '/analytics',
         label: 'Analytics',
@@ -121,14 +145,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         show: hasPermission(actor.roles, 'compliance.view'),
       },
       {
-        href: '/dashboard',
-        label: 'Dashboard',
-        short: 'Home',
-        icon: 'gauge',
-        group: 'Overview',
-        show: hasPermission(actor.roles, 'submission.view_all'),
-      },
-      {
         href: '/admin/settings',
         label: 'Company settings',
         short: 'Settings',
@@ -173,7 +189,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         show: hasPermission(actor.roles, 'audit.view'),
       },
     ] satisfies NavItem[]
-  ).filter((item) => item.show)
+  )
+    .filter((item) => item.show)
+    // Home may already be somebody's portal. One destination, one entry.
+    .filter((item, i, all) => i === all.findIndex((o) => o.href === item.href))
 
   return (
     <AppNav
