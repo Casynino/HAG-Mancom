@@ -2,6 +2,8 @@ import 'server-only'
 
 import Anthropic from '@anthropic-ai/sdk'
 
+import { AppError } from '@/lib/errors'
+
 /**
  * The AI adapter.
  *
@@ -87,20 +89,25 @@ class AnthropicProvider implements AiProvider {
   }): Promise<{ value: T; usage: AiUsage }> {
     const started = Date.now()
 
-    const response = await this.getClient().messages.create({
-      model: AI_MODEL,
-      max_tokens: input.maxTokens ?? 8000,
-      system: input.system,
-      thinking: { type: 'adaptive' },
-      output_config: {
-        effort: input.effort ?? 'medium',
-        format: {
-          type: 'json_schema',
-          schema: input.schema,
+    let response: Anthropic.Message
+    try {
+      response = await this.getClient().messages.create({
+        model: AI_MODEL,
+        max_tokens: input.maxTokens ?? 8000,
+        system: input.system,
+        thinking: { type: 'adaptive' },
+        output_config: {
+          effort: input.effort ?? 'medium',
+          format: {
+            type: 'json_schema',
+            schema: input.schema,
+          },
         },
-      },
-      messages: [{ role: 'user', content: input.prompt }],
-    })
+        messages: [{ role: 'user', content: input.prompt }],
+      })
+    } catch (err) {
+      throw translateProviderError(err)
+    }
 
     // A safety refusal is a valid outcome, not an exception to swallow.
     if (response.stop_reason === 'refusal') {
@@ -132,6 +139,82 @@ class AnthropicProvider implements AiProvider {
   }
 }
 
+/**
+ * Turns an Anthropic transport failure into something an Administrator can act on.
+ *
+ * Without this every one of these — an expired key, a revoked key, an exhausted
+ * credit balance — reaches the user as "Something went wrong. Please try again",
+ * because the generic handler deliberately refuses to leak internals it does not
+ * recognise. That is the right default and the wrong answer here: each of these
+ * has a specific, boring remedy, and only an Administrator can carry it out.
+ *
+ * The messages name the remedy, not the mechanism. Nothing here reveals the key,
+ * the account, or anything about the request.
+ */
+function translateProviderError(err: unknown): Error {
+  if (!(err instanceof Anthropic.APIError)) {
+    return err instanceof Error ? err : new Error('The assistant could not be reached.')
+  }
+
+  const detail = String(
+    (err as { error?: { error?: { message?: string } } }).error?.error?.message ?? '',
+  )
+
+  // Credit exhausted arrives as a 400, not a payment status.
+  if (/credit balance|insufficient/i.test(detail)) {
+    return new AppError(
+      'The company\u2019s Claude credit balance is exhausted. An Administrator must add credit in the ' +
+        'Anthropic Console before the assistant can draft again. Documents can still be written by hand.',
+      'ai_no_credit',
+      402,
+    )
+  }
+
+  switch (err.status) {
+    case 401:
+      return new AppError(
+        'The Claude API key is not valid \u2014 it has most likely expired or been revoked. An ' +
+          'Administrator must issue a new key in the Anthropic Console and set it as ANTHROPIC_API_KEY. ' +
+          'Everything else in the platform is unaffected.',
+        'ai_key_invalid',
+        503,
+      )
+    case 403:
+      return new AppError(
+        'The Claude API key is not permitted to make this request. An Administrator should check the ' +
+          'key\u2019s workspace and scope in the Anthropic Console.',
+        'ai_key_forbidden',
+        503,
+      )
+    case 429:
+      return new AppError(
+        'The assistant is rate limited at the moment. Wait a minute and try again, or write the ' +
+          'wording by hand.',
+        'ai_rate_limited',
+        429,
+      )
+    case 529:
+      return new AppError(
+        'The assistant is overloaded at the moment. Try again shortly, or write the wording by hand.',
+        'ai_overloaded',
+        503,
+      )
+    default:
+      if (err.status && err.status >= 500) {
+        return new AppError(
+          'The assistant is unavailable at the moment. Try again shortly, or write the wording by hand.',
+          'ai_unavailable',
+          503,
+        )
+      }
+      return new AppError(
+        'The assistant could not complete this request. Try again, or write the wording by hand.',
+        'ai_request_failed',
+        502,
+      )
+  }
+}
+
 let cached: AiProvider | null = null
 
 export function getAiProvider(): AiProvider {
@@ -144,6 +227,9 @@ export function getAiProvider(): AiProvider {
 export function resetAiProvider(): void {
   cached = null
 }
+
+/** Exposed for tests only; the translation is otherwise an internal detail. */
+export const __translateProviderErrorForTests = translateProviderError
 
 export function isAiConfigured(): boolean {
   return getAiProvider().isConfigured()
