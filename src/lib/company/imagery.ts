@@ -11,6 +11,19 @@
  * work, and a stock photograph presented as a delivered project is a claim that
  * collapses the moment a client reverse-searches it.
  *
+ * SEVERAL OF THESE ARE THE WRONG SUBJECT. They were selected on filename and
+ * search term without anyone opening them, and three are simply not what they
+ * were labelled: `pylons` is a telecommunications mast, not transmission
+ * pylons; `panel` is a PC motherboard being probed with a multimeter, not a
+ * distribution panel; `switchgear` is a tangle of informal street wiring, which
+ * for a company whose pitch is the quality of its workmanship argues against
+ * HA GROUP rather than for it. The alt text below now says what each photograph
+ * actually shows, and the ones that mislead are marked `offBrand` and are not
+ * used on the site.
+ *
+ * The real fix is HA GROUP's own photographs. Until those arrive the site uses
+ * the few of these that are honestly what they claim to be.
+ *
  * When real project photography arrives, it belongs in `projects` in
  * ./profile.ts with a named client and year, and it should replace these.
  */
@@ -22,6 +35,12 @@ export interface Photo {
   src: string
   /** Describes the subject only. Never asserts whose site it is. */
   alt: string
+  /**
+   * True when the photograph is the wrong subject for HA GROUP, or actively
+   * works against them. Kept in the file rather than deleted so nobody
+   * re-downloads the same wrong image, and so the reason is recorded.
+   */
+  offBrand?: string
 }
 
 export const photos = {
@@ -31,7 +50,10 @@ export const photos = {
   },
   pylons: {
     src: '/imagery/pylons-dusk.jpeg',
-    alt: 'Transmission pylons silhouetted at dusk',
+    alt: 'A telecommunications mast carrying sector antennas and microwave dishes',
+    offBrand:
+      'Telecommunications, not electrical power. Also portrait, and mostly pale ' +
+      'sky, so it dissolves on the light theme.',
   },
   solar: {
     src: '/imagery/solar-farm.jpeg',
@@ -39,11 +61,13 @@ export const photos = {
   },
   panel: {
     src: '/imagery/electrical-panel.jpeg',
-    alt: 'Industrial electrical distribution panel with wiring and breakers',
+    alt: 'Hands probing a computer mainboard with a multimeter',
+    offBrand: 'Consumer electronics repair, not electro-mechanical engineering.',
   },
   switchgear: {
     src: '/imagery/switchgear.jpeg',
-    alt: 'Low-voltage switchgear cabinet interior',
+    alt: 'A dense tangle of informal overhead cabling on a street pole',
+    offBrand: 'The opposite of the workmanship HA GROUP sells. Unusable on their own site.',
   },
   mining: {
     src: '/imagery/mining.jpeg',

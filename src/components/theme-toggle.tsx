@@ -54,9 +54,15 @@ function apply(theme: Theme) {
 }
 
 /**
- * @param tone `shell` for the public site's permanently-dark header, where the
- * control sits on a dark ground in both themes. `surface` for the application,
- * where it sits on a panel that flips.
+ * @param tone `shell` for the public site's header, `surface` for the
+ * application's panels.
+ *
+ * `shell` once meant "on a permanently dark header" and hard-coded white. The
+ * public header later became transparent over the hero, which is near-white in
+ * the light theme — so the control was white on white and effectively invisible,
+ * while the navigation links beside it stayed readable because they use the
+ * `shell-fg` token. It now uses that same token, so it is exactly as legible as
+ * the words next to it, in either theme.
  */
 export function ThemeToggle({ tone = 'surface' }: { tone?: 'surface' | 'shell' }) {
   const [theme, setTheme] = useState<Theme>('system')
@@ -85,7 +91,7 @@ export function ThemeToggle({ tone = 'surface' }: { tone?: 'surface' | 'shell' }
       role="radiogroup"
       aria-label="Colour theme"
       className={`inline-flex items-center gap-0.5 rounded-full border p-0.5 ${
-        onShell ? 'border-white/20' : 'border-ink-300'
+        onShell ? 'border-shell-fg/25' : 'border-ink-300'
       }`}
     >
       {OPTIONS.map(({ value, label, Icon }) => {
@@ -104,10 +110,10 @@ export function ThemeToggle({ tone = 'surface' }: { tone?: 'surface' | 'shell' }
             className={`flex size-7 items-center justify-center rounded-full transition-colors ${
               active
                 ? onShell
-                  ? 'bg-white/15 text-white'
+                  ? 'bg-shell-fg/15 text-shell-fg'
                   : 'bg-ink-200 text-ink-900'
                 : onShell
-                  ? 'text-white/50 hover:text-white'
+                  ? 'text-shell-fg/55 hover:text-shell-fg'
                   : 'text-ink-500 hover:text-ink-800'
             }`}
           >

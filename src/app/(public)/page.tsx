@@ -51,22 +51,25 @@ export default function HomePage() {
             high-voltage transmission — without competing with the type, and the
             live network is drawn on top of it. */}
         <Image
-          src={photos.pylons.src}
+          src={photos.mining.src}
           alt=""
           fill
           priority
           sizes="100vw"
-          className="pointer-events-none object-cover opacity-30"
+          className="pointer-events-none object-cover"
+          style={{ opacity: 'var(--hero-photo-opacity)' }}
         />
         <GridCanvas className="absolute inset-0 z-10 size-full" />
 
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -top-52 -right-40 size-[44rem] rounded-full bg-brand-600/25 blur-[120px]"
+          style={{ opacity: 'var(--hero-glow-opacity)' }}
         />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -bottom-64 -left-40 size-[38rem] rounded-full bg-live-600/10 blur-[120px]"
+          style={{ opacity: 'var(--hero-glow-opacity)' }}
         />
         {/*
           A scrim under the copy. The network is deliberately busy, and busy is
@@ -76,7 +79,8 @@ export default function HomePage() {
         */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-r from-shell via-shell/75 to-shell/20"
+          className="pointer-events-none absolute inset-0 z-20"
+          style={{ backgroundImage: 'var(--hero-scrim)' }}
         />
         {/* Fades the network into the section below rather than cutting it. */}
         <div
@@ -307,11 +311,13 @@ export default function HomePage() {
           alt={photos.solar.alt}
           fill
           sizes="100vw"
-          className="pointer-events-none object-cover opacity-20"
+          className="pointer-events-none object-cover"
+          style={{ opacity: 'calc(var(--hero-photo-opacity) * 0.72)' }}
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-shell via-shell/80 to-shell/40"
+          className="pointer-events-none absolute inset-0"
+          style={{ backgroundImage: 'var(--hero-scrim)' }}
         />
 
         <div className="relative mx-auto grid max-w-6xl gap-10 px-5 py-24 sm:px-8 sm:py-28 lg:grid-cols-2 lg:items-center">

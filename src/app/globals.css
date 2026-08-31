@@ -19,8 +19,7 @@
 
 @theme {
   --font-sans:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
   /* Cool steel neutrals, biased slightly toward the accent hue. */
@@ -132,6 +131,37 @@
      */
     --logo-filter: none;
 
+    /*
+     * The hero photograph.
+     *
+     * These were a single hard-coded pair — a 30% photo under a 100%-to-75%
+     * scrim — chosen against the dark shell, where they read as a rich,
+     * deliberately darkened ground. Nobody re-checked them when the shell
+     * gained a light theme, and on a near-white ground the same numbers erase
+     * the photograph almost completely: 30% of an image, washed out by 75%
+     * white. It looked faded and cheap, which is the opposite of the intent.
+     *
+     * So the treatment is a token, like the logo filter above. Light needs a
+     * much stronger photograph and a much lighter scrim to reach the same
+     * result the dark theme gets for free.
+     */
+    /*
+     * The two large blurred colour orbs over the hero. On the dark shell they
+     * read as glow behind the network. On a near-white ground the same orbs
+     * read as haze sitting on top of the photograph — which is what made the
+     * page look washed out and out of focus. Light keeps a trace of them, not
+     * a veil.
+     */
+    --hero-glow-opacity: 0.3;
+    --hero-photo-opacity: 0.9;
+    --hero-scrim: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-shell) 97%, transparent),
+      color-mix(in srgb, var(--color-shell) 88%, transparent) 34%,
+      color-mix(in srgb, var(--color-shell) 42%, transparent) 62%,
+      color-mix(in srgb, var(--color-shell) 0%, transparent)
+    );
+
     color-scheme: light;
   }
 
@@ -195,6 +225,15 @@
       --color-shell-fg: #ffffff;
       --logo-filter: brightness(0) invert(1);
 
+      --hero-glow-opacity: 1;
+      --hero-photo-opacity: 0.34;
+      --hero-scrim: linear-gradient(
+        to right,
+        var(--color-shell),
+        color-mix(in srgb, var(--color-shell) 75%, transparent) 55%,
+        color-mix(in srgb, var(--color-shell) 20%, transparent)
+      );
+
       color-scheme: dark;
     }
   }
@@ -237,6 +276,15 @@
     --color-shell: #0e131b;
     --color-shell-fg: #ffffff;
     --logo-filter: brightness(0) invert(1);
+
+    --hero-glow-opacity: 1;
+    --hero-photo-opacity: 0.34;
+    --hero-scrim: linear-gradient(
+      to right,
+      var(--color-shell),
+      color-mix(in srgb, var(--color-shell) 75%, transparent) 55%,
+      color-mix(in srgb, var(--color-shell) 20%, transparent)
+    );
 
     color-scheme: dark;
   }

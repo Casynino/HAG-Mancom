@@ -67,8 +67,8 @@ export default function ContactPage() {
           >
             <div className="relative min-h-64 bg-ink-100">
               <Image
-                src={photos.pylons.src}
-                alt={photos.pylons.alt}
+                src={photos.mining.src}
+                alt={photos.mining.alt}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"

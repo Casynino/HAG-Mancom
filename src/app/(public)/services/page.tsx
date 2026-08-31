@@ -22,7 +22,7 @@ export default function ServicesPage() {
     <>
       <header className="relative isolate overflow-hidden border-b border-shell-fg/10 bg-shell text-shell-fg">
         <Image
-          src={photos.panel.src}
+          src={photos.manufacturing.src}
           alt=""
           fill
           priority
