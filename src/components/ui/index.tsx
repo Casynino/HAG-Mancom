@@ -1232,3 +1232,96 @@ export function ComparisonPill({
     </span>
   )
 }
+
+/**
+ * One record as a card of its own.
+ *
+ * The list pages rendered rows inside a single divided panel, which is the
+ * right shape for a ledger and the wrong one for a queue: every row weighed the
+ * same, the reference and the amount were the same size as the client's name,
+ * and nothing about a card said whether it needed a person or not.
+ *
+ * The card gives each record its own edges, puts the identifying chips on one
+ * line, the amount where the eye lands, and — when there is one — a coloured
+ * rule down the left saying this one wants attention. Everything is optional
+ * because these pages carry documents, submissions and deliveries, which share
+ * a shape but not a set of fields.
+ */
+export function RecordCard({
+  href,
+  chips,
+  reference,
+  title,
+  meta,
+  amount,
+  amountLabel,
+  footer,
+  note,
+  accent,
+  index,
+}: {
+  href: string
+  chips?: ReactNode
+  reference?: string | null
+  title: ReactNode
+  meta?: ReactNode
+  amount?: ReactNode
+  amountLabel?: string
+  footer?: ReactNode
+  note?: ReactNode
+  accent?: 'warn' | 'risk' | 'ok' | 'brand'
+  index?: number
+}) {
+  const bar = accent
+    ? { warn: 'bg-warn-600', risk: 'bg-risk-600', ok: 'bg-ok-600', brand: 'bg-brand-600' }[accent]
+    : null
+
+  return (
+    <Link
+      href={href}
+      className="rise group relative flex flex-col overflow-hidden rounded-xl border border-ink-200 bg-panel p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg sm:p-5"
+      style={index === undefined ? undefined : ({ '--i': index } as CSSProperties)}
+    >
+      {bar ? (
+        <span className={cn('absolute inset-y-0 left-0 w-1', bar)} aria-hidden="true" />
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-2">
+        {chips}
+        {reference ? (
+          <span className="font-mono text-xs text-ink-400 tabular">{reference}</span>
+        ) : null}
+      </div>
+
+      <div className="mt-2.5 flex items-start justify-between gap-4">
+        <p className="font-display min-w-0 text-[15px] leading-snug font-semibold text-ink-950">
+          {title}
+        </p>
+        {amount ? (
+          <span className="shrink-0 text-right">
+            <span className="font-display block text-base font-bold text-ink-950 tabular">
+              {amount}
+            </span>
+            {amountLabel ? (
+              <span className="block text-[10px] tracking-[0.1em] text-ink-400 uppercase">
+                {amountLabel}
+              </span>
+            ) : null}
+          </span>
+        ) : null}
+      </div>
+
+      {meta ? <p className="mt-1 text-sm leading-relaxed text-ink-500">{meta}</p> : null}
+      {note ? <div className="mt-2.5">{note}</div> : null}
+
+      {footer ? (
+        <p className="mt-3 border-t border-ink-100 pt-2.5 text-xs text-ink-400">{footer}</p>
+      ) : null}
+    </Link>
+  )
+}
+
+/** A grid of RecordCards. Two up on a wide screen, one on a phone. */
+export function RecordGrid({ children }: { children: ReactNode }) {
+  return <div className="grid gap-4 xl:grid-cols-2">{children}</div>
+}

@@ -3,7 +3,16 @@ import type { Metadata } from 'next'
 import { asc, desc, eq, inArray, sql } from 'drizzle-orm'
 import { clientPurchaseOrders, clients, documents, profiles, projects } from '@/db/schema'
 import { DocumentCreateForm } from '@/components/document-create-form'
-import { Badge, EmptyState, Notice, PageHeader, Panel } from '@/components/ui'
+import {
+  Badge,
+  EmptyState,
+  Notice,
+  PageHeader,
+  Panel,
+  RecordCard,
+  RecordGrid,
+  SectionBar,
+} from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -183,58 +192,70 @@ type Row = {
 }
 
 function Section({ title, rows, muted }: { title: string; rows: Row[]; muted?: boolean }) {
+  const scope: Record<string, string> = {
+    'Being prepared': 'On the desk. No reference is allocated until one is submitted.',
+    'With the approver': 'Numbered and locked. The Director decides on exactly this version.',
+    Approved: 'Signed and sealed. A correction from here is a new revision, never an edit.',
+    Closed: 'Cancelled or archived. Kept because a reference must always resolve.',
+  }
+
   return (
-    <section className="space-y-2">
-      <div className="flex items-baseline gap-2">
-        <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">{title}</h2>
-        <span className="text-xs text-ink-400 tabular">{rows.length}</span>
+    <section className="space-y-3">
+      <SectionBar
+        label={title}
+        scope={scope[title]}
+        tone={
+          title === 'With the approver'
+            ? 'warn'
+            : title === 'Approved'
+              ? 'ok'
+              : title === 'Closed'
+                ? 'brand'
+                : 'live'
+        }
+      />
+      <div className={muted ? 'opacity-70' : undefined}>
+        <RecordGrid>
+          {rows.map((row, i) => {
+            const status = DOCUMENT_STATUS[row.status] ?? {
+              label: row.status,
+              tone: 'neutral' as const,
+            }
+            return (
+              <RecordCard
+                key={row.id}
+                index={i}
+                href={`/technical/documents/${row.id}`}
+                accent={row.status === 'pending_approval' ? 'warn' : undefined}
+                chips={
+                  <>
+                    <Badge tone="neutral">
+                      {DOCUMENT_TYPE_LABELS[row.documentType] ?? row.documentType}
+                    </Badge>
+                    <Badge tone={status.tone}>{status.label}</Badge>
+                    {row.reference ? (
+                      <span className="font-mono text-xs text-ink-400 tabular">
+                        {row.reference}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-ink-400">No reference yet</span>
+                    )}
+                  </>
+                }
+                title={row.title}
+                amount={row.grandTotal ? formatAmount(row.grandTotal) : undefined}
+                amountLabel={row.grandTotal ? row.currency : undefined}
+                meta={`${row.clientName} · ${row.projectName}`}
+                footer={`${row.preparedByName ?? 'Unassigned'} · ${
+                  row.submittedForApprovalAt
+                    ? `submitted ${relativeTime(row.submittedForApprovalAt)}`
+                    : `updated ${relativeTime(row.updatedAt)}`
+                }`}
+              />
+            )
+          })}
+        </RecordGrid>
       </div>
-      <Panel className="divide-y divide-ink-100">
-        {rows.map((row) => {
-          const status = DOCUMENT_STATUS[row.status] ?? {
-            label: row.status,
-            tone: 'neutral' as const,
-          }
-          return (
-            <Link
-              key={row.id}
-              href={`/technical/documents/${row.id}`}
-              className={`block px-4 py-3.5 transition-colors hover:bg-ink-50 sm:px-5 ${muted ? 'opacity-70' : ''}`}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge tone="neutral">
-                  {DOCUMENT_TYPE_LABELS[row.documentType] ?? row.documentType}
-                </Badge>
-                <Badge tone={status.tone}>{status.label}</Badge>
-                {row.reference ? (
-                  <span className="font-mono text-xs text-ink-400 tabular">{row.reference}</span>
-                ) : (
-                  <span className="text-xs text-ink-400">No reference yet</span>
-                )}
-              </div>
-
-              <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-2">
-                <p className="font-medium text-ink-900">{row.title}</p>
-                {row.grandTotal ? (
-                  <p className="text-sm font-medium text-ink-900 tabular">
-                    {row.currency} {formatAmount(row.grandTotal)}
-                  </p>
-                ) : null}
-              </div>
-
-              <p className="mt-0.5 text-sm text-ink-500">
-                {row.clientName} · {row.projectName}
-              </p>
-              <p className="mt-1.5 text-xs text-ink-400">
-                {row.preparedByName ? `${row.preparedByName} · ` : ''}
-                {row.submittedForApprovalAt
-                  ? `submitted ${relativeTime(row.submittedForApprovalAt)}`
-                  : `updated ${relativeTime(row.updatedAt)}`}
-              </p>
-            </Link>
-          )
-        })}
-      </Panel>
     </section>
   )
 }

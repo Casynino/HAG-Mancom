@@ -1,7 +1,17 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { sql } from 'drizzle-orm'
-import { Badge, EmptyState, Input, PageHeader, Panel, SectionBar, Select } from '@/components/ui'
+import {
+  Badge,
+  EmptyState,
+  Input,
+  PageHeader,
+  Panel,
+  RecordCard,
+  RecordGrid,
+  SectionBar,
+  Select,
+} from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -215,48 +225,38 @@ export default async function RepositoryPage({
           />
         </Panel>
       ) : (
-        <Panel className="divide-y divide-ink-100">
-          {rows.map((row) => {
+        <RecordGrid>
+          {rows.map((row, i) => {
             const statusMeta = DOCUMENT_STATUS[row.status ?? ''] ?? {
               label: row.status ?? '',
               tone: 'neutral' as const,
             }
             return (
-              <Link
+              <RecordCard
                 key={row.id ?? ''}
+                index={i}
                 href={`/technical/documents/${row.id}`}
-                className="block px-4 py-3.5 hover:bg-ink-50 sm:px-5"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge tone="neutral">
-                    {DOCUMENT_TYPE_LABELS[row.document_type ?? ''] ?? row.document_type}
-                  </Badge>
-                  <Badge tone={statusMeta.tone}>{statusMeta.label}</Badge>
-                  {row.reference ? (
-                    <span className="font-mono text-xs text-ink-400 tabular">{row.reference}</span>
-                  ) : null}
-                  {row.po_number ? (
-                    <span className="font-mono text-xs text-ink-400">PO {row.po_number}</span>
-                  ) : null}
-                </div>
-
-                <div className="mt-1.5 flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="font-medium text-ink-900">{row.title}</p>
-                  {row.grand_total ? (
-                    <p className="text-sm font-medium text-ink-900 tabular">
-                      {row.currency} {formatAmount(row.grand_total)}
-                    </p>
-                  ) : null}
-                </div>
-
-                <p className="mt-0.5 text-sm text-ink-500">
-                  {row.client_name} · {row.project_name}
-                </p>
-                <p className="mt-1 text-xs text-ink-400">{formatDate(row.document_date)}</p>
-              </Link>
+                reference={row.reference}
+                chips={
+                  <>
+                    <Badge tone="neutral">
+                      {DOCUMENT_TYPE_LABELS[row.document_type ?? ''] ?? row.document_type}
+                    </Badge>
+                    <Badge tone={statusMeta.tone}>{statusMeta.label}</Badge>
+                    {row.po_number ? (
+                      <span className="font-mono text-xs text-ink-400">PO {row.po_number}</span>
+                    ) : null}
+                  </>
+                }
+                title={row.title}
+                amount={row.grand_total ? formatAmount(row.grand_total) : undefined}
+                amountLabel={row.grand_total ? (row.currency ?? undefined) : undefined}
+                meta={`${row.client_name} · ${row.project_name}`}
+                footer={formatDate(row.document_date)}
+              />
             )
           })}
-        </Panel>
+        </RecordGrid>
       )}
 
       {pageCount > 1 ? (
