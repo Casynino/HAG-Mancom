@@ -142,6 +142,35 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(href + '/')
 }
 
+/** One row in the phone menu. Mirrors NavRow, in the light palette. */
+function MobileRow({
+  item,
+  active,
+  onNavigate,
+}: {
+  item: NavItem
+  active: boolean
+  onNavigate: () => void
+}) {
+  const Icon = ICONS[item.icon] ?? ClipboardList
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        'flex items-center gap-3 rounded-lg border px-3 py-3 text-sm transition-colors',
+        active
+          ? 'border-brand-600/40 bg-brand-600/10 font-medium text-brand-700'
+          : 'border-transparent text-ink-700 hover:bg-ink-50',
+      )}
+    >
+      <Icon className="size-4 shrink-0" aria-hidden="true" />
+      {item.label}
+    </Link>
+  )
+}
+
 export function AppNav({
   items,
   unread,
@@ -300,12 +329,30 @@ export function AppNav({
 
       {/* ---------------- Mobile top bar ---------------- */}
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-ink-200 bg-panel px-4 py-3 lg:hidden">
-        <div>
-          <p className="text-[10px] font-semibold tracking-[0.18em] text-brand-600 uppercase">
-            HA GROUP
-          </p>
-          <p className="text-sm font-semibold text-ink-900">AI Operations</p>
-        </div>
+        {/* The same identity the sidebar carries. It read "HA GROUP / AI
+            Operations" here and "MANCOM / Operations Platform" there, which is
+            two names for one product depending on which device you opened. */}
+        <Link href={home?.href ?? '/'} className="flex min-w-0 items-center gap-2.5">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-sidebar">
+            <Image
+              src="/brand/ha-group-logo-transparent.png"
+              alt=""
+              width={301}
+              height={254}
+              priority
+              className="h-5 w-auto"
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
+          </span>
+          <span className="min-w-0">
+            <span className="font-display block truncate text-sm font-bold tracking-wide text-ink-950">
+              MANCOM
+            </span>
+            <span className="block truncate text-[9px] tracking-[0.14em] text-ink-500 uppercase">
+              Operations Platform
+            </span>
+          </span>
+        </Link>
         <div className="flex items-center gap-1">
           <Link
             href="/notifications"
@@ -331,21 +378,71 @@ export function AppNav({
 
       {menuOpen ? (
         <div className="border-b border-ink-200 bg-panel lg:hidden">
-          <nav className="p-2" aria-label="All sections">
-            {items.map((item) => {
-              const Icon = ICONS[item.icon] ?? ClipboardList
+          {/* The same bands as the sidebar. A flat list of fifteen destinations
+              on a phone is a wall; grouped, it is four short reads. */}
+          <nav className="max-h-[70dvh] overflow-y-auto p-2" aria-label="All sections">
+            {home ? (
+              <div className="mb-3">
+                <MobileRow
+                  item={home}
+                  active={isActive(pathname, home.href)}
+                  onNavigate={() => setMenuOpen(false)}
+                />
+              </div>
+            ) : null}
+
+            {GROUP_ORDER.map((group) => {
+              const inGroup = items.filter((i) => i.group === group && i !== home)
+              if (inGroup.length === 0) return null
+              const GroupIcon = GROUP_ICONS[group]
+
               return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 rounded px-3 py-3 text-sm text-ink-700 hover:bg-ink-50"
-                >
-                  <Icon className="size-4" aria-hidden="true" />
-                  {item.label}
-                </Link>
+                <div key={group} className="mb-3">
+                  <p className="flex items-center gap-2 px-3 pb-1.5 text-[10px] font-semibold tracking-[0.16em] text-ink-500 uppercase">
+                    <GroupIcon className="size-3.5 shrink-0" aria-hidden="true" />
+                    {group}
+                  </p>
+                  <div className="ml-3 space-y-0.5 border-l border-ink-200 pl-2">
+                    {inGroup.map((item) => (
+                      <MobileRow
+                        key={item.href}
+                        item={item}
+                        active={isActive(pathname, item.href)}
+                        onNavigate={() => setMenuOpen(false)}
+                      />
+                    ))}
+                  </div>
+                </div>
               )
             })}
+
+            <div className="mb-1">
+              <p className="flex items-center gap-2 px-3 pb-1.5 text-[10px] font-semibold tracking-[0.16em] text-ink-500 uppercase">
+                <Bell className="size-3.5 shrink-0" aria-hidden="true" />
+                System
+              </p>
+              <div className="ml-3 space-y-0.5 border-l border-ink-200 pl-2">
+                <Link
+                  href="/notifications"
+                  onClick={() => setMenuOpen(false)}
+                  aria-current={pathname === '/notifications' ? 'page' : undefined}
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg border px-3 py-3 text-sm transition-colors',
+                    pathname === '/notifications'
+                      ? 'border-brand-600/40 bg-brand-600/10 font-medium text-brand-700'
+                      : 'border-transparent text-ink-700 hover:bg-ink-50',
+                  )}
+                >
+                  <Bell className="size-4 shrink-0" aria-hidden="true" />
+                  Notifications
+                  {unread > 0 ? (
+                    <span className="ml-auto rounded-full bg-brand-600 px-1.5 py-0.5 text-[11px] font-semibold text-white tabular">
+                      {unread > 99 ? '99+' : unread}
+                    </span>
+                  ) : null}
+                </Link>
+              </div>
+            </div>
           </nav>
           <div className="border-t border-ink-200 p-3">
             <p className="px-3 text-sm font-medium text-ink-900">{user.name}</p>

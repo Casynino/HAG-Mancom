@@ -23,6 +23,11 @@ export default async function SignInPage() {
        * the business, drawn rather than photographed, so it cannot be mistaken
        * for a site the company has worked on.
        */}
+      {/* A deep field behind everything, so the navy is not flat. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_75%_35%,#1b2a4a_0%,#141d33_45%,#0d1424_100%)]"
+      />
       <AfricaNetwork className="pointer-events-none absolute inset-0 size-full" />
       <span
         aria-hidden="true"
@@ -31,6 +36,17 @@ export default async function SignInPage() {
       <span
         aria-hidden="true"
         className="pointer-events-none absolute -right-40 -bottom-40 size-[32rem] rounded-full bg-live-500/15 blur-[120px]"
+      />
+      {/* A faint grid, the way a drawing is set out before anything is drawn on
+          it. It is the one nod to what the company actually does. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+          backgroundSize: '56px 56px',
+        }}
       />
       {/* Darkens the left, where the form is, and leaves the right to the globe. */}
       <span
@@ -76,7 +92,13 @@ export default async function SignInPage() {
          * third ground — three borders competing over a two-field form. The
          * form is bare now and this is the only surface.
          */}
-        <div className="rounded-2xl border border-white/12 bg-panel p-5 shadow-2xl sm:p-6">
+        {/*
+         * A lift of the navy, not a black box on top of it. `bg-panel` inverts
+         * with the theme and this page does not — the globe needs a dark ground
+         * in both — so a themed surface here produced two darks that did not
+         * belong to each other.
+         */}
+        <div className="rounded-2xl border border-white/12 bg-white/[0.055] p-5 shadow-2xl backdrop-blur-xl sm:p-6">
           <SignInForm />
         </div>
 

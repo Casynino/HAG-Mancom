@@ -167,7 +167,13 @@ export default function HomePage() {
           <p className="text-xs font-semibold tracking-[0.16em] text-ink-500 uppercase">
             Principals we represent
           </p>
-          <div className="flex items-center gap-10">
+          {/*
+           * Wraps and centres on a phone. Three marks at a fixed 40px gap on one
+           * unwrapping line pushed this band to 473px inside a 375px viewport,
+           * which gave the whole page a horizontal scrollbar — the kind of fault
+           * nobody reports because it reads as the page being "a bit odd".
+           */}
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-5 sm:gap-x-10">
             {PARTNER_MARKS.map((m) => (
               <Image
                 key={m.src}
@@ -175,7 +181,7 @@ export default function HomePage() {
                 alt={m.alt}
                 width={120}
                 height={44}
-                className="h-9 w-auto opacity-60 mix-blend-multiply grayscale transition hover:opacity-100 hover:grayscale-0 dark:mix-blend-normal"
+                className="h-8 w-auto max-w-[40vw] object-contain opacity-60 mix-blend-multiply grayscale transition hover:opacity-100 hover:grayscale-0 sm:h-9 dark:mix-blend-normal"
               />
             ))}
             <span className="font-display text-lg font-semibold text-ink-400">OPP</span>
