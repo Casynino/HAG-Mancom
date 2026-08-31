@@ -22,10 +22,17 @@ export default async function ClientsPage() {
         tradingName: clients.tradingName,
         tin: clients.tin,
         vrn: clients.vrn,
+        registrationNumber: clients.registrationNumber,
+        addressLine1: clients.addressLine1,
+        addressLine2: clients.addressLine2,
         city: clients.city,
+        region: clients.region,
+        postalAddress: clients.postalAddress,
+        country: clients.country,
         contactPerson: clients.contactPerson,
         contactPhone: clients.contactPhone,
         contactEmail: clients.contactEmail,
+        notes: clients.notes,
         status: clients.status,
         projectCount: sql<number>`(
           select count(*)::int from ${projects} where ${projects.clientId} = ${clients.id}

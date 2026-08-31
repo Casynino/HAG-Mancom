@@ -23,6 +23,7 @@ import {
   legalEntitySchema,
   numberingRuleSchema,
   roundingPolicySchema,
+  taxRuleSchema,
 } from '@/lib/validation/schemas'
 
 /**
@@ -304,6 +305,20 @@ async function insertDraft(
       return (r.rows[0] as { id: string }).id
     }
 
+    case 'tax_rules': {
+      const v = taxRuleSchema.safeParse(Object.fromEntries(formData))
+      if (!v.success) throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
+      const docType = v.data.documentType || null
+      const r = await db.execute(sql`
+        insert into public.tax_rules
+          (code, label, rate_percent, document_type, state, notes, created_by)
+        values (${v.data.code}, ${v.data.label}, ${v.data.ratePercent},
+                ${docType}::public.document_type, 'draft',
+                ${v.data.notes ?? null}, ${actor.id}::uuid)
+        returning id`)
+      return (r.rows[0] as { id: string }).id
+    }
+
     case 'rounding_policies': {
       const v = roundingPolicySchema.safeParse(Object.fromEntries(formData))
       if (!v.success) throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
@@ -396,5 +411,3 @@ export async function withdrawConfigAction(
     return actionError(err)
   }
 }
-
-export { TABLE_LABELS as CONFIG_TABLE_LABELS }

@@ -66,6 +66,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       show: hasPermission(actor.roles, 'client.manage'),
     },
     {
+      href: '/technical/deliveries',
+      label: 'Deliveries',
+      short: 'Deliver',
+      icon: 'truck',
+      show: hasPermission(actor.roles, 'delivery.sign'),
+    },
+    {
       href: '/compliance',
       label: 'Compliance',
       short: 'Comply',
@@ -92,6 +99,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       short: 'Settings',
       icon: 'sliders',
       show: hasPermission(actor.roles, 'config.manage'),
+    },
+    {
+      href: '/admin/assets',
+      label: 'Brand assets',
+      short: 'Brand',
+      icon: 'image',
+      // Also reachable by Directors, who are the only people who can upload
+      // their own signature.
+      show:
+        hasPermission(actor.roles, 'asset.manage') ||
+        hasPermission(actor.roles, 'asset.upload_own_signature'),
     },
     {
       href: '/admin/users',

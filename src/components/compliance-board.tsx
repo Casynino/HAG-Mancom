@@ -5,7 +5,11 @@ import { BellRing, FileCheck2, Plus } from 'lucide-react'
 import { Badge, Field, Input, Notice, Panel, PanelHeader, Select, Textarea } from '@/components/ui'
 import { errorsFor, FormResult, SubmitButton } from '@/components/form'
 import { COMPLIANCE_STATUS, formatDate } from '@/lib/display'
-import { recordComplianceAction, runComplianceRemindersAction } from '@/server/compliance-actions'
+import {
+  createComplianceTypeAction,
+  recordComplianceAction,
+  runComplianceRemindersAction,
+} from '@/server/compliance-actions'
 import type { ComplianceRow } from '@/server/compliance-actions'
 
 /**
@@ -32,7 +36,9 @@ export function ComplianceBoard({
     async () => runComplianceRemindersAction(),
     null,
   )
+  const [typeState, typeAction] = useActionState(createComplianceTypeAction, null)
   const [showForm, setShowForm] = useState(false)
+  const [showTypeForm, setShowTypeForm] = useState(false)
 
   const expired = rows.filter((r) => r.status === 'expired')
   const soon = rows.filter((r) => r.status === 'expiring_soon' || r.status === 'renewal_pending')
@@ -55,6 +61,17 @@ export function ComplianceBoard({
           </button>
         ) : null}
 
+        {canManage ? (
+          <button
+            type="button"
+            onClick={() => setShowTypeForm((v) => !v)}
+            className="tap inline-flex items-center gap-2 rounded border border-ink-300 bg-white px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
+          >
+            <Plus className="size-4" aria-hidden="true" />
+            {showTypeForm ? 'Close' : 'Add a certificate type'}
+          </button>
+        ) : null}
+
         <form action={reminderAction}>
           <SubmitButton variant="secondary" pendingLabel="Checking…">
             <BellRing className="size-4" aria-hidden="true" />
@@ -68,6 +85,65 @@ export function ComplianceBoard({
           Trading without these may breach contract terms or the law. Renew and record the new
           certificate.
         </Notice>
+      ) : null}
+
+      {showTypeForm && canManage ? (
+        <Panel>
+          <PanelHeader
+            title="New certificate type"
+            description="The kinds of certificate HA GROUP has to keep current — a licence, a registration, a tax clearance."
+          />
+          <form action={typeAction} className="space-y-4 p-4 sm:p-5" noValidate>
+            <FormResult state={typeState} />
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Code" htmlFor="code" required errors={errorsFor(typeState, 'code')}>
+                <Input id="code" name="code" required maxLength={40} placeholder="TIN" />
+              </Field>
+              <Field label="Label" htmlFor="label" required errors={errorsFor(typeState, 'label')}>
+                <Input
+                  id="label"
+                  name="label"
+                  required
+                  maxLength={160}
+                  placeholder="Taxpayer Identification Number"
+                />
+              </Field>
+              <Field label="Issuing authority" htmlFor="authority">
+                <Input id="authority" name="authority" maxLength={120} placeholder="TRA" />
+              </Field>
+              <Field
+                label="Normal validity (months)"
+                htmlFor="defaultValidityMonths"
+                hint="Leave blank if it does not expire on a fixed cycle."
+                errors={errorsFor(typeState, 'defaultValidityMonths')}
+              >
+                <Input
+                  id="defaultValidityMonths"
+                  name="defaultValidityMonths"
+                  type="number"
+                  min={1}
+                  max={240}
+                />
+              </Field>
+            </div>
+
+            <Field
+              label="Remind at"
+              htmlFor="reminderDays"
+              hint="Days before expiry, comma separated."
+              errors={errorsFor(typeState, 'reminderDays')}
+            >
+              <Input id="reminderDays" name="reminderDays" defaultValue="90,30,14,7,1,0" />
+            </Field>
+
+            <Field label="Description" htmlFor="description">
+              <Textarea id="description" name="description" rows={2} maxLength={1000} />
+            </Field>
+
+            <SubmitButton pendingLabel="Adding…">Add type</SubmitButton>
+          </form>
+        </Panel>
       ) : null}
 
       {showForm && canManage ? (

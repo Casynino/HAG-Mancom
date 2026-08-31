@@ -1,12 +1,12 @@
 'use client'
 
 import { useActionState, useMemo, useState } from 'react'
-import { FileText, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { FileText, PenLine, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { Badge, Field, Input, Notice, Panel, PanelHeader, Select, Textarea } from '@/components/ui'
 import { errorsFor, FormResult, SubmitButton } from '@/components/form'
 import { Decimal, formatAmount } from '@/lib/finance/decimal'
 import { saveDocumentAction } from '@/server/document-actions'
-import { draftScopeFromSubmissionAction } from '@/server/ai-actions'
+import { draftLetterAction, draftScopeFromSubmissionAction } from '@/server/ai-actions'
 
 /**
  * The document editor.
@@ -117,6 +117,8 @@ function previewTotals(
 
 export function DocumentEditor({
   documentId,
+  documentType,
+  clientId,
   submissionId,
   editable,
   currency,
@@ -129,6 +131,8 @@ export function DocumentEditor({
   aiAvailable,
 }: {
   documentId: string
+  documentType: string
+  clientId: string
   submissionId: string | null
   editable: boolean
   currency: string
@@ -151,6 +155,8 @@ export function DocumentEditor({
 }) {
   const [state, formAction] = useActionState(saveDocumentAction, null)
   const [aiState, aiAction] = useActionState(draftScopeFromSubmissionAction, null)
+  const [letterState, letterAction] = useActionState(draftLetterAction, null)
+  const [body, setBody] = useState(initial.bodyContent)
   const [lines, setLines] = useState<LineDraft[]>(
     initialLines.length > 0 ? initialLines : [emptyLine()],
   )
@@ -165,6 +171,10 @@ export function DocumentEditor({
   }
 
   const aiDraft = aiState?.ok ? aiState.data : null
+  const letterDraft = letterState?.ok ? letterState.data : null
+
+  // A letter carries prose instead of priced lines.
+  const isLetter = documentType === 'official_letter'
 
   return (
     <div className="space-y-5">
@@ -275,6 +285,105 @@ export function DocumentEditor({
       ) : null}
 
       {/* ---------------- The document ---------------- */}
+      {/* ---------------- AI letter drafting ---------------- */}
+      {editable && isLetter ? (
+        <Panel>
+          <PanelHeader
+            title="Draft this letter"
+            description="The assistant writes wording only. It is never given figures and never returns them."
+          />
+          <div className="space-y-3 p-4 sm:p-5">
+            <FormResult state={letterState} />
+
+            {!aiAvailable ? (
+              <Notice tone="neutral">
+                The AI assistant is not configured, so the letter has to be written by hand. Type it
+                in the Letter panel below.
+              </Notice>
+            ) : (
+              <form action={letterAction} className="space-y-3">
+                <input type="hidden" name="clientId" value={clientId} />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Field
+                    label="Subject"
+                    htmlFor="letter-subject"
+                    required
+                    errors={errorsFor(letterState, 'subject')}
+                  >
+                    <Input id="letter-subject" name="subject" required maxLength={200} />
+                  </Field>
+                  <Field label="Tone" htmlFor="letter-tone">
+                    <Select id="letter-tone" name="tone" defaultValue="neutral">
+                      <option value="neutral">Neutral</option>
+                      <option value="formal">Formal</option>
+                      <option value="firm">Firm</option>
+                      <option value="conciliatory">Conciliatory</option>
+                    </Select>
+                  </Field>
+                </div>
+                <Field
+                  label="What should it say?"
+                  htmlFor="letter-intent"
+                  hint="A sentence or two. The assistant turns it into a letter; you keep editorial control."
+                  errors={errorsFor(letterState, 'intent')}
+                >
+                  <Textarea id="letter-intent" name="intent" rows={3} required maxLength={4000} />
+                </Field>
+                <SubmitButton variant="secondary" pendingLabel="Drafting…">
+                  <PenLine className="size-4" aria-hidden="true" />
+                  Draft the letter
+                </SubmitButton>
+              </form>
+            )}
+
+            {letterDraft ? (
+              <div className="space-y-3 rounded border border-brand-200 bg-brand-50 p-3">
+                <div className="space-y-1 text-sm text-ink-900">
+                  <p className="font-medium">{letterDraft.subject}</p>
+                  <p>{letterDraft.salutation}</p>
+                  <p className="whitespace-pre-wrap">{letterDraft.body}</p>
+                  <p>{letterDraft.closing}</p>
+                </div>
+
+                {letterDraft.missing.length > 0 ? (
+                  <div>
+                    <p className="text-xs font-medium text-warn-700 uppercase">
+                      The assistant could not supply
+                    </p>
+                    <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm text-ink-700">
+                      {letterDraft.missing.map((m, i) => (
+                        <li key={i}>{m}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setBody(
+                      [
+                        letterDraft.salutation,
+                        '',
+                        letterDraft.body,
+                        '',
+                        letterDraft.closing,
+                      ].join('\n'),
+                    )
+                  }
+                  className="tap rounded border border-brand-600 bg-white px-3 text-sm font-medium text-brand-700 hover:bg-brand-50"
+                >
+                  Put this in the letter
+                </button>
+                <p className="text-xs text-ink-500">
+                  Nothing is saved until you save the document below.
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </Panel>
+      ) : null}
+
       <form action={formAction} className="space-y-5" noValidate>
         <input type="hidden" name="documentId" value={documentId} />
         <input
@@ -363,8 +472,35 @@ export function DocumentEditor({
           </fieldset>
         </Panel>
 
+        {/* ---------------- Letter body ---------------- */}
+        {isLetter ? (
+          <Panel>
+            <PanelHeader
+              title="Letter"
+              description="This is the text that will be printed under the letterhead."
+            />
+            <div className="space-y-3 p-4 sm:p-5">
+              <Field
+                label="Body"
+                htmlFor="bodyContent"
+                errors={errorsFor(state, 'bodyContent')}
+              >
+                <Textarea
+                  id="bodyContent"
+                  name="bodyContent"
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  rows={14}
+                  maxLength={20000}
+                  disabled={!editable}
+                />
+              </Field>
+            </div>
+          </Panel>
+        ) : null}
+
         {/* ---------------- Lines ---------------- */}
-        <Panel>
+        <Panel className={isLetter ? 'hidden' : undefined}>
           <PanelHeader
             title="Line items"
             description="Line totals are calculated, not typed. Quantity × unit price, less any discount."

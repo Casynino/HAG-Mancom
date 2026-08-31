@@ -18,6 +18,8 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   Stamp,
+  Truck,
+  Image as ImageIcon,
   Users,
   X,
   type LucideIcon,
@@ -46,6 +48,8 @@ const ICONS: Record<string, LucideIcon> = {
   file: FileText,
   search: Search,
   shieldcheck: ShieldCheck,
+  truck: Truck,
+  image: ImageIcon,
 }
 
 export interface NavItem {

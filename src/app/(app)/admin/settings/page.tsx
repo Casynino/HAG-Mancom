@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { sql } from 'drizzle-orm'
+import { ConfigDraftForm } from '@/components/config-draft-form'
 import { ConfigReview, type ConfigRecord } from '@/components/config-review'
 import { Notice, PageHeader } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
@@ -15,7 +16,7 @@ export const metadata: Metadata = { title: 'Company settings' }
  * renderer — it never needs to know the shape of ten different tables.
  */
 export default async function SettingsPage() {
-  const records = await pageContext(async (db, actor) => {
+  const { records, legalEntities } = await pageContext(async (db, actor) => {
     if (!hasPermission(actor.roles, 'config.manage')) {
       throw new AuthorizationError('Company settings are managed by Administrators.')
     }
@@ -80,7 +81,20 @@ export default async function SettingsPage() {
         u.table_name, u.summary
     `)
 
-    return result.rows as unknown as ConfigRecord[]
+    // Offered when adding a bank account, which must belong to an entity.
+    const entities = await db.execute(sql`
+      select id, name, state::text as state from public.legal_entities
+      where state in ('draft', 'pending_approval', 'approved')
+      order by state = 'approved' desc, name`)
+
+    return {
+      records: result.rows as unknown as ConfigRecord[],
+      legalEntities: entities.rows as unknown as Array<{
+        id: string
+        name: string
+        state: string
+      }>,
+    }
   })
 
   const drafts = records.filter((r) => r.state === 'draft' || r.state === 'pending_approval')
@@ -100,6 +114,8 @@ export default async function SettingsPage() {
           particular — so read the note on each before approving.
         </Notice>
       ) : null}
+
+      <ConfigDraftForm legalEntities={legalEntities} />
 
       <ConfigReview records={records} />
     </>

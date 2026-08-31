@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { desc, eq, inArray } from 'drizzle-orm'
-import { clients, documents, profiles, projects } from '@/db/schema'
+import { asc, desc, eq, inArray, sql } from 'drizzle-orm'
+import { clientPurchaseOrders, clients, documents, profiles, projects } from '@/db/schema'
+import { DocumentCreateForm } from '@/components/document-create-form'
 import { Badge, EmptyState, Notice, PageHeader, Panel } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
@@ -13,7 +14,8 @@ import { DOCUMENT_STATUS, DOCUMENT_TYPE_LABELS, relativeTime } from '@/lib/displ
 export const metadata: Metadata = { title: 'Documents' }
 
 export default async function DocumentsPage() {
-  const { rows, readiness, canCreate } = await pageContext(async (db, actor) => {
+  const { rows, readiness, canCreate, projectOptions, poOptions, currencies } =
+    await pageContext(async (db, actor) => {
     if (!hasPermission(actor.roles, 'document.view')) {
       throw new AuthorizationError('Documents are prepared by the Technical Office.')
     }
@@ -44,10 +46,50 @@ export default async function DocumentsPage() {
     // is never halfway through a quotation before learning it cannot be issued.
     const quotationReadiness = await checkConfigReadiness(db, 'quotation', 'TZS')
 
+    // What the "start a document" form needs to offer real choices rather than
+    // free text: live projects, the Purchase Orders the clients actually sent,
+    // and the currencies an approved rounding policy exists for.
+    const [projectRows, poRows, currencyRows] = await Promise.all([
+      db
+        .select({
+          id: projects.id,
+          name: projects.name,
+          reference: projects.reference,
+          clientName: clients.legalName,
+        })
+        .from(projects)
+        .innerJoin(clients, eq(clients.id, projects.clientId))
+        .where(inArray(projects.status, ['planning', 'active', 'on_hold']))
+        .orderBy(asc(clients.legalName), asc(projects.name)),
+
+      db
+        .select({
+          id: clientPurchaseOrders.id,
+          projectId: clientPurchaseOrders.projectId,
+          poNumber: clientPurchaseOrders.poNumber,
+        })
+        .from(clientPurchaseOrders)
+        .where(inArray(clientPurchaseOrders.status, ['open', 'partially_fulfilled']))
+        .orderBy(desc(clientPurchaseOrders.createdAt)),
+
+      db.execute(sql`
+        select distinct currency from public.rounding_policies
+        where state = 'approved' order by currency`),
+    ])
+
+    const approvedCurrencies = (currencyRows.rows as Array<{ currency: string }>).map(
+      (r) => r.currency,
+    )
+
     return {
       rows: result,
       readiness: quotationReadiness,
       canCreate: hasPermission(actor.roles, 'document.create'),
+      projectOptions: projectRows,
+      poOptions: poRows,
+      // Never an empty select: if no policy is approved yet the readiness
+      // notice above already explains why nothing can be issued.
+      currencies: approvedCurrencies.length > 0 ? approvedCurrencies : ['TZS'],
     }
   })
 
@@ -82,14 +124,21 @@ export default async function DocumentsPage() {
       ) : null}
 
       {canCreate && readiness.ready ? (
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href="/technical"
-            className="tap inline-flex items-center rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700"
-          >
-            Start from a site submission
-          </Link>
-        </div>
+        <>
+          <DocumentCreateForm
+            projects={projectOptions}
+            purchaseOrders={poOptions}
+            currencies={currencies}
+          />
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/technical"
+              className="tap inline-flex items-center rounded border border-ink-300 bg-white px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
+            >
+              Start a quotation from a site submission
+            </Link>
+          </div>
+        </>
       ) : null}
 
       {rows.length === 0 ? (

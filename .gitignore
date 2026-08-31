@@ -3,6 +3,7 @@ node_modules/
 .env
 .env.local
 .env.*.local
+.env.local.backup-*
 *.log
 .DS_Store
 .vercel
@@ -10,3 +11,8 @@ storage/
 coverage/
 next-env.d.ts
 *.tsbuildinfo
+
+# Licensed Monotype fonts. Drop the Century Gothic TTFs into assets/fonts/ on
+# each machine that needs them — they are licensed per seat, not redistributable.
+assets/fonts/*
+!assets/fonts/README.md

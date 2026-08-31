@@ -19,6 +19,12 @@ import { withExtension } from '@/lib/documents/naming'
  * under the caller's RLS session. A document they cannot see returns 404 rather
  * than 403, so this route cannot be used to discover which documents exist.
  */
+/**
+ * Rendering a PDF or DOCX is CPU-bound and can outrun the default serverless
+ * limit on a long document, so this route asks for more time than a page does.
+ */
+export const maxDuration = 60
+
 export async function GET(
   _request: Request,
   context: { params: Promise<{ id: string; kind: string }> },

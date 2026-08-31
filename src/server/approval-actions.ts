@@ -663,5 +663,3 @@ export async function previewDocumentAction(
     return actionError(err)
   }
 }
-
-export { withExtension }

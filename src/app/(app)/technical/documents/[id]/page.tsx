@@ -10,10 +10,12 @@ import {
   documentLines,
   documentVersions,
   documents,
+  emailMessages,
   profiles,
   projects,
 } from '@/db/schema'
 import { DocumentEditor, type LineDraft } from '@/components/document-editor'
+import { DocumentEmails } from '@/components/document-emails'
 import { DocumentWorkflow } from '@/components/document-workflow'
 import { Badge, DescriptionList, Notice, PageHeader, Panel, PanelHeader } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
@@ -104,8 +106,26 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
       configError = err instanceof Error ? err.message : 'Company settings are incomplete.'
     }
 
+    // Every send attempt against this document, newest first.
+    const emails = await db
+      .select({
+        id: emailMessages.id,
+        subject: emailMessages.subject,
+        toAddresses: emailMessages.toAddresses,
+        status: emailMessages.status,
+        provider: emailMessages.provider,
+        failureReason: emailMessages.failureReason,
+        attemptCount: emailMessages.attemptCount,
+        queuedAt: emailMessages.queuedAt,
+        sentAt: emailMessages.sentAt,
+      })
+      .from(emailMessages)
+      .where(eq(emailMessages.documentId, id))
+      .orderBy(desc(emailMessages.queuedAt))
+
     return {
       ...row,
+      emails,
       lines,
       charges,
       events,
@@ -207,6 +227,8 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
           submissionId={doc.sourceSubmissionId}
           editable={editable}
           currency={doc.currency}
+          documentType={doc.documentType}
+          clientId={doc.clientId}
           decimalPlaces={data.config.rounding.decimalPlaces}
           taxLabel={data.config.tax?.label ?? null}
           taxRatePercent={data.config.tax?.ratePercent ?? null}
@@ -285,6 +307,15 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
         canSubmit={data.canSubmit && editable}
         canSend={data.canSend}
         canIssue={data.canIssue}
+      />
+
+      <DocumentEmails
+        messages={data.emails.map((m) => ({
+          ...m,
+          queuedAt: m.queuedAt.toISOString(),
+          sentAt: m.sentAt?.toISOString() ?? null,
+        }))}
+        canSend={data.canSend}
       />
 
       {/* ---------------- Versions ---------------- */}

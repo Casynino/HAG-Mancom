@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { and, asc, eq, isNull } from 'drizzle-orm'
 import {
   clients,
+  documents,
   engineerSubmissions,
   profiles,
   projects,
@@ -13,10 +14,12 @@ import {
 } from '@/db/schema'
 import { AttachmentManager } from '@/components/attachment-manager'
 import { ReviewActions } from '@/components/review-actions'
+import { SubmissionQuotation } from '@/components/submission-quotation'
 import { Badge, DescriptionList, Notice, PageHeader, Panel, PanelHeader } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
+import { checkConfigReadiness } from '@/lib/finance/config'
 import {
   formatDate,
   formatDateTime,
@@ -95,12 +98,31 @@ export default async function ReviewSubmissionPage({
         .limit(500),
     ])
 
+    // Documents already drafted from this visit, and whether the settings a
+    // quotation depends on have been approved yet.
+    const [derivedDocuments, readiness] = await Promise.all([
+      db
+        .select({
+          id: documents.id,
+          reference: documents.reference,
+          documentType: documents.documentType,
+          status: documents.status,
+        })
+        .from(documents)
+        .where(eq(documents.sourceSubmissionId, id))
+        .orderBy(asc(documents.createdAt)),
+      checkConfigReadiness(db, 'quotation', 'TZS'),
+    ])
+
     return {
       ...submission,
       measurements,
       attachments,
       events,
       allProjects,
+      derivedDocuments,
+      readiness,
+      canCreateDocument: hasPermission(actor.roles, 'document.create'),
       canReview: hasPermission(actor.roles, 'submission.review'),
       canRelink: hasPermission(actor.roles, 'project.manage'),
       canCancel: hasPermission(actor.roles, 'submission.cancel'),
@@ -225,6 +247,15 @@ export default async function ReviewSubmissionPage({
           canCancel={data.canCancel}
         />
       ) : null}
+
+      <SubmissionQuotation
+        submissionId={s.id}
+        status={s.status}
+        existing={data.derivedDocuments}
+        canCreate={data.canCreateDocument}
+        configReady={data.readiness.ready}
+        configMissing={data.readiness.missing}
+      />
 
       <Panel>
         <PanelHeader title="History" />

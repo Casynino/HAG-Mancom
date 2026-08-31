@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState, useState } from 'react'
 import { Plus, UserMinus, UserPlus } from 'lucide-react'
 import {
@@ -174,7 +175,12 @@ export function ProjectManager({
                 <div className="flex flex-wrap items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-medium text-ink-900">{p.name}</p>
+                      <Link
+                        href={`/technical/projects/${p.id}`}
+                        className="font-medium text-brand-700 hover:underline"
+                      >
+                        {p.name}
+                      </Link>
                       <Badge tone={STATUS_TONE[p.status] ?? 'neutral'}>
                         {p.status.replace(/_/g, ' ')}
                       </Badge>

@@ -288,6 +288,17 @@ export const chargeRuleSchema = z.object({
   notes: optionalText(2000),
 })
 
+export const taxRuleSchema = z.object({
+  code: requiredText('Code', 1, 30).toUpperCase(),
+  label: requiredText('Label', 1, 120),
+  ratePercent: z.coerce
+    .number()
+    .min(0, 'A tax rate cannot be negative.')
+    .max(100, 'A tax rate cannot exceed 100%.'),
+  documentType: z.string().optional(),
+  notes: optionalText(2000),
+})
+
 export const roundingPolicySchema = z.object({
   scope: trimmed(60).default('default'),
   currency: trimmed(3).min(3, 'Use a three-letter currency code.'),
