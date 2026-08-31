@@ -1296,49 +1296,70 @@ export function RecordCard({
   index?: number
 }) {
   const bar = accent
-    ? { warn: 'bg-warn-600', risk: 'bg-risk-600', ok: 'bg-ok-600', brand: 'bg-brand-600' }[accent]
+    ? {
+        warn: 'from-warn-600 to-warn-600/40',
+        risk: 'from-risk-600 to-risk-600/40',
+        ok: 'from-ok-600 to-ok-600/40',
+        brand: 'from-brand-600 to-brand-600/40',
+      }[accent]
     : null
 
   return (
     <Link
       href={href}
-      className="rise group relative flex flex-col overflow-hidden rounded-xl border border-ink-200 bg-panel p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg sm:p-5"
+      className="rise group relative flex flex-col overflow-hidden rounded-xl border border-ink-200 bg-panel transition-all duration-200 hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg"
       style={index === undefined ? undefined : ({ '--i': index } as CSSProperties)}
     >
       {bar ? (
-        <span className={cn('absolute inset-y-0 left-0 w-1', bar)} aria-hidden="true" />
+        <span
+          className={cn('absolute inset-y-0 left-0 w-1 bg-gradient-to-b', bar)}
+          aria-hidden="true"
+        />
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-2">
-        {chips}
-        {reference ? (
-          <span className="font-mono text-xs text-ink-400 tabular">{reference}</span>
-        ) : null}
-      </div>
+      <div className="flex flex-1 flex-col gap-2.5 p-4 sm:p-5">
+        {/* Chips and the reference share one line. The reference is the thing
+            somebody reads a document back by, so it sits at the end of that
+            line where the eye already is, not buried under the title. */}
+        <div className="flex flex-wrap items-center gap-2">
+          {chips}
+          {reference ? (
+            <span className="ml-auto font-mono text-xs text-ink-400 tabular">{reference}</span>
+          ) : null}
+        </div>
 
-      <div className="mt-2.5 flex items-start justify-between gap-4">
-        <p className="font-display min-w-0 text-[15px] leading-snug font-semibold text-ink-950">
-          {title}
-        </p>
+        <p className="font-display text-[15px] leading-snug font-semibold text-ink-950">{title}</p>
+
+        {/*
+         * The amount, if there is one, on its own line under the title rather
+         * than crushed into a column beside it. Currency reads as a prefix the
+         * way it is spoken and the way it prints on the document — "TZS
+         * 51,186,468.33" — not stacked beneath the figure, where it looked like
+         * something had gone wrong with the layout.
+         */}
         {amount ? (
-          <span className="shrink-0 text-right">
-            <span className="font-display block text-base font-bold text-ink-950 tabular">
-              {amount}
-            </span>
+          <p className="font-display flex items-baseline gap-1.5 tracking-tight tabular">
             {amountLabel ? (
-              <span className="block text-[10px] tracking-[0.1em] text-ink-400 uppercase">
-                {amountLabel}
-              </span>
+              <span className="text-xs font-semibold text-ink-500">{amountLabel}</span>
             ) : null}
-          </span>
+            <span className="text-xl font-bold text-ink-950">{amount}</span>
+          </p>
         ) : null}
+
+        {meta ? <p className="text-sm leading-relaxed text-ink-500">{meta}</p> : null}
+        {note ? <div>{note}</div> : null}
       </div>
 
-      {meta ? <p className="mt-1 text-sm leading-relaxed text-ink-500">{meta}</p> : null}
-      {note ? <div className="mt-2.5">{note}</div> : null}
-
+      {/* Pinned to the bottom edge so a short card and a tall one still line up
+          along the same rule, instead of leaving a hole in the middle. */}
       {footer ? (
-        <p className="mt-3 border-t border-ink-100 pt-2.5 text-xs text-ink-400">{footer}</p>
+        <div className="flex items-center justify-between gap-3 border-t border-ink-100 px-4 py-2.5 sm:px-5">
+          <span className="truncate text-xs text-ink-400">{footer}</span>
+          <ChevronRight
+            className="size-4 shrink-0 text-ink-300 transition-transform group-hover:translate-x-0.5"
+            aria-hidden="true"
+          />
+        </div>
       ) : null}
     </Link>
   )

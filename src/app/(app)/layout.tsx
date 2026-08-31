@@ -81,8 +81,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         show: hasPermission(actor.roles, 'submission.review'),
       },
       {
+        /*
+         * "Approvals", not "Director Portal". This entry only ever appears for
+         * somebody holding the director role — the `show` below says so — and
+         * naming it after the person reading it is labelling your own office
+         * door from the inside. The Dashboard's desk grid still calls it the
+         * Director Portal, because there a Technical Officer is looking at
+         * whose desk their document has gone to.
+         */
         href: '/approvals',
-        label: 'Director Portal',
+        label: 'Approvals',
         short: 'Approve',
         icon: 'stamp',
         group: 'Operations',
@@ -179,6 +187,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         icon: 'users',
         group: 'Administration',
         show: hasPermission(actor.roles, 'user.manage'),
+      },
+      {
+        // Everybody has one, whatever their role — it is the only page in the
+        // platform about the person rather than the company's work.
+        href: '/profile',
+        label: 'My profile',
+        short: 'Me',
+        icon: 'users',
+        group: 'Administration',
+        show: true,
       },
       {
         href: '/admin/audit',

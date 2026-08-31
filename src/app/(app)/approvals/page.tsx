@@ -1,8 +1,16 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { and, asc, eq, gte, inArray, isNull, sql } from 'drizzle-orm'
-import { clients, companyAssets, documents, profiles, projects } from '@/db/schema'
-import { CheckCircle2, PenLine, Stamp, Wallet } from 'lucide-react'
+import {
+  approvalPolicies,
+  clients,
+  companyAssets,
+  documents,
+  profiles,
+  projects,
+} from '@/db/schema'
+import { ApprovalDecision } from '@/components/approval-decision'
+import { CheckCircle2, FileText, PenLine, Stamp, Wallet } from 'lucide-react'
 import {
   Badge,
   EmptyState,
@@ -13,7 +21,7 @@ import {
   SectionBar,
 } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
-import { hasPermission } from '@/lib/authz/roles'
+import { canApplySignature, canApplyStamp, hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
 import { Decimal, formatAmount } from '@/lib/finance/decimal'
 import { DOCUMENT_TYPE_LABELS, relativeTime } from '@/lib/display'
@@ -35,58 +43,85 @@ export default async function ApprovalsPage() {
 
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
 
-    const [rows, approvedThisMonth, pendingValue, ownSignature] = await Promise.all([
-      db
-        .select({
-          id: documents.id,
-          reference: documents.reference,
-          documentType: documents.documentType,
-          title: documents.title,
-          currency: documents.currency,
-          grandTotal: documents.grandTotal,
-          submittedForApprovalAt: documents.submittedForApprovalAt,
-          clientName: clients.legalName,
-          projectName: projects.name,
-          submittedByName: profiles.fullName,
-        })
-        .from(documents)
-        .innerJoin(clients, eq(clients.id, documents.clientId))
-        .innerJoin(projects, eq(projects.id, documents.projectId))
-        .leftJoin(profiles, eq(profiles.id, documents.submittedBy))
-        .where(inArray(documents.status, ['pending_approval']))
-        .orderBy(asc(documents.submittedForApprovalAt))
-        .limit(100),
+    const [rows, approvedThisMonth, pendingValue, ownSignature, policies, stamp] =
+      await Promise.all([
+        db
+          .select({
+            id: documents.id,
+            reference: documents.reference,
+            documentType: documents.documentType,
+            title: documents.title,
+            currency: documents.currency,
+            grandTotal: documents.grandTotal,
+            submittedForApprovalAt: documents.submittedForApprovalAt,
+            clientName: clients.legalName,
+            projectName: projects.name,
+            submittedByName: profiles.fullName,
+          })
+          .from(documents)
+          .innerJoin(clients, eq(clients.id, documents.clientId))
+          .innerJoin(projects, eq(projects.id, documents.projectId))
+          .leftJoin(profiles, eq(profiles.id, documents.submittedBy))
+          .where(inArray(documents.status, ['pending_approval']))
+          .orderBy(asc(documents.submittedForApprovalAt))
+          .limit(100),
 
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(documents)
-        .where(and(eq(documents.approvedBy, actor.id), gte(documents.approvedAt, monthStart))),
+        db
+          .select({ count: sql<number>`count(*)::int` })
+          .from(documents)
+          .where(and(eq(documents.approvedBy, actor.id), gte(documents.approvedAt, monthStart))),
 
-      db
-        .select({ total: sql<string>`coalesce(sum(${documents.grandTotal}), 0)::text` })
-        .from(documents)
-        .where(eq(documents.status, 'pending_approval')),
+        db
+          .select({ total: sql<string>`coalesce(sum(${documents.grandTotal}), 0)::text` })
+          .from(documents)
+          .where(eq(documents.status, 'pending_approval')),
 
-      // A signature belongs to the Director it is for; nobody can supply one on
-      // their behalf, so this checks for *theirs*, not merely any signature.
-      db
-        .select({ id: companyAssets.id })
-        .from(companyAssets)
-        .where(
-          and(
-            eq(companyAssets.kind, 'signature'),
-            eq(companyAssets.ownerUserId, actor.id),
-            eq(companyAssets.state, 'approved'),
-          ),
-        )
-        .limit(1),
-    ])
+        // A signature belongs to the Director it is for; nobody can supply one on
+        // their behalf, so this checks for *theirs*, not merely any signature.
+        db
+          .select({ id: companyAssets.id })
+          .from(companyAssets)
+          .where(
+            and(
+              eq(companyAssets.kind, 'signature'),
+              eq(companyAssets.ownerUserId, actor.id),
+              eq(companyAssets.state, 'approved'),
+            ),
+          )
+          .limit(1),
+
+        db
+          .select({
+            documentType: approvalPolicies.documentType,
+            requiresSignature: approvalPolicies.requiresSignature,
+            requiresStamp: approvalPolicies.requiresStamp,
+          })
+          .from(approvalPolicies)
+          .where(eq(approvalPolicies.state, 'approved')),
+
+        db
+          .select({ id: companyAssets.id })
+          .from(companyAssets)
+          .where(and(eq(companyAssets.kind, 'stamp'), eq(companyAssets.state, 'approved')))
+          .limit(1),
+      ])
 
     return {
       rows,
       approvedThisMonth: approvedThisMonth[0]?.count ?? 0,
       pendingValue: pendingValue[0]?.total ?? '0',
       hasSignature: ownSignature.length > 0,
+      hasStamp: stamp.length > 0,
+      maySign: canApplySignature(actor.roles),
+      mayStamp: canApplyStamp(actor.roles),
+      // Keyed by document type so each card can be told what its own approval
+      // actually requires, rather than guessing or hiding the controls.
+      policyByType: Object.fromEntries(
+        policies.map((pol) => [
+          pol.documentType,
+          { requiresSignature: pol.requiresSignature, requiresStamp: pol.requiresStamp },
+        ]),
+      ) as Record<string, { requiresSignature: boolean; requiresStamp: boolean } | undefined>,
     }
   })
 
@@ -169,39 +204,72 @@ export default async function ApprovalsPage() {
           />
         </Panel>
       ) : (
-        <Panel id="queue" className="scroll-mt-24 divide-y divide-ink-100">
-          {rows.map((row) => (
-            <Link
-              key={row.id}
-              href={`/approvals/${row.id}`}
-              className="block px-4 py-4 transition-colors hover:bg-ink-50 sm:px-5"
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge tone="warn">
-                  {DOCUMENT_TYPE_LABELS[row.documentType] ?? row.documentType}
-                </Badge>
-                {row.reference ? (
-                  <span className="font-mono text-xs text-ink-400 tabular">{row.reference}</span>
-                ) : null}
-              </div>
+        <div id="queue" className="scroll-mt-24 space-y-4">
+          {rows.map((row, i) => {
+            const policy = data.policyByType[row.documentType]
+            return (
+              <Panel key={row.id} className="overflow-hidden">
+                <div className="p-4 sm:p-5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge tone="warn">
+                      {DOCUMENT_TYPE_LABELS[row.documentType] ?? row.documentType}
+                    </Badge>
+                    {row.reference ? (
+                      <span className="font-mono text-xs text-ink-400 tabular">
+                        {row.reference}
+                      </span>
+                    ) : null}
+                    <Link
+                      href={`/approvals/${row.id}`}
+                      className="ml-auto inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline"
+                    >
+                      <FileText className="size-4" aria-hidden="true" />
+                      Read it in full
+                    </Link>
+                  </div>
 
-              <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
-                <p className="text-base font-medium text-ink-900">{row.title}</p>
-                {row.grandTotal ? (
-                  <p className="text-base font-semibold text-ink-900 tabular">
-                    {row.currency} {formatAmount(row.grandTotal)}
+                  <div className="mt-2.5 flex flex-wrap items-baseline justify-between gap-3">
+                    <p className="font-display text-base font-semibold text-ink-950">{row.title}</p>
+                    {row.grandTotal ? (
+                      <p className="font-display flex items-baseline gap-1.5 tabular">
+                        <span className="text-xs font-semibold text-ink-500">{row.currency}</span>
+                        <span className="text-xl font-bold text-ink-950">
+                          {formatAmount(row.grandTotal)}
+                        </span>
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <p className="mt-1 text-sm text-ink-600">{row.clientName}</p>
+                  <p className="mt-1 text-xs text-ink-400">
+                    {row.projectName} · from {row.submittedByName ?? 'the Technical Office'} ·{' '}
+                    {relativeTime(row.submittedForApprovalAt)}
                   </p>
-                ) : null}
-              </div>
+                </div>
 
-              <p className="mt-0.5 text-sm text-ink-600">{row.clientName}</p>
-              <p className="mt-1.5 text-xs text-ink-400">
-                {row.projectName} · from {row.submittedByName ?? 'the Technical Office'} ·{' '}
-                {relativeTime(row.submittedForApprovalAt)}
-              </p>
-            </Link>
-          ))}
-        </Panel>
+                {/*
+                 * The decision, on the card. A Director should be able to clear
+                 * three straightforward letters without opening three pages.
+                 * It is the same component the detail page uses, so the
+                 * signature and stamp rules cannot drift between the two — and
+                 * the real enforcement is a database trigger either way.
+                 */}
+                <div className="border-t border-ink-200 bg-ink-50/60 p-4 sm:p-5">
+                  <ApprovalDecision
+                    compact
+                    documentId={row.id}
+                    requiresSignature={policy?.requiresSignature ?? false}
+                    requiresStamp={policy?.requiresStamp ?? false}
+                    maySign={data.maySign}
+                    mayStamp={data.mayStamp}
+                    hasOwnSignature={data.hasSignature}
+                    hasStamp={data.hasStamp}
+                  />
+                </div>
+              </Panel>
+            )
+          })}
+        </div>
       )}
     </>
   )

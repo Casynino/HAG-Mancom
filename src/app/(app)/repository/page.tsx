@@ -236,6 +236,13 @@ export default async function RepositoryPage({
                 key={row.id ?? ''}
                 index={i}
                 href={`/technical/documents/${row.id}`}
+                accent={
+                  row.status === 'pending_approval' || row.status === 'pending_review'
+                    ? 'warn'
+                    : row.status === 'approved' || row.status === 'issued'
+                      ? 'ok'
+                      : undefined
+                }
                 reference={row.reference}
                 chips={
                   <>

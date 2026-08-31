@@ -26,6 +26,7 @@ export function ApprovalDecision({
   mayStamp,
   hasOwnSignature,
   hasStamp,
+  compact,
 }: {
   documentId: string
   requiresSignature: boolean
@@ -34,6 +35,14 @@ export function ApprovalDecision({
   mayStamp: boolean
   hasOwnSignature: boolean
   hasStamp: boolean
+  /**
+   * Drop the surrounding panel and heading so the same control can sit inside a
+   * card in the approval queue. A Director should be able to clear a queue of
+   * three straightforward letters without opening three pages — and it is the
+   * same component, so the signature and stamp rules cannot drift between the
+   * two places it appears.
+   */
+  compact?: boolean
 }) {
   const [state, formAction] = useActionState(decideDocumentAction, null)
   const [mode, setMode] = useState<'none' | 'reject' | 'changes'>('none')
@@ -41,14 +50,9 @@ export function ApprovalDecision({
   const signatureBlocked = requiresSignature && (!maySign || !hasOwnSignature)
   const stampBlocked = requiresStamp && (!mayStamp || !hasStamp)
 
-  return (
-    <Panel>
-      <PanelHeader
-        title="Your decision"
-        description="Approving locks this version and generates the final document."
-      />
-
-      <div className="space-y-4 p-4 sm:p-5">
+  const body = (
+    <>
+      <div className={compact ? 'space-y-3' : 'space-y-4 p-4 sm:p-5'}>
         <FormResult state={state} />
 
         {signatureBlocked ? (
@@ -196,11 +200,25 @@ export function ApprovalDecision({
           </form>
         ) : null}
 
-        <p className="text-xs text-ink-400">
-          Approving preserves the unsigned version and creates a final, locked version with a
-          content hash. Corrections after approval require a new revision.
-        </p>
+        {compact ? null : (
+          <p className="text-xs text-ink-400">
+            Approving preserves the unsigned version and creates a final, locked version with a
+            content hash. Corrections after approval require a new revision.
+          </p>
+        )}
       </div>
+    </>
+  )
+
+  if (compact) return body
+
+  return (
+    <Panel>
+      <PanelHeader
+        title="Your decision"
+        description="Approving locks this version and generates the final document."
+      />
+      {body}
     </Panel>
   )
 }

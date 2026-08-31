@@ -255,7 +255,10 @@ export function AppNav({
           {/* The person, as a card. An initial in a disc is faster to recognise
               across a desk than a name in the same weight as everything else,
               and the role beneath it answers "why can I not see that page". */}
-          <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2.5">
+          <Link
+            href="/profile"
+            className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2.5 transition-colors hover:bg-white/[0.08]"
+          >
             <span className="font-display flex size-9 shrink-0 items-center justify-center rounded-full bg-live-400/20 text-sm font-bold text-live-300">
               {user.name.trim().charAt(0).toUpperCase()}
             </span>
@@ -263,7 +266,7 @@ export function AppNav({
               <span className="block truncate text-sm font-medium text-white">{user.name}</span>
               <span className="block truncate text-xs text-white/45">{user.roles.join(' · ')}</span>
             </span>
-          </div>
+          </Link>
 
           <form action={signOutAction} className="mt-2">
             <button
