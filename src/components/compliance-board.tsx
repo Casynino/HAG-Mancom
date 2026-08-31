@@ -65,7 +65,7 @@ export function ComplianceBoard({
           <button
             type="button"
             onClick={() => setShowTypeForm((v) => !v)}
-            className="tap inline-flex items-center gap-2 rounded border border-ink-300 bg-white px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
+            className="tap inline-flex items-center gap-2 rounded border border-ink-300 bg-panel px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
           >
             <Plus className="size-4" aria-hidden="true" />
             {showTypeForm ? 'Close' : 'Add a certificate type'}
@@ -210,7 +210,7 @@ export function ComplianceBoard({
                   name="certificate"
                   type="file"
                   accept="application/pdf,image/jpeg,image/png"
-                  className="tap w-full rounded border border-ink-300 bg-white px-3 text-sm"
+                  className="tap w-full rounded border border-ink-300 bg-panel px-3 text-sm"
                 />
               </Field>
             </div>

@@ -20,7 +20,7 @@ const BUTTON_BASE =
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800',
   secondary:
-    'bg-white text-ink-800 border border-ink-300 hover:bg-ink-50 active:bg-ink-100',
+    'bg-panel text-ink-800 border border-ink-300 hover:bg-ink-50 active:bg-ink-100',
   ghost: 'text-ink-600 hover:bg-ink-100 hover:text-ink-900',
   danger: 'bg-risk-600 text-white hover:bg-risk-700',
 }
@@ -50,7 +50,7 @@ export function Button({
 /* -------------------------------------------------------------------------- */
 
 export function Panel({ className, ...props }: ComponentProps<'div'>) {
-  return <div className={cn('rounded border border-ink-200 bg-white', className)} {...props} />
+  return <div className={cn('rounded border border-ink-200 bg-panel', className)} {...props} />
 }
 
 export function PanelHeader({
@@ -78,7 +78,7 @@ export function PanelHeader({
 /* -------------------------------------------------------------------------- */
 
 const CONTROL =
-  'w-full rounded border border-ink-300 bg-white px-3 text-ink-900 placeholder:text-ink-400 ' +
+  'w-full rounded border border-ink-300 bg-panel px-3 text-ink-900 placeholder:text-ink-400 ' +
   'focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600 ' +
   'disabled:bg-ink-50 disabled:text-ink-500 aria-[invalid=true]:border-risk-600'
 

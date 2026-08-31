@@ -148,7 +148,7 @@ export function ApprovalDecision({
           <button
             type="button"
             onClick={() => setMode(mode === 'changes' ? 'none' : 'changes')}
-            className="tap-lg flex items-center justify-center gap-2 rounded border border-ink-300 bg-white px-3 text-sm font-medium text-ink-800 hover:bg-ink-50"
+            className="tap-lg flex items-center justify-center gap-2 rounded border border-ink-300 bg-panel px-3 text-sm font-medium text-ink-800 hover:bg-ink-50"
           >
             <CornerUpLeft className="size-4" aria-hidden="true" />
             Request a correction
@@ -156,7 +156,7 @@ export function ApprovalDecision({
           <button
             type="button"
             onClick={() => setMode(mode === 'reject' ? 'none' : 'reject')}
-            className="tap-lg flex items-center justify-center gap-2 rounded border border-risk-600/30 bg-white px-3 text-sm font-medium text-risk-700 hover:bg-risk-50"
+            className="tap-lg flex items-center justify-center gap-2 rounded border border-risk-600/30 bg-panel px-3 text-sm font-medium text-risk-700 hover:bg-risk-50"
           >
             <X className="size-4" aria-hidden="true" />
             Reject

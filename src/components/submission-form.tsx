@@ -208,7 +208,7 @@ export function SubmissionForm({
               type="button"
               onClick={captureLocation}
               disabled={gpsState === 'locating'}
-              className="tap flex w-full items-center justify-center gap-2 rounded border border-ink-300 bg-white px-4 text-sm font-medium text-ink-800 hover:bg-ink-50 disabled:opacity-50"
+              className="tap flex w-full items-center justify-center gap-2 rounded border border-ink-300 bg-panel px-4 text-sm font-medium text-ink-800 hover:bg-ink-50 disabled:opacity-50"
             >
               <MapPin className="size-4" aria-hidden="true" />
               {gpsState === 'locating' ? 'Getting location…' : 'Use my current location'}

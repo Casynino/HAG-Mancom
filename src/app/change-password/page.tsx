@@ -4,7 +4,8 @@ import { Notice } from '@/components/ui'
 import { getActor } from '@/lib/authz/guard'
 import { ChangePasswordForm } from './change-password-form'
 
-export const metadata: Metadata = { title: 'Change password' }
+export const metadata: Metadata = {
+  robots: { index: false, follow: false }, title: 'Change password' }
 
 /**
  * Reachable while `mustChangePassword` is set, which is exactly when

@@ -199,7 +199,7 @@ export function ProjectManager({
                   <button
                     type="button"
                     onClick={() => setExpanded(isOpen ? null : p.id)}
-                    className="tap flex items-center gap-1.5 rounded border border-ink-300 bg-white px-3 text-sm text-ink-700 hover:bg-ink-50"
+                    className="tap flex items-center gap-1.5 rounded border border-ink-300 bg-panel px-3 text-sm text-ink-700 hover:bg-ink-50"
                     aria-expanded={isOpen}
                   >
                     <UserPlus className="size-4" aria-hidden="true" />

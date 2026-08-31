@@ -124,7 +124,7 @@ export default async function DashboardPage() {
           <Link
             key={t.label}
             href={t.href}
-            className="rounded border border-ink-200 bg-white p-4 transition-colors hover:border-brand-300 hover:bg-brand-50"
+            className="rounded border border-ink-200 bg-panel p-4 transition-colors hover:border-brand-300 hover:bg-brand-50"
           >
             <p className="text-2xl font-semibold text-ink-900 tabular">{t.value}</p>
             <p className="mt-0.5 text-xs text-ink-500">{t.label}</p>

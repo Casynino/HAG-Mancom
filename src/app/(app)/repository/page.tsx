@@ -187,7 +187,7 @@ export default async function RepositoryPage({
             {q || documentType || status || from || to ? (
               <Link
                 href="/repository"
-                className="tap inline-flex items-center rounded border border-ink-300 bg-white px-4 text-sm text-ink-700 hover:bg-ink-50"
+                className="tap inline-flex items-center rounded border border-ink-300 bg-panel px-4 text-sm text-ink-700 hover:bg-ink-50"
               >
                 Clear
               </Link>
@@ -253,7 +253,7 @@ export default async function RepositoryPage({
           {page > 1 ? (
             <Link
               href={buildHref(page - 1)}
-              className="tap inline-flex items-center rounded border border-ink-300 bg-white px-4 text-sm text-ink-700 hover:bg-ink-50"
+              className="tap inline-flex items-center rounded border border-ink-300 bg-panel px-4 text-sm text-ink-700 hover:bg-ink-50"
             >
               ← Previous
             </Link>
@@ -266,7 +266,7 @@ export default async function RepositoryPage({
           {page < pageCount ? (
             <Link
               href={buildHref(page + 1)}
-              className="tap inline-flex items-center rounded border border-ink-300 bg-white px-4 text-sm text-ink-700 hover:bg-ink-50"
+              className="tap inline-flex items-center rounded border border-ink-300 bg-panel px-4 text-sm text-ink-700 hover:bg-ink-50"
             >
               Next →
             </Link>

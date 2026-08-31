@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 /**
  * The staff entry point.
  *
- * HA GROUP's public website is a separate WordPress site at hpcagroup.africa
- * and is NOT part of this codebase — nothing here modifies it. This route is
- * the destination a "Staff Login" link on that site points at, so the public
- * site needs only a menu item, not a deployment.
+ * The public website now lives in this same application, at `/`, with a Staff
+ * login control in its header — so this route is no longer the only way in.
+ * It is kept because it is a stable, memorable address to hand to staff and to
+ * put on printed material, and because any old link to it must keep working.
  *
  * Deliberately thin: no company information, no marketing copy, nothing that
  * duplicates or competes with the public site. It exists to send a signed-in
@@ -53,7 +53,7 @@ export default async function PortalPage() {
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
 
-        <div className="mt-8 rounded border border-ink-200 bg-white p-4">
+        <div className="mt-8 rounded border border-ink-200 bg-panel p-4">
           <p className="text-sm font-medium text-ink-800">No account?</p>
           <p className="mt-1 text-sm text-ink-500">
             Accounts are issued by the HA GROUP administrator. Contact them directly — this system

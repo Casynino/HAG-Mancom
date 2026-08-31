@@ -141,7 +141,7 @@ export function ConfigReview({ records }: { records: ConfigRecord[] }) {
                           <button
                             type="button"
                             onClick={() => setRejecting(rejecting === key ? null : key)}
-                            className="flex h-9 items-center gap-1.5 rounded border border-ink-300 bg-white px-3 text-sm text-ink-700 hover:bg-ink-50"
+                            className="flex h-9 items-center gap-1.5 rounded border border-ink-300 bg-panel px-3 text-sm text-ink-700 hover:bg-ink-50"
                           >
                             <X className="size-4" aria-hidden="true" />
                             Reject

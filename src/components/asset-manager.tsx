@@ -129,7 +129,7 @@ export function AssetManager({
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
                   required
-                  className="tap w-full rounded border border-ink-300 bg-white px-3 text-sm"
+                  className="tap w-full rounded border border-ink-300 bg-panel px-3 text-sm"
                 />
               </Field>
             </div>
@@ -207,7 +207,7 @@ export function AssetManager({
                         <img
                           src={`/api/assets/${asset.id}`}
                           alt={asset.label}
-                          className="h-12 w-24 shrink-0 rounded border border-ink-200 bg-white object-contain p-1"
+                          className="h-12 w-24 shrink-0 rounded border border-ink-200 bg-panel object-contain p-1"
                         />
                       ) : (
                         <div className="flex h-12 w-24 shrink-0 items-center justify-center rounded border border-dashed border-ink-300 text-ink-400">
@@ -286,7 +286,7 @@ export function AssetManager({
                           <button
                             type="button"
                             onClick={() => setRejecting(rejecting === asset.id ? null : asset.id)}
-                            className="flex h-9 items-center gap-1.5 rounded border border-ink-300 bg-white px-3 text-sm text-ink-700 hover:bg-ink-50"
+                            className="flex h-9 items-center gap-1.5 rounded border border-ink-300 bg-panel px-3 text-sm text-ink-700 hover:bg-ink-50"
                           >
                             <X className="size-4" aria-hidden="true" />
                             Reject

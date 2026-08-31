@@ -25,6 +25,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/components/ui'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { signOutAction } from '@/server/auth-actions'
 
 /**
@@ -93,7 +94,7 @@ export function AppNav({
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
       {/* ---------------- Desktop sidebar ---------------- */}
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-ink-200 bg-white lg:flex">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-ink-200 bg-panel lg:flex">
         <div className="border-b border-ink-200 px-5 py-4">
           <p className="text-[11px] font-semibold tracking-[0.18em] text-brand-600 uppercase">
             HA GROUP
@@ -146,6 +147,12 @@ export function AppNav({
         <div className="border-t border-ink-200 p-3">
           <p className="truncate px-3 text-sm font-medium text-ink-900">{user.name}</p>
           <p className="truncate px-3 text-xs text-ink-500">{user.roles.join(' · ')}</p>
+
+          <div className="mt-3 flex items-center justify-between px-3">
+            <span className="text-xs text-ink-500">Theme</span>
+            <ThemeToggle />
+          </div>
+
           <form action={signOutAction} className="mt-2">
             <button
               type="submit"
@@ -159,7 +166,7 @@ export function AppNav({
       </aside>
 
       {/* ---------------- Mobile top bar ---------------- */}
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-ink-200 bg-white px-4 py-3 lg:hidden">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-ink-200 bg-panel px-4 py-3 lg:hidden">
         <div>
           <p className="text-[10px] font-semibold tracking-[0.18em] text-brand-600 uppercase">
             HA GROUP
@@ -190,7 +197,7 @@ export function AppNav({
       </header>
 
       {menuOpen ? (
-        <div className="border-b border-ink-200 bg-white lg:hidden">
+        <div className="border-b border-ink-200 bg-panel lg:hidden">
           <nav className="p-2" aria-label="All sections">
             {items.map((item) => {
               const Icon = ICONS[item.icon] ?? ClipboardList
@@ -210,6 +217,12 @@ export function AppNav({
           <div className="border-t border-ink-200 p-3">
             <p className="px-3 text-sm font-medium text-ink-900">{user.name}</p>
             <p className="px-3 text-xs text-ink-500">{user.roles.join(' · ')}</p>
+
+            <div className="mt-3 flex items-center justify-between px-3">
+              <span className="text-xs text-ink-500">Theme</span>
+              <ThemeToggle />
+            </div>
+
             <form action={signOutAction} className="mt-1">
               <button
                 type="submit"
@@ -233,7 +246,7 @@ export function AppNav({
       {/* ---------------- Mobile tab bar ---------------- */}
       {primary.length > 1 ? (
         <nav
-          className="fixed inset-x-0 bottom-0 z-20 grid border-t border-ink-200 bg-white lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-20 grid border-t border-ink-200 bg-panel lg:hidden"
           style={{
             gridTemplateColumns: `repeat(${primary.length}, minmax(0, 1fr))`,
             paddingBottom: 'env(safe-area-inset-bottom)',

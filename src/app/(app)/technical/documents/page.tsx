@@ -133,7 +133,7 @@ export default async function DocumentsPage() {
           <div className="flex flex-wrap gap-2">
             <Link
               href="/technical"
-              className="tap inline-flex items-center rounded border border-ink-300 bg-white px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
+              className="tap inline-flex items-center rounded border border-ink-300 bg-panel px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
             >
               Start a quotation from a site submission
             </Link>

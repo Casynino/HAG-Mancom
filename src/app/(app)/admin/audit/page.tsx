@@ -111,7 +111,7 @@ export default async function AuditPage({
         {page > 1 ? (
           <a
             href={`/admin/audit?page=${page - 1}`}
-            className="tap inline-flex items-center rounded border border-ink-300 bg-white px-4 text-sm text-ink-700 hover:bg-ink-50"
+            className="tap inline-flex items-center rounded border border-ink-300 bg-panel px-4 text-sm text-ink-700 hover:bg-ink-50"
           >
             ← Newer
           </a>
@@ -121,7 +121,7 @@ export default async function AuditPage({
         {rows.length === PAGE_SIZE ? (
           <a
             href={`/admin/audit?page=${page + 1}`}
-            className="tap inline-flex items-center rounded border border-ink-300 bg-white px-4 text-sm text-ink-700 hover:bg-ink-50"
+            className="tap inline-flex items-center rounded border border-ink-300 bg-panel px-4 text-sm text-ink-700 hover:bg-ink-50"
           >
             Older →
           </a>

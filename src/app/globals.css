@@ -58,18 +58,149 @@
   --color-risk-50: #fdecea;
   --color-risk-600: #b3261e;
   --color-risk-700: #8f1e18;
+
+  /*
+   * Public site only.
+   *
+   * "Live" is the one warm note in an otherwise cool palette — the colour of an
+   * energised indicator lamp. It earns its place on an electrical contractor's
+   * site and is used sparingly: section eyebrows, rules, the active nav marker.
+   * Never for status, which stays semantic above, and never as a fill.
+   */
+  --color-live-300: #f0c078;
+  --color-live-400: #e0a458;
+  --color-live-600: #a8701c;
+  --color-live-700: #825511;
+
+  /*
+   * `panel` is the raised surface every card and form sits on. It is a token
+   * rather than literal white because it becomes near-black in dark mode; a
+   * hard-coded bg-white would stay white and blind the reader.
+   */
+  /* A 52px control: taller than the app's 44px tap target, because the public
+     site's buttons are marketing objects as well as controls. */
+  --spacing-13: 3.25rem;
+
+  --color-panel: #ffffff;
+
+  /*
+   * `shell` is the deep ground the public site's hero, header and footer are
+   * built on. It deliberately does NOT invert: those surfaces are dark by
+   * design in both themes, and the white type on them must stay readable.
+   */
+  --color-shell: #0e131b;
+
+  /* Display face for the public site; the app keeps the system stack. */
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
   :root {
     --surface: var(--color-ink-50);
-    --panel: #ffffff;
+    --panel: var(--color-panel);
     --line: var(--color-ink-200);
     --line-strong: var(--color-ink-300);
     --text: var(--color-ink-900);
     --text-muted: var(--color-ink-500);
     --text-subtle: var(--color-ink-400);
     color-scheme: light;
+  }
+
+  /*
+   * Dark mode.
+   *
+   * The neutral ramp is INVERTED rather than replaced. Every screen in this
+   * application already uses `ink-50` to mean "faintest surface" and `ink-900`
+   * to mean "strongest text" — that is a semantic relationship, not a literal
+   * one, so flipping the ramp end for end makes all ~600 existing usages
+   * correct in dark mode without touching a single component.
+   *
+   * The brand ramp is NOT inverted, because it is used two different ways:
+   * `bg-brand-600` is a button fill that carries white text, and
+   * `text-brand-700` is a link. Inverting would fix the second and break the
+   * first. Instead the fill steps stay saturated and only the steps used as
+   * foreground are lightened.
+   *
+   * Three selectors, because the viewer has three states: an explicit dark
+   * choice, an explicit light choice, and no choice at all (the default), where
+   * only the OS preference speaks. Anything defined solely inside a media query
+   * would never apply to a viewer who has chosen explicitly.
+   */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --color-ink-50: #12171f;
+      --color-ink-100: #171d27;
+      --color-ink-200: #222a37;
+      --color-ink-300: #303b4c;
+      --color-ink-400: #5b6a80;
+      --color-ink-500: #8695a9;
+      --color-ink-600: #a4b1c2;
+      --color-ink-700: #c1cbd8;
+      --color-ink-800: #dde3ec;
+      --color-ink-900: #eef2f7;
+      --color-ink-950: #f8fafc;
+
+      --color-brand-50: #141d33;
+      --color-brand-100: #1a2743;
+      --color-brand-200: #24365c;
+      --color-brand-300: #b9c9f1;
+      --color-brand-600: #2f52b8;
+      --color-brand-700: #6f8de0;
+      --color-brand-800: #8ba5e6;
+      --color-brand-900: #b9c9f1;
+
+      --color-ok-50: #10231a;
+      --color-ok-600: #5cc48d;
+      --color-ok-700: #7fd6a6;
+      --color-warn-50: #241c0c;
+      --color-warn-600: #d9a441;
+      --color-warn-700: #e6bc6d;
+      --color-risk-50: #2a1210;
+      --color-risk-600: #e8817a;
+      --color-risk-700: #f0a19b;
+
+      --color-panel: #151b24;
+
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme='dark'] {
+    --color-ink-50: #12171f;
+    --color-ink-100: #171d27;
+    --color-ink-200: #222a37;
+    --color-ink-300: #303b4c;
+    --color-ink-400: #5b6a80;
+    --color-ink-500: #8695a9;
+    --color-ink-600: #a4b1c2;
+    --color-ink-700: #c1cbd8;
+    --color-ink-800: #dde3ec;
+    --color-ink-900: #eef2f7;
+    --color-ink-950: #f8fafc;
+
+    --color-brand-50: #141d33;
+    --color-brand-100: #1a2743;
+    --color-brand-200: #24365c;
+    --color-brand-300: #b9c9f1;
+    --color-brand-600: #2f52b8;
+    --color-brand-700: #6f8de0;
+    --color-brand-800: #8ba5e6;
+    --color-brand-900: #b9c9f1;
+
+    --color-ok-50: #10231a;
+    --color-ok-600: #5cc48d;
+    --color-ok-700: #7fd6a6;
+    --color-warn-50: #241c0c;
+    --color-warn-600: #d9a441;
+    --color-warn-700: #e6bc6d;
+    --color-risk-50: #2a1210;
+    --color-risk-600: #e8817a;
+    --color-risk-700: #f0a19b;
+
+    --color-panel: #151b24;
+
+    color-scheme: dark;
   }
 
   * {

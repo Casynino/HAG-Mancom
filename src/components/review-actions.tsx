@@ -132,7 +132,7 @@ export function ReviewActions({
             <button
               type="button"
               onClick={() => setPanel(panel === 'changes' ? 'none' : 'changes')}
-              className="tap-lg flex items-center justify-center gap-2 rounded border border-ink-300 bg-white px-5 text-sm font-medium text-ink-800 hover:bg-ink-50 sm:order-1"
+              className="tap-lg flex items-center justify-center gap-2 rounded border border-ink-300 bg-panel px-5 text-sm font-medium text-ink-800 hover:bg-ink-50 sm:order-1"
             >
               <CornerUpLeft className="size-4" aria-hidden="true" />
               Request a correction

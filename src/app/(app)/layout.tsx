@@ -1,3 +1,8 @@
+import type { Metadata } from 'next'
+
+/** Nothing behind sign-in belongs in a search index. */
+export const metadata: Metadata = { robots: { index: false, follow: false } }
+
 import { and, eq, isNull, sql } from 'drizzle-orm'
 import { notifications } from '@/db/schema'
 import { AppNav, type NavItem } from '@/components/app-nav'

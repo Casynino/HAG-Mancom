@@ -249,7 +249,7 @@ export default async function ApprovalPage({ params }: { params: Promise<{ id: s
               href={`/api/documents/${doc.id}/pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              className="tap-lg flex w-full items-center justify-center rounded border border-ink-300 bg-white px-5 font-medium text-ink-800 hover:bg-ink-50"
+              className="tap-lg flex w-full items-center justify-center rounded border border-ink-300 bg-panel px-5 font-medium text-ink-800 hover:bg-ink-50"
             >
               Open the PDF
             </a>

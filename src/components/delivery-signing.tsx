@@ -99,7 +99,7 @@ function SignaturePad({
         onPointerMove={move}
         onPointerUp={end}
         onPointerLeave={end}
-        className="h-40 w-full touch-none rounded border-2 border-dashed border-ink-300 bg-white"
+        className="h-40 w-full touch-none rounded border-2 border-dashed border-ink-300 bg-panel"
         aria-label="Signature area — sign with your finger or a stylus"
       />
       <div className="flex items-center justify-between">

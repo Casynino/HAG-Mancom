@@ -16,7 +16,7 @@ export default function Forbidden() {
           HA GROUP TZ LTD
         </p>
 
-        <div className="mt-4 flex gap-3 rounded border border-ink-200 bg-white p-5">
+        <div className="mt-4 flex gap-3 rounded border border-ink-200 bg-panel p-5">
           <ShieldAlert className="mt-0.5 size-5 shrink-0 text-warn-600" aria-hidden="true" />
           <div className="min-w-0 space-y-3">
             <h1 className="text-lg font-semibold text-ink-900">

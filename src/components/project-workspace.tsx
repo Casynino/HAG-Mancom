@@ -343,7 +343,7 @@ export function ProjectWorkspace(props: {
                     name="document"
                     type="file"
                     accept="application/pdf,image/jpeg,image/png"
-                    className="tap w-full rounded border border-ink-300 bg-white px-3 text-sm"
+                    className="tap w-full rounded border border-ink-300 bg-panel px-3 text-sm"
                   />
                 </Field>
 
@@ -685,7 +685,7 @@ export function ProjectWorkspace(props: {
                     name="evidence"
                     type="file"
                     accept="application/pdf,image/jpeg,image/png"
-                    className="tap w-full rounded border border-ink-300 bg-white px-3 text-sm"
+                    className="tap w-full rounded border border-ink-300 bg-panel px-3 text-sm"
                   />
                 </Field>
 

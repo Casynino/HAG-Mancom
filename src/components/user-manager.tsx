@@ -150,7 +150,7 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
                 <button
                   type="button"
                   onClick={() => setTempPassword(suggestPassword())}
-                  className="tap shrink-0 rounded border border-ink-300 bg-white px-3 text-sm text-ink-700 hover:bg-ink-50"
+                  className="tap shrink-0 rounded border border-ink-300 bg-panel px-3 text-sm text-ink-700 hover:bg-ink-50"
                 >
                   Regenerate
                 </button>
@@ -204,7 +204,7 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
                   <button
                     type="button"
                     onClick={() => setEditing(editing === p.id ? null : p.id)}
-                    className="flex h-9 items-center gap-1.5 rounded border border-ink-300 bg-white px-3 text-sm text-ink-700 hover:bg-ink-50"
+                    className="flex h-9 items-center gap-1.5 rounded border border-ink-300 bg-panel px-3 text-sm text-ink-700 hover:bg-ink-50"
                   >
                     <ShieldCheck className="size-4" aria-hidden="true" />
                     Roles
@@ -215,7 +215,7 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
                       setResetting(resetting === p.id ? null : p.id)
                       setNewPassword(suggestPassword())
                     }}
-                    className="flex h-9 items-center gap-1.5 rounded border border-ink-300 bg-white px-3 text-sm text-ink-700 hover:bg-ink-50"
+                    className="flex h-9 items-center gap-1.5 rounded border border-ink-300 bg-panel px-3 text-sm text-ink-700 hover:bg-ink-50"
                   >
                     <KeyRound className="size-4" aria-hidden="true" />
                     Reset
@@ -244,7 +244,7 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
                     {APP_ROLES.map((role) => (
                       <label
                         key={role}
-                        className="tap flex cursor-pointer items-center gap-2.5 rounded border border-ink-200 bg-white px-3 has-checked:border-brand-600 has-checked:bg-brand-50"
+                        className="tap flex cursor-pointer items-center gap-2.5 rounded border border-ink-200 bg-panel px-3 has-checked:border-brand-600 has-checked:bg-brand-50"
                       >
                         <input
                           type="checkbox"

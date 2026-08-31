@@ -179,7 +179,7 @@ export function DocumentWorkflow({
                   href={`/api/documents/${documentId}/signed`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="tap inline-flex items-center gap-2 rounded border border-ink-300 bg-white px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
+                  className="tap inline-flex items-center gap-2 rounded border border-ink-300 bg-panel px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
                 >
                   <Eye className="size-4" aria-hidden="true" />
                   Open final document
@@ -211,7 +211,7 @@ export function DocumentWorkflow({
                 <button
                   type="button"
                   onClick={() => setPanel(panel === 'invoice' ? 'none' : 'invoice')}
-                  className="tap inline-flex items-center gap-2 rounded border border-ink-300 bg-white px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
+                  className="tap inline-flex items-center gap-2 rounded border border-ink-300 bg-panel px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
                 >
                   Raise the invoice
                 </button>
@@ -221,7 +221,7 @@ export function DocumentWorkflow({
                 <button
                   type="button"
                   onClick={() => setPanel(panel === 'efd' ? 'none' : 'efd')}
-                  className="tap inline-flex items-center gap-2 rounded border border-ink-300 bg-white px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
+                  className="tap inline-flex items-center gap-2 rounded border border-ink-300 bg-panel px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
                 >
                   <Receipt className="size-4" aria-hidden="true" />
                   Record the EFD receipt
@@ -366,7 +366,7 @@ export function DocumentWorkflow({
                     name="receipt"
                     type="file"
                     accept="application/pdf,image/jpeg,image/png"
-                    className="tap w-full rounded border border-ink-300 bg-white px-3 text-sm"
+                    className="tap w-full rounded border border-ink-300 bg-panel px-3 text-sm"
                   />
                 </Field>
 

@@ -371,7 +371,7 @@ export function DocumentEditor({
                       ].join('\n'),
                     )
                   }
-                  className="tap rounded border border-brand-600 bg-white px-3 text-sm font-medium text-brand-700 hover:bg-brand-50"
+                  className="tap rounded border border-brand-600 bg-panel px-3 text-sm font-medium text-brand-700 hover:bg-brand-50"
                 >
                   Put this in the letter
                 </button>
