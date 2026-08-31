@@ -375,9 +375,20 @@ export async function checkDocumentCompletenessAction(
             (a) => !base.blocking.includes(a),
           ),
         }
-      } catch {
-        // The assistant failing must not stop a Technical Officer working.
-        return base
+      } catch (err) {
+        // The assistant failing must not stop a Technical Officer working — the
+        // platform's own checks are the ones that govern, and they have already
+        // run. But it must not fail invisibly either: swallowing this silently
+        // is how a rejected schema keyword left every AI feature dead for weeks
+        // with nothing in any log to show for it.
+        console.error('[ai] completeness check failed; returning platform checks only', err)
+        return {
+          ...base,
+          advisory: [
+            ...base.advisory,
+            'The assistant could not be reached, so only the platform’s own checks were run.',
+          ],
+        }
       }
     })
 

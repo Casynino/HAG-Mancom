@@ -65,6 +65,22 @@ export interface ScopeDraft {
   concerns: string[]
 }
 
+/**
+ * A note on array bounds.
+ *
+ * These schemas do not use `maxItems`, and must not: the structured-output
+ * validator rejects the whole request with
+ *
+ *   output_config.format.schema: For 'array' type, property 'maxItems' is not supported
+ *
+ * and the rejection is a 400 that the calling action deliberately swallows so a
+ * Technical Officer is never blocked by the assistant. The two together are how
+ * every AI feature in this platform sat broken and completely silent. `maxLength`,
+ * `minLength` and `minItems` are supported; numeric `minimum` is not. Bounds on
+ * array length therefore live in the description, where the model reads them,
+ * and the real ceiling is `max_tokens`. A test asserts that no rejected keyword
+ * reappears in any schema here.
+ */
 const SCOPE_SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -77,7 +93,6 @@ const SCOPE_SCHEMA = {
     },
     lineDescriptions: {
       type: 'array',
-      maxItems: 20,
       items: { type: 'string', maxLength: 300 },
       description:
         'One description per chargeable line. Describe the work only. Never include a quantity, ' +
@@ -85,13 +100,11 @@ const SCOPE_SCHEMA = {
     },
     missing: {
       type: 'array',
-      maxItems: 15,
       items: { type: 'string', maxLength: 200 },
       description: 'Facts needed before this can be priced or issued.',
     },
     concerns: {
       type: 'array',
-      maxItems: 10,
       items: { type: 'string', maxLength: 300 },
       description: 'Contradictions or ambiguities in the engineer’s submission.',
     },
@@ -175,7 +188,7 @@ const LETTER_SCHEMA = {
         '— the platform adds those. No invented dates, amounts or reference numbers.',
     },
     closing: { type: 'string', maxLength: 120 },
-    missing: { type: 'array', maxItems: 15, items: { type: 'string', maxLength: 200 } },
+    missing: { type: 'array', items: { type: 'string', maxLength: 200 } },
   },
 } as const
 
@@ -234,8 +247,8 @@ const COMPLETENESS_SCHEMA = {
   required: ['readyToSubmit', 'blocking', 'advisory'],
   properties: {
     readyToSubmit: { type: 'boolean' },
-    blocking: { type: 'array', maxItems: 15, items: { type: 'string', maxLength: 250 } },
-    advisory: { type: 'array', maxItems: 15, items: { type: 'string', maxLength: 250 } },
+    blocking: { type: 'array', items: { type: 'string', maxLength: 250 } },
+    advisory: { type: 'array', items: { type: 'string', maxLength: 250 } },
   },
 } as const
 
@@ -307,11 +320,10 @@ const BRAND_SCHEMA = {
   ],
   properties: {
     documentType: { type: ['string', 'null'], maxLength: 60 },
-    fonts: { type: 'array', maxItems: 10, items: { type: 'string', maxLength: 80 } },
-    headings: { type: 'array', maxItems: 40, items: { type: 'string', maxLength: 200 } },
+    fonts: { type: 'array', items: { type: 'string', maxLength: 80 } },
+    headings: { type: 'array', items: { type: 'string', maxLength: 200 } },
     standardClauses: {
       type: 'array',
-      maxItems: 20,
       items: {
         type: 'object',
         additionalProperties: false,
@@ -329,7 +341,7 @@ const BRAND_SCHEMA = {
         'The document numbering pattern as a token template, e.g. {PREFIX}_{YY}{M}{SEQ}. Null if ' +
         'the document carries no reference or the pattern is not clear from one example.',
     },
-    observations: { type: 'array', maxItems: 25, items: { type: 'string', maxLength: 300 } },
+    observations: { type: 'array', items: { type: 'string', maxLength: 300 } },
     confidence: { type: 'string', enum: ['high', 'medium', 'low'] },
   },
 } as const
