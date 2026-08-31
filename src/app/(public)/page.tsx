@@ -35,9 +35,16 @@ const VERTICAL_PHOTOS: Record<string, { src: string; alt: string }> = {
   'Agro-processing': photos.transmission,
 }
 
+/*
+ * Only partners whose mark is actually in public/brand. Optibelt was listed
+ * here pointing at a file that was never added, so the home page shipped a
+ * broken image — a 404 on every load, invisible unless you read the server log.
+ * A test now fails if a mark is referenced without the file beside it.
+ */
 const PARTNER_MARKS = [
   { src: '/brand/sew-eurodrive.png', alt: 'SEW Eurodrive' },
-  { src: '/brand/optibelt.jpg', alt: 'Optibelt' },
+  { src: '/brand/schneider-electric.png', alt: 'Schneider Electric' },
+  { src: '/brand/optimised-power.png', alt: 'Optimised Power Products' },
 ]
 
 export default function HomePage() {

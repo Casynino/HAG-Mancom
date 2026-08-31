@@ -43,6 +43,17 @@ describe('public site photography', () => {
     }
   })
 
+  it('every brand mark the pages reference exists in public/brand', () => {
+    // The home page shipped a partner logo pointing at a file nobody added, so
+    // it 404'd on every load and only the server log knew.
+    const files = new Set(readdirSync(join(process.cwd(), 'public/brand')))
+    const referenced = [...USED_IN_PAGES.matchAll(/['"]\/brand\/([^'"]+)['"]/g)].map((m) => m[1]!)
+    expect(referenced.length).toBeGreaterThan(0)
+    for (const file of referenced) {
+      expect(files.has(file), `/brand/${file} is referenced but not in public/brand`).toBe(true)
+    }
+  })
+
   it('describes each photograph rather than asserting whose site it is', () => {
     for (const photo of Object.values(photos) as Photo[]) {
       expect(photo.alt).not.toMatch(/\b(our|HA GROUP|HAG)\b/i)

@@ -55,7 +55,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${archivo.variable} ${plex.variable}`}>
+    // suppressHydrationWarning: THEME_SCRIPT deliberately stamps `data-theme`
+    // on this element before React runs — that is the entire point of it — and
+    // without the suppression React reports the attribute it did not render as
+    // a hydration mismatch on every page load.
+    <html lang="en-GB" className={`${archivo.variable} ${plex.variable}`} suppressHydrationWarning>
       <head>
         {/*
           Blocking on purpose. It must run before the first paint, or every page

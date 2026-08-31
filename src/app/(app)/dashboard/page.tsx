@@ -11,9 +11,26 @@ import {
   projects,
 } from '@/db/schema'
 import { ArrowRight, FilePlus2, FileText, HardHat, ShieldCheck, Stamp } from 'lucide-react'
-import { Badge, EmptyState, PageHeader, Panel, PanelHeader, StatCard } from '@/components/ui'
+import type { ReactNode } from 'react'
+import {
+  AttentionItem,
+  Badge,
+  BannerPill,
+  Desk,
+  DeskGrid,
+  EmptyState,
+  Panel,
+  PanelHeader,
+  QuickAction,
+  QuickActions,
+  SectionHead,
+  Stat,
+  StatChip,
+  StatStrip,
+  WelcomeBanner,
+} from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
-import { hasPermission } from '@/lib/authz/roles'
+import { hasPermission, ROLE_LABELS } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
 import { Decimal, formatAmount } from '@/lib/finance/decimal'
 import {
@@ -166,6 +183,8 @@ export default async function DashboardPage() {
 
     return {
       actorName: actor.fullName,
+      actorRoles: actor.roles.map((r) => ROLE_LABELS[r]),
+      drafts: total(documentCounts, 'draft'),
       awaitingApproval: total(documentCounts, 'pending_approval', 'pending_review'),
       openWorkRequests: total(submissionCounts, 'submitted', 'under_review'),
       documentsIssued: total(documentCounts, 'approved', 'issued'),
@@ -182,21 +201,67 @@ export default async function DashboardPage() {
 
   const now = new Date()
 
+  /*
+   * What is genuinely waiting on this person, worst first. Each line says what
+   * is wrong in plain words rather than restating the count — a number the
+   * reader has to interpret is a number they will skip.
+   */
+  const attention: Array<{
+    href: string
+    title: string
+    line: string
+    tone: 'warn' | 'risk' | 'brand'
+    icon: ReactNode
+  }> = []
+
+  if (data.expiring.length > 0) {
+    attention.push({
+      href: '/compliance',
+      title: `${data.expiring.length} certificate${data.expiring.length === 1 ? '' : 's'} lapse within 90 days`,
+      line: data.expiring.map((e) => `${e.label} — ${formatDate(e.expiresOn)}`).join(' · '),
+      tone: 'risk',
+      icon: <ShieldCheck className="size-4" aria-hidden="true" />,
+    })
+  }
+  if (data.awaitingApproval > 0) {
+    attention.push({
+      href: '/approvals',
+      title: `${data.awaitingApproval} document${data.awaitingApproval === 1 ? '' : 's'} with the Director`,
+      line: 'Numbered and locked. Nothing reaches a client until one of these is signed.',
+      tone: 'warn',
+      icon: <Stamp className="size-4" aria-hidden="true" />,
+    })
+  }
+  if (data.openWorkRequests > 0) {
+    attention.push({
+      href: '/technical',
+      title: `${data.openWorkRequests} site report${data.openWorkRequests === 1 ? '' : 's'} not yet written up`,
+      line: 'An engineer has been to site. Nobody has turned it into a document yet.',
+      tone: 'brand',
+      icon: <HardHat className="size-4" aria-hidden="true" />,
+    })
+  }
+
   return (
     <>
-      <PageHeader
-        eyebrow={`${greeting(now.getHours())}, ${data.actorName.split(' ')[0]}`}
-        title="Operations Command Centre"
-        description="Live status of site inspections, documentation, approvals and statutory compliance."
-        action={
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="hidden rounded-lg border border-ink-200 bg-panel px-3 py-2 text-sm text-ink-600 tabular sm:inline-block">
-              {formatDate(now.toISOString().slice(0, 10))}
-            </span>
+      <WelcomeBanner
+        greeting={greeting(now.getHours())}
+        name={data.actorName.split(' ')[0]!}
+        line="Here is the whole operation, and what is waiting on you."
+        pills={
+          <>
+            <BannerPill dot>{formatDate(now.toISOString().slice(0, 10))}</BannerPill>
+            {data.actorRoles.map((role) => (
+              <BannerPill key={role}>{role.toUpperCase()}</BannerPill>
+            ))}
+          </>
+        }
+        actions={
+          <>
             {data.canSubmit ? (
               <Link
                 href="/engineer/new"
-                className="tap inline-flex items-center gap-2 rounded-lg border border-ink-300 bg-panel px-4 text-sm font-medium text-ink-800 hover:bg-ink-50"
+                className="tap inline-flex items-center gap-2 rounded-lg border border-white/25 px-4 text-sm font-medium text-white transition-colors hover:bg-white/10"
               >
                 <HardHat className="size-4" aria-hidden="true" />
                 New work request
@@ -205,79 +270,156 @@ export default async function DashboardPage() {
             {data.canCreateDocument ? (
               <Link
                 href="/technical/studio"
-                className="tap btn-primary inline-flex items-center gap-2 rounded-lg px-4 text-sm font-medium"
+                className="tap inline-flex items-center gap-2 rounded-lg bg-white px-4 text-sm font-medium text-sidebar transition-colors hover:bg-white/90"
               >
                 <FilePlus2 className="size-4" aria-hidden="true" />
                 Generate document
               </Link>
             ) : null}
-          </div>
+          </>
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label="Awaiting approval"
-          value={data.awaitingApproval}
-          meta="With the Director"
+      <QuickActions>
+        <QuickAction
           href="/approvals"
           tone={data.awaitingApproval > 0 ? 'warn' : 'neutral'}
           icon={<Stamp className="size-4" aria-hidden="true" />}
-        />
-        <StatCard
-          label="Open work requests"
-          value={data.openWorkRequests}
-          meta="From site engineers"
+          count={data.awaitingApproval}
+        >
+          Awaiting approval
+        </QuickAction>
+        <QuickAction
           href="/technical"
           tone={data.openWorkRequests > 0 ? 'brand' : 'neutral'}
           icon={<HardHat className="size-4" aria-hidden="true" />}
-        />
-        <StatCard
-          label="Documents issued"
-          value={data.documentsIssued}
-          meta={`${data.activeProjects} active project${data.activeProjects === 1 ? '' : 's'}`}
-          href="/repository"
-          icon={<FileText className="size-4" aria-hidden="true" />}
-        />
-        <StatCard
-          label="Approved value"
-          value={`TZS ${formatAmount(Decimal.from(data.approvedValue), 0)}`}
-          meta={`${data.approvedThisMonth} approved this month`}
-          href="/technical/documents"
-          tone="ok"
+          count={data.openWorkRequests}
+        >
+          Site inbox
+        </QuickAction>
+        <QuickAction
+          href="/compliance"
+          tone={data.expiring.length > 0 ? 'risk' : 'ok'}
           icon={<ShieldCheck className="size-4" aria-hidden="true" />}
-        />
-      </div>
+          count={data.expiring.length}
+        >
+          Compliance
+        </QuickAction>
+        <QuickAction href="/repository" icon={<FileText className="size-4" aria-hidden="true" />}>
+          Repository
+        </QuickAction>
+        <QuickAction href="/analytics" icon={<ArrowRight className="size-4" aria-hidden="true" />}>
+          Analytics
+        </QuickAction>
+      </QuickActions>
 
-      {data.expiring.length > 0 ? (
-        <Panel className="border-warn-600/30 bg-warn-50">
-          <div className="flex flex-wrap items-start gap-4 p-4 sm:p-5">
-            <ShieldCheck className="mt-0.5 size-5 shrink-0 text-warn-700" aria-hidden="true" />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-warn-700">
-                {data.expiring.length} certificate{data.expiring.length === 1 ? '' : 's'} expire
-                within 90 days
-              </p>
-              <ul className="mt-1.5 space-y-0.5">
-                {data.expiring.map((e) => (
-                  <li key={e.id} className="text-sm text-ink-700">
-                    {e.label}
-                    {e.authority ? <span className="text-ink-500"> · {e.authority}</span> : null}
-                    <span className="text-ink-500"> · expires {formatDate(e.expiresOn)}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <Link
-              href="/compliance"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-warn-700 hover:underline"
-            >
-              Review
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </Panel>
+      {attention.length > 0 ? (
+        <section className="space-y-3">
+          <SectionHead
+            label="Needs your attention"
+            count={attention.length}
+            href="/technical"
+            linkLabel="Technical Office"
+          />
+          {attention.map((item) => (
+            <AttentionItem key={item.href + item.title} {...item} />
+          ))}
+        </section>
       ) : null}
+
+      <section className="space-y-3">
+        <SectionHead
+          label="The work"
+          description="What has been asked for, what is written, and what a Director has signed."
+          href="/technical/documents"
+          linkLabel="Full position"
+        />
+        <StatStrip>
+          <Stat
+            label="Site inbox"
+            value={data.openWorkRequests}
+            note="reports from engineers, not yet written up"
+            icon={<HardHat className="size-4" aria-hidden="true" />}
+            href="/technical"
+            tone={data.openWorkRequests > 0 ? 'brand' : 'neutral'}
+          />
+          <Stat
+            label="Drafts"
+            value={data.drafts}
+            note="being written, no reference issued yet"
+            icon={<FileText className="size-4" aria-hidden="true" />}
+            href="/technical/documents"
+          />
+          <Stat
+            label="With the Director"
+            value={data.awaitingApproval}
+            note="submitted and numbered, waiting on a decision"
+            icon={<Stamp className="size-4" aria-hidden="true" />}
+            href="/approvals"
+            tone={data.awaitingApproval > 0 ? 'warn' : 'neutral'}
+          />
+          <Stat
+            label="Issued"
+            value={data.documentsIssued}
+            note={`across ${data.activeProjects} active project${data.activeProjects === 1 ? '' : 's'}`}
+            icon={<FileText className="size-4" aria-hidden="true" />}
+            href="/repository"
+          />
+          <Stat
+            label="Approved value"
+            prefix="TZS"
+            value={formatAmount(Decimal.from(data.approvedValue), 0)}
+            chip={<StatChip label="This month">{data.approvedThisMonth}</StatChip>}
+            note="quotations and invoices a Director has signed"
+            icon={<ShieldCheck className="size-4" aria-hidden="true" />}
+            href="/technical/documents"
+            tone="ok"
+          />
+        </StatStrip>
+      </section>
+
+      <section className="space-y-3">
+        <SectionHead label="The desks" description="Where each part of the work actually lives." />
+        <DeskGrid>
+          <Desk
+            href="/technical"
+            title="Technical Office"
+            description="Site reports in, drafts on the desk, and what has gone up for a decision."
+            status={
+              data.openWorkRequests > 0 ? `${data.openWorkRequests} waiting` : 'nothing waiting'
+            }
+          />
+          <Desk
+            href="/technical/studio"
+            title="AI Document Studio"
+            description="Turn a site report into the wording of a quotation, invoice or letter."
+          />
+          <Desk
+            href="/approvals"
+            title="Director Portal"
+            description="Read in full, then approve and seal, or return for correction."
+            status={
+              data.awaitingApproval > 0 ? `${data.awaitingApproval} waiting` : 'nothing waiting'
+            }
+          />
+          <Desk
+            href="/technical/clients"
+            title="Clients"
+            description="Who they are, their TIN and VRN, and their purchase orders."
+          />
+          <Desk
+            href="/compliance"
+            title="Compliance"
+            description="Every certificate, who issued it, and when it lapses."
+            status={data.expiring.length > 0 ? `${data.expiring.length} expiring` : 'all valid'}
+          />
+          <Desk
+            href="/repository"
+            title="Repository"
+            description="Every document ever issued, searchable by reference or client."
+          />
+        </DeskGrid>
+      </section>
 
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         <Panel>
@@ -350,7 +492,10 @@ export default async function DashboardPage() {
             title="Latest site submissions"
             description="Waiting on the Technical Office."
             action={
-              <Link href="/technical" className="text-sm font-medium text-brand-700 hover:underline">
+              <Link
+                href="/technical"
+                className="text-sm font-medium text-brand-700 hover:underline"
+              >
                 Queue
               </Link>
             }
