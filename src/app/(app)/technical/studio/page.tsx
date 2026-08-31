@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { asc, desc, eq, inArray } from 'drizzle-orm'
 import { clientPurchaseOrders, clients, engineerSubmissions, profiles, projects } from '@/db/schema'
 import { DocumentStudio } from '@/components/document-studio'
-import { PageHeader } from '@/components/ui'
+import { PageHeader, SectionBar } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -88,6 +88,12 @@ export default async function StudioPage() {
         eyebrow="AI Document Studio"
         title="Generate a company document"
         description="Answer a few questions. The assistant drafts the wording; the platform does every calculation, allocates the reference on submission, and applies the seal at approval."
+      />
+
+      <SectionBar
+        label="What are we producing"
+        scope="The assistant writes the words. Every figure, every reference and every seal is the platform's."
+        tone="brand"
       />
 
       <DocumentStudio

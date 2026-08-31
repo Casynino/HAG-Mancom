@@ -57,6 +57,11 @@ export default async function EngineerHome() {
         eyebrow="Engineer"
         title="My site work"
         description="Everything you have filed, and anything waiting on you."
+        stats={[
+          { label: 'filed', value: rows.length },
+          { label: 'moving', value: inProgress.length },
+          { label: 'need you', value: needsAttention.length },
+        ]}
         action={
           canCreate ? (
             <Link

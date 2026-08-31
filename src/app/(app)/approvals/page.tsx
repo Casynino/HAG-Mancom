@@ -3,7 +3,15 @@ import type { Metadata } from 'next'
 import { and, asc, eq, gte, inArray, isNull, sql } from 'drizzle-orm'
 import { clients, companyAssets, documents, profiles, projects } from '@/db/schema'
 import { CheckCircle2, PenLine, Stamp, Wallet } from 'lucide-react'
-import { Badge, EmptyState, Notice, PageHeader, Panel, StatCard } from '@/components/ui'
+import {
+  Badge,
+  EmptyState,
+  MetricCard,
+  Notice,
+  PageHeader,
+  Panel,
+  SectionBar,
+} from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -90,30 +98,48 @@ export default async function ApprovalsPage() {
         eyebrow="Director Portal"
         title="Executive approvals"
         description="Review and approve with your signature and the company stamp applied automatically — from any device."
+        stats={[
+          { label: 'waiting on you', value: rows.length },
+          {
+            label: 'already numbered',
+            value: rows.filter((r) => r.reference).length,
+          },
+        ]}
+      />
+
+      <SectionBar
+        label="Waiting on your decision"
+        scope="Numbered and locked at submission · nothing reaches a client until you sign"
+        tone={rows.length > 0 ? 'warn' : 'ok'}
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard
+        <MetricCard
+          index={0}
           label="Awaiting your decision"
           value={rows.length}
-          meta={rows.length === 0 ? 'Nothing waiting' : 'Oldest first'}
+          note={rows.length === 0 ? 'nothing waiting' : 'oldest first — they have been numbered'}
           href="#queue"
           tone={rows.length > 0 ? 'warn' : 'neutral'}
           icon={<Stamp className="size-4" aria-hidden="true" />}
         />
-        <StatCard
+        <MetricCard
+          index={1}
           label="Approved this month"
           value={data.approvedThisMonth}
-          meta="By you"
+          note="signed and sealed by you"
           href="/repository"
           tone="ok"
           icon={<CheckCircle2 className="size-4" aria-hidden="true" />}
         />
-        <StatCard
+        <MetricCard
+          index={2}
           label="Pending value"
-          value={`TZS ${formatAmount(Decimal.from(data.pendingValue), 0)}`}
-          meta="Across the queue"
+          prefix="TZS"
+          value={formatAmount(Decimal.from(data.pendingValue), 0)}
+          note="the total sitting on your desk, unsigned"
           href="#queue"
+          tone="brand"
           icon={<Wallet className="size-4" aria-hidden="true" />}
         />
       </div>

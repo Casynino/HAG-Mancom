@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { sql } from 'drizzle-orm'
-import { Badge, EmptyState, Input, PageHeader, Panel, Select } from '@/components/ui'
+import { Badge, EmptyState, Input, PageHeader, Panel, SectionBar, Select } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -120,6 +120,13 @@ export default async function RepositoryPage({
             ? 'Nothing matches.'
             : `${total} document${total === 1 ? '' : 's'}${q ? ` matching “${q}”` : ''}.`
         }
+        stats={[{ label: q ? 'matching' : 'ever issued', value: total }]}
+      />
+
+      <SectionBar
+        label="Search everything"
+        scope="Every document the company has ever produced, whatever its state · by reference, client, project or PO"
+        tone="brand"
       />
 
       {/* A plain GET form: the search is bookmarkable and survives a reload. */}

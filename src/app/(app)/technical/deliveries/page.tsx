@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { desc, eq } from 'drizzle-orm'
 import { clients, deliveries, projects } from '@/db/schema'
-import { Badge, EmptyState, PageHeader, Panel } from '@/components/ui'
+import { Badge, EmptyState, PageHeader, Panel, SectionBar } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -49,6 +49,17 @@ export default async function DeliveriesPage() {
             ? 'Nothing waiting for signatures.'
             : `${awaiting.length} awaiting signatures.`
         }
+        stats={[
+          { label: 'delivery notes', value: rows.length },
+          { label: 'awaiting signature', value: awaiting.length },
+          { label: 'settled', value: settled.length },
+        ]}
+      />
+
+      <SectionBar
+        label="What has left the yard"
+        scope="A signed delivery note is what lets an invoice be raised against the work"
+        tone={awaiting.length > 0 ? 'warn' : 'ok'}
       />
 
       {rows.length === 0 ? (

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { sql } from 'drizzle-orm'
 import { ConfigDraftForm } from '@/components/config-draft-form'
 import { ConfigReview, type ConfigRecord } from '@/components/config-review'
-import { Notice, PageHeader } from '@/components/ui'
+import { Notice, PageHeader, SectionBar } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -105,6 +105,17 @@ export default async function SettingsPage() {
         eyebrow="Administrator"
         title="Company settings"
         description="Nothing here takes effect until you approve it. Values observed in historical documents arrive as drafts."
+        stats={[
+          { label: 'settings on record', value: records.length },
+          { label: 'in effect', value: records.filter((r) => r.state === 'approved').length },
+          { label: 'awaiting you', value: drafts.length },
+        ]}
+      />
+
+      <SectionBar
+        label="What the company runs on"
+        scope="Rates, entities, addresses and numbering · a draft has no effect until approved"
+        tone={drafts.length > 0 ? 'warn' : 'ok'}
       />
 
       {drafts.length > 0 ? (

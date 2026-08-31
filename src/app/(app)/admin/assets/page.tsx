@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { asc, eq } from 'drizzle-orm'
 import { companyAssets, profiles } from '@/db/schema'
 import { AssetManager } from '@/components/asset-manager'
-import { Notice, PageHeader } from '@/components/ui'
+import { Notice, PageHeader, SectionBar } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { canApplySignature, hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -69,6 +69,19 @@ export default async function AssetsPage() {
         eyebrow="Administrator"
         title="Brand assets"
         description="The logo, partner marks, stamp and signatures that print on company documents."
+        stats={[
+          { label: 'assets held', value: data.assets.length },
+          {
+            label: 'in effect',
+            value: data.assets.filter((a) => a.state === 'approved').length,
+          },
+        ]}
+      />
+
+      <SectionBar
+        label="What prints on a document"
+        scope="An asset has no effect until it is approved · the Director's signature is theirs alone to upload"
+        tone={hasApprovedLogo && hasApprovedStamp ? 'ok' : 'warn'}
       />
 
       {!hasApprovedLogo || !hasApprovedStamp ? (

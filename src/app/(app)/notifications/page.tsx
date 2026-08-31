@@ -33,6 +33,10 @@ export default async function NotificationsPage() {
         eyebrow="Notifications"
         title={unread > 0 ? `${unread} unread` : 'Notifications'}
         description="What has happened on your work."
+        stats={[
+          { label: 'unread', value: unread },
+          { label: 'in total', value: rows.length },
+        ]}
         action={
           unread > 0 ? (
             <form action={markNotificationsReadAction}>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { asc, isNull } from 'drizzle-orm'
 import { profiles, userRoles } from '@/db/schema'
 import { UserManager } from '@/components/user-manager'
-import { PageHeader } from '@/components/ui'
+import { PageHeader, SectionBar } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission, type AppRole } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -63,6 +63,16 @@ export default async function UsersPage() {
         eyebrow="Administrator"
         title="People and roles"
         description="Roles decide what each person can reach. Every grant and revoke is recorded in the audit trail."
+        stats={[
+          { label: 'people', value: people.length },
+          { label: 'active', value: people.filter((p) => p.isActive).length },
+        ]}
+      />
+
+      <SectionBar
+        label="Who can do what"
+        scope="A role is the only thing that opens a portal · every change is recorded"
+        tone="brand"
       />
       <UserManager people={people} actorId={actorId} />
     </>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { desc, eq } from 'drizzle-orm'
 import { auditLog, profiles } from '@/db/schema'
-import { Badge, EmptyState, PageHeader, Panel } from '@/components/ui'
+import { Badge, EmptyState, PageHeader, Panel, SectionBar } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission, ROLE_LABELS, type AppRole } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -61,6 +61,16 @@ export default async function AuditPage({
         eyebrow="Oversight"
         title="Audit trail"
         description="Append-only. Records cannot be edited or deleted by anyone, including administrators and the database owner."
+        stats={[
+          { label: 'on this page', value: rows.length },
+          { label: 'page', value: page },
+        ]}
+      />
+
+      <SectionBar
+        label="Everything that happened"
+        scope="Newest first · enforced by a database trigger, not by convention"
+        tone="brand"
       />
 
       {rows.length === 0 ? (

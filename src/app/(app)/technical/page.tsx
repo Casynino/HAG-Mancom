@@ -129,6 +129,11 @@ export default async function TechnicalQueue({
         eyebrow="Technical Office"
         title="Operational Control Centre"
         description="Review what came in from site, turn it into a document, and track it through approval."
+        stats={[
+          { label: 'in from site', value: data.inbox.length },
+          { label: 'on the desk', value: data.drafts.length },
+          { label: 'with the Director', value: data.withDirector.length },
+        ]}
         action={
           data.canCreateDocument ? (
             <Link

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { BrandTraining } from '@/components/brand-training'
-import { PageHeader } from '@/components/ui'
+import { PageHeader, SectionBar } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -33,6 +33,19 @@ export default async function BrandTrainingPage() {
         eyebrow="Brand training"
         title="Teach the assistant how HA GROUP writes"
         description="Upload documents the company has already issued. The assistant reports the patterns it can see; you decide what becomes a standard."
+        stats={[
+          { label: 'uploaded', value: assets.length },
+          {
+            label: 'analysed',
+            value: assets.filter((a) => a.analysisStatus === 'completed').length,
+          },
+        ]}
+      />
+
+      <SectionBar
+        label="What it has been given"
+        scope="It reports what it observes · nothing here changes a company setting on its own"
+        tone="brand"
       />
 
       <BrandTraining

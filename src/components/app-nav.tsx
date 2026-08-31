@@ -287,7 +287,15 @@ export function AppNav({
       {/* ---------------- Content ---------------- */}
       <div className="flex min-w-0 flex-1 flex-col">
         <main className="flex-1 px-4 py-5 pb-24 sm:px-6 lg:px-8 lg:py-8 lg:pb-8">
-          <div className="mx-auto w-full max-w-5xl space-y-5">{children}</div>
+          {/*
+              max-w-5xl is 1024px, which was sized for reading. These pages are
+              not read, they are scanned: strips of four and five figures, tables
+              with eight columns, two-up panels. At 1024 a wide monitor showed a
+              column of content floating between two margins of nothing, while
+              the tables inside it scrolled. Prose keeps its own max-w-2xl where
+              it appears, so widening the shell costs nothing in line length.
+          */}
+          <div className="mx-auto w-full max-w-[104rem] space-y-5">{children}</div>
         </main>
       </div>
 
