@@ -116,7 +116,7 @@ async function main() {
         const r = await c.query<{ id: string }>(
           `insert into public.profiles
              (email, full_name, password_hash, must_change_password, is_active, job_title, phone)
-           values ($1, $2, $3, true, true, $4, $5) returning id`,
+           values ($1, $2, $3, false, true, $4, $5) returning id`,
           [p.email, p.name, hash, p.title, p.phone],
         )
         ids[p.email] = r.rows[0]!.id
@@ -496,7 +496,26 @@ async function main() {
     )
     const legalEntityId = entity.rows[0]?.id ?? null
 
-    const docs = [
+    interface DemoDocument {
+      type: string
+      reference: string | null
+      title: string
+      scope: string
+      clientRef: string | null
+      date: string
+      status: string
+      quantity: string
+      unitPrice: string
+      subTotal: string
+      chargesBeforeVat: string
+      taxableTotal: string
+      vat: string
+      grandTotal: string
+      po: string | null
+      line: string
+    }
+
+    const docs: DemoDocument[] = [
       {
         type: 'quotation',
         reference: QUOTATION.reference,
@@ -512,7 +531,7 @@ async function main() {
         taxableTotal: QUOTATION.taxableTotal,
         vat: QUOTATION.vat,
         grandTotal: QUOTATION.grandTotal,
-        po: null as string | null,
+        po: null,
         line: 'July 2026 Maintenance Services',
       },
       {
@@ -535,10 +554,38 @@ async function main() {
       },
     ]
 
+    /*
+     * One document is deliberately left with the Director rather than pushed
+     * through to approved. Without it the approval queue is empty on first
+     * sign-in, the Director Portal has nothing to demonstrate, and "what needs
+     * my attention" — the first question the dashboard exists to answer — has
+     * no answer. This is the letter HA GROUP actually sent.
+     */
+    docs.push({
+      type: 'official_letter',
+      reference: null,
+      title: 'REQUEST FOR EXTENSION OF PAYMENT DEADLINE',
+      scope: 'Alliance One Tobacco Tanzania Limited',
+      clientRef: null,
+      date: '2026-08-07',
+      status: 'pending_approval',
+      quantity: '1',
+      unitPrice: '0',
+      subTotal: '0',
+      chargesBeforeVat: '0',
+      taxableTotal: '0',
+      vat: '0',
+      grandTotal: '0',
+      po: null,
+      line: 'Request for extension of payment deadline',
+    })
+
     for (const d of docs) {
       const existing = await c.query<{ id: string }>(
-        'select id from public.documents where reference = $1',
-        [d.reference],
+        d.reference
+          ? 'select id from public.documents where reference = $1'
+          : 'select id from public.documents where title = $1 and reference is null',
+        [d.reference ?? d.title],
       )
       if (existing.rows.length > 0) continue
 
@@ -605,7 +652,9 @@ async function main() {
        * this works and an accurate demonstration of the path a document takes.
        */
       const chain =
-        d.status === 'issued'
+        d.status === 'pending_approval'
+          ? ['pending_approval']
+          : d.status === 'issued'
           ? ['pending_approval', 'approved', 'issued']
           : d.status === 'approved'
             ? ['pending_approval', 'approved']
@@ -640,7 +689,19 @@ async function main() {
         union all select 1 from public.charge_rules where state='approved') s
     `)
     console.table(counts.rows)
-    console.log(`\nDemo accounts (all must change password on first sign-in):`)
+    /*
+     * These three are demonstration personas, not real staff accounts, so they
+     * do not force a password change: the point of them is to step between the
+     * Engineer, Technical Officer and Director views and watch the same records
+     * from each side. The real Administrator account still forces one.
+     */
+    await c.query(
+      `update public.profiles set must_change_password = false
+        where email in ($1, $2, $3)`,
+      people.map((p) => p.email),
+    )
+
+    console.log(`\nDemo personas — sign in as each to see the same records from every side:`)
     for (const p of people) console.log(`  ${p.email.padEnd(30)} ${p.name} — ${p.title}`)
     console.log(`\n  password: ${demoPassword}`)
   } catch (err) {

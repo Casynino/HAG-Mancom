@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
   Bell,
+  BarChart3,
   Building2,
   ClipboardList,
   FileText,
@@ -53,6 +54,7 @@ const ICONS: Record<string, LucideIcon> = {
   truck: Truck,
   image: ImageIcon,
   sparkles: Sparkles,
+  chart: BarChart3,
 }
 
 export interface NavItem {

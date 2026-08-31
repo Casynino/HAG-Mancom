@@ -2,7 +2,9 @@ import type { Metadata } from 'next'
 import { asc, eq } from 'drizzle-orm'
 import { complianceTypes, profiles } from '@/db/schema'
 import { ComplianceBoard } from '@/components/compliance-board'
-import { PageHeader } from '@/components/ui'
+import { AlertTriangle, CalendarClock, CircleCheck, CircleX, ShieldCheck } from 'lucide-react'
+import { PageHeader, Panel, PanelHeader, Ring, StatCard } from '@/components/ui'
+import { formatDate } from '@/lib/display'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -38,22 +40,139 @@ export default async function CompliancePage() {
     }
   })
 
-  const attention = data.rows.filter((r) =>
-    ['expired', 'expiring_soon', 'renewal_pending', 'unknown'].includes(r.status),
-  )
+  const tracked = data.rows.length
+  const expired = data.rows.filter((r) => r.status === 'expired').length
+  const expiring = data.rows.filter((r) =>
+    ['expiring_soon', 'renewal_pending'].includes(r.status),
+  ).length
+  const valid = data.rows.filter((r) => r.status === 'valid').length
+
+  const unknown = data.rows.filter((r) => r.status === 'unknown').length
+
+  /*
+   * Health is measured only across certificates whose validity can actually be
+   * determined — those with an expiry date on file. Counting the ones with no
+   * expiry recorded as failures produced a 23% reading on a company with
+   * nothing expired, which is not a hard truth, it is a wrong one. Those are
+   * reported separately as needing a date, which is the real action.
+   */
+  const assessable = valid + expiring + expired
+  const health = assessable === 0 ? 100 : Math.round((valid / assessable) * 100)
+  const healthTone = expired > 0 ? 'risk' : expiring > 0 ? 'warn' : 'ok'
+
+  // Only things that actually run out belong on a renewal timeline.
+  const timeline = data.rows
+    .filter((r) => r.expiresOn !== null)
+    .sort((a, b) => (a.expiresOn ?? '').localeCompare(b.expiresOn ?? ''))
+    .slice(0, 6)
 
   return (
     <>
       <PageHeader
         eyebrow="Compliance"
-        title="Licences and certificates"
-        description={
-          attention.length === 0
-            ? 'Everything is current.'
-            : `${attention.length} item${attention.length === 1 ? '' : 's'} need attention.`
-        }
+        title="Statutory & regulatory command"
+        description="Certificates, licences and registrations, with reminders at 90, 30, 14, 7 and 1 days before expiry."
       />
-      <ComplianceBoard {...data} />
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          label="Tracked items"
+          value={tracked}
+          meta={`${assessable} with an expiry date`}
+          href="#all-records"
+          icon={<ShieldCheck className="size-4" aria-hidden="true" />}
+        />
+        <StatCard
+          label="Expiring soon"
+          value={expiring}
+          meta="Within the reminder window"
+          href="#all-records"
+          tone={expiring > 0 ? 'warn' : 'neutral'}
+          icon={<AlertTriangle className="size-4" aria-hidden="true" />}
+        />
+        <StatCard
+          label="Expired"
+          value={expired}
+          meta={expired > 0 ? 'Renew immediately' : 'None'}
+          href="#all-records"
+          tone={expired > 0 ? 'risk' : 'neutral'}
+          icon={<CircleX className="size-4" aria-hidden="true" />}
+        />
+        <StatCard
+          label="In good standing"
+          value={valid}
+          meta="Current and verified"
+          href="#all-records"
+          tone="ok"
+          icon={<CircleCheck className="size-4" aria-hidden="true" />}
+        />
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-[auto_1fr]">
+        <Panel>
+          <PanelHeader title="Certificate health" />
+          <div className="flex flex-col items-center gap-4 p-6">
+            <Ring percent={health} label={`${health}%`} sublabel="health" tone={healthTone} />
+            <p className="text-center text-sm text-ink-500">
+              {valid} of {assessable} assessable valid · {expired} expired · {expiring} expiring
+            </p>
+            {unknown > 0 ? (
+              <p className="text-center text-xs text-ink-400">
+                {unknown} more {unknown === 1 ? 'has' : 'have'} no expiry date recorded, so
+                {unknown === 1 ? ' its' : ' their'} status cannot be judged.
+              </p>
+            ) : null}
+          </div>
+        </Panel>
+
+        <Panel>
+          <PanelHeader
+            title="Renewal timeline"
+            description="Soonest first. Items without an expiry date are not shown."
+            action={<CalendarClock className="size-4 text-ink-400" aria-hidden="true" />}
+          />
+          {timeline.length === 0 ? (
+            <p className="px-4 py-8 text-sm text-ink-500 sm:px-5">
+              No certificate on file has an expiry date recorded.
+            </p>
+          ) : (
+            <ol className="divide-y divide-ink-100">
+              {timeline.map((r) => {
+                const days = r.daysRemaining
+                const dot =
+                  r.status === 'expired'
+                    ? 'bg-risk-600'
+                    : r.status === 'expiring_soon' || r.status === 'renewal_pending'
+                      ? 'bg-warn-600'
+                      : 'bg-ok-600'
+                return (
+                  <li key={r.id} className="flex items-center gap-4 px-4 py-3.5 sm:px-5">
+                    <span className={`size-2.5 shrink-0 rounded-full ${dot}`} aria-hidden="true" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-ink-900">
+                        {r.label}
+                      </span>
+                      <span className="mt-0.5 block truncate text-xs text-ink-500">
+                        {[r.authority, r.responsibleName].filter(Boolean).join(' · ')}
+                        {days !== null
+                          ? ` · ${days < 0 ? `${Math.abs(days)} day(s) overdue` : `${days} day(s) to expiry`}`
+                          : ''}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-sm text-ink-600 tabular">
+                      {formatDate(r.expiresOn)}
+                    </span>
+                  </li>
+                )
+              })}
+            </ol>
+          )}
+        </Panel>
+      </div>
+
+      <div id="all-records" className="scroll-mt-24">
+        <ComplianceBoard {...data} />
+      </div>
     </>
   )
 }

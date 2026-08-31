@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { ComponentProps, ReactNode } from 'react'
@@ -248,5 +249,111 @@ export function DescriptionList({ items }: { items: Array<[ReactNode, ReactNode]
         </div>
       ))}
     </dl>
+  )
+}
+
+/**
+ * A headline figure with somewhere to go.
+ *
+ * Every one of these is derived from a query, never a stored counter — a
+ * dashboard that reports a number nobody can reconcile against the records is
+ * worse than no dashboard. `href` is not optional by accident: a figure that
+ * demands attention should take you to the thing that needs it.
+ */
+export function StatCard({
+  label,
+  value,
+  meta,
+  href,
+  icon,
+  tone = 'neutral',
+}: {
+  label: string
+  value: ReactNode
+  meta?: ReactNode
+  href: string
+  icon?: ReactNode
+  tone?: 'neutral' | 'brand' | 'warn' | 'risk' | 'ok'
+}) {
+  const accent = {
+    neutral: 'text-ink-400',
+    brand: 'text-brand-600',
+    warn: 'text-warn-600',
+    risk: 'text-risk-600',
+    ok: 'text-ok-600',
+  }[tone]
+
+  return (
+    <Link
+      href={href}
+      className="group relative overflow-hidden rounded-xl border border-ink-200 bg-panel p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-lg"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-[11px] font-semibold tracking-[0.14em] text-ink-500 uppercase">
+          {label}
+        </p>
+        {icon ? (
+          <span
+            className={cn(
+              'flex size-8 shrink-0 items-center justify-center rounded-lg bg-ink-50',
+              accent,
+            )}
+          >
+            {icon}
+          </span>
+        ) : null}
+      </div>
+
+      <p className="font-display mt-4 text-3xl font-bold tracking-tight text-ink-950 tabular sm:text-4xl">
+        {value}
+      </p>
+      {meta ? <p className="mt-1.5 text-xs text-ink-500">{meta}</p> : null}
+    </Link>
+  )
+}
+
+/**
+ * A donut showing one proportion. Pure SVG — a chart library for a single ring
+ * would be more bytes than the rest of the page.
+ */
+export function Ring({
+  percent,
+  label,
+  sublabel,
+  tone = 'ok',
+}: {
+  percent: number
+  label: string
+  sublabel?: string
+  tone?: 'ok' | 'warn' | 'risk'
+}) {
+  const clamped = Math.max(0, Math.min(100, percent))
+  const radius = 52
+  const circumference = 2 * Math.PI * radius
+  const stroke = { ok: 'stroke-ok-600', warn: 'stroke-warn-600', risk: 'stroke-risk-600' }[tone]
+
+  return (
+    <div className="relative flex size-36 items-center justify-center">
+      <svg viewBox="0 0 128 128" className="size-full -rotate-90">
+        <circle cx="64" cy="64" r={radius} fill="none" strokeWidth="10" className="stroke-ink-200" />
+        <circle
+          cx="64"
+          cy="64"
+          r={radius}
+          fill="none"
+          strokeWidth="10"
+          strokeLinecap="round"
+          className={cn(stroke, 'transition-[stroke-dashoffset] duration-1000 ease-out')}
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * (1 - clamped / 100)}
+        />
+      </svg>
+      <div className="absolute text-center">
+        <p className="font-display text-2xl font-bold text-ink-950 tabular">{label}</p>
+        {sublabel ? (
+          <p className="text-[10px] tracking-[0.14em] text-ink-500 uppercase">{sublabel}</p>
+        ) : null}
+      </div>
+    </div>
   )
 }

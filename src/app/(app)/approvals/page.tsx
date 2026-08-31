@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { asc, eq, inArray } from 'drizzle-orm'
-import { clients, documents, profiles, projects } from '@/db/schema'
-import { Badge, EmptyState, PageHeader, Panel } from '@/components/ui'
+import { and, asc, eq, gte, inArray, isNull, sql } from 'drizzle-orm'
+import { clients, companyAssets, documents, profiles, projects } from '@/db/schema'
+import { CheckCircle2, PenLine, Stamp, Wallet } from 'lucide-react'
+import { Badge, EmptyState, Notice, PageHeader, Panel, StatCard } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
-import { formatAmount } from '@/lib/finance/decimal'
+import { Decimal, formatAmount } from '@/lib/finance/decimal'
 import { DOCUMENT_TYPE_LABELS, relativeTime } from '@/lib/display'
 
 export const metadata: Metadata = { title: 'Approvals' }
@@ -19,54 +20,130 @@ export const metadata: Metadata = { title: 'Approvals' }
  * is, who it is for, how much, and how long it has been waiting.
  */
 export default async function ApprovalsPage() {
-  const rows = await pageContext(async (db, actor) => {
+  const data = await pageContext(async (db, actor) => {
     if (!hasPermission(actor.roles, 'approval.decide')) {
       throw new AuthorizationError('The approval inbox is for Directors.')
     }
 
-    return db
-      .select({
-        id: documents.id,
-        reference: documents.reference,
-        documentType: documents.documentType,
-        title: documents.title,
-        currency: documents.currency,
-        grandTotal: documents.grandTotal,
-        submittedForApprovalAt: documents.submittedForApprovalAt,
-        clientName: clients.legalName,
-        projectName: projects.name,
-        submittedByName: profiles.fullName,
-      })
-      .from(documents)
-      .innerJoin(clients, eq(clients.id, documents.clientId))
-      .innerJoin(projects, eq(projects.id, documents.projectId))
-      .leftJoin(profiles, eq(profiles.id, documents.submittedBy))
-      .where(inArray(documents.status, ['pending_approval']))
-      .orderBy(asc(documents.submittedForApprovalAt))
-      .limit(100)
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+
+    const [rows, approvedThisMonth, pendingValue, ownSignature] = await Promise.all([
+      db
+        .select({
+          id: documents.id,
+          reference: documents.reference,
+          documentType: documents.documentType,
+          title: documents.title,
+          currency: documents.currency,
+          grandTotal: documents.grandTotal,
+          submittedForApprovalAt: documents.submittedForApprovalAt,
+          clientName: clients.legalName,
+          projectName: projects.name,
+          submittedByName: profiles.fullName,
+        })
+        .from(documents)
+        .innerJoin(clients, eq(clients.id, documents.clientId))
+        .innerJoin(projects, eq(projects.id, documents.projectId))
+        .leftJoin(profiles, eq(profiles.id, documents.submittedBy))
+        .where(inArray(documents.status, ['pending_approval']))
+        .orderBy(asc(documents.submittedForApprovalAt))
+        .limit(100),
+
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(documents)
+        .where(and(eq(documents.approvedBy, actor.id), gte(documents.approvedAt, monthStart))),
+
+      db
+        .select({ total: sql<string>`coalesce(sum(${documents.grandTotal}), 0)::text` })
+        .from(documents)
+        .where(eq(documents.status, 'pending_approval')),
+
+      // A signature belongs to the Director it is for; nobody can supply one on
+      // their behalf, so this checks for *theirs*, not merely any signature.
+      db
+        .select({ id: companyAssets.id })
+        .from(companyAssets)
+        .where(
+          and(
+            eq(companyAssets.kind, 'signature'),
+            eq(companyAssets.ownerUserId, actor.id),
+            eq(companyAssets.state, 'approved'),
+          ),
+        )
+        .limit(1),
+    ])
+
+    return {
+      rows,
+      approvedThisMonth: approvedThisMonth[0]?.count ?? 0,
+      pendingValue: pendingValue[0]?.total ?? '0',
+      hasSignature: ownSignature.length > 0,
+    }
   })
+
+  const { rows } = data
 
   return (
     <>
       <PageHeader
-        eyebrow="Director"
-        title="Approvals"
-        description={
-          rows.length === 0
-            ? 'Nothing is waiting for you.'
-            : `${rows.length} document${rows.length === 1 ? '' : 's'} waiting, oldest first.`
-        }
+        eyebrow="Director Portal"
+        title="Executive approvals"
+        description="Review and approve with your signature and the company stamp applied automatically — from any device."
       />
 
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          label="Awaiting your decision"
+          value={rows.length}
+          meta={rows.length === 0 ? 'Nothing waiting' : 'Oldest first'}
+          href="#queue"
+          tone={rows.length > 0 ? 'warn' : 'neutral'}
+          icon={<Stamp className="size-4" aria-hidden="true" />}
+        />
+        <StatCard
+          label="Approved this month"
+          value={data.approvedThisMonth}
+          meta="By you"
+          href="/repository"
+          tone="ok"
+          icon={<CheckCircle2 className="size-4" aria-hidden="true" />}
+        />
+        <StatCard
+          label="Pending value"
+          value={`TZS ${formatAmount(Decimal.from(data.pendingValue), 0)}`}
+          meta="Across the queue"
+          href="#queue"
+          icon={<Wallet className="size-4" aria-hidden="true" />}
+        />
+      </div>
+
+      {!data.hasSignature ? (
+        <Notice tone="warn" title="No signature image is on file">
+          <p>
+            Documents whose approval policy requires a signature cannot be approved until you upload
+            yours. Only you can — a signature is bound to the person it belongs to, and nobody may
+            supply one on your behalf.
+          </p>
+          <Link
+            href="/admin/assets"
+            className="mt-2 inline-flex items-center gap-1.5 font-medium underline"
+          >
+            <PenLine className="size-4" aria-hidden="true" />
+            Upload your signature
+          </Link>
+        </Notice>
+      ) : null}
+
       {rows.length === 0 ? (
-        <Panel>
+        <Panel id="queue">
           <EmptyState
             title="Your inbox is clear"
             description="Documents appear here as soon as the Technical Office submits them."
           />
         </Panel>
       ) : (
-        <Panel className="divide-y divide-ink-100">
+        <Panel id="queue" className="scroll-mt-24 divide-y divide-ink-100">
           {rows.map((row) => (
             <Link
               key={row.id}

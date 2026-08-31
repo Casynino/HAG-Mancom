@@ -33,6 +33,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const items: NavItem[] = (
     [
       {
+        href: '/analytics',
+        label: 'Analytics',
+        short: 'Charts',
+        icon: 'chart',
+        group: 'Overview',
+        show: hasPermission(actor.roles, 'submission.view_all'),
+      },
+      {
         href: '/engineer',
         label: 'My site work',
         short: 'Site',
@@ -114,8 +122,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       },
       {
         href: '/dashboard',
-        label: 'Overview',
-        short: 'Overview',
+        label: 'Dashboard',
+        short: 'Home',
         icon: 'gauge',
         group: 'Overview',
         show: hasPermission(actor.roles, 'submission.view_all'),
