@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { projects } from '@/lib/company/profile'
 
 /**
@@ -67,6 +68,9 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
           })}
         </nav>
 
+        <div className="hidden md:block">
+          <ThemeToggle tone="shell" />
+        </div>
 
         <Link
           href={signedIn ? '/dashboard' : '/sign-in'}
@@ -107,6 +111,10 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
               {signedIn ? 'Go to portal' : 'Staff login'}
             </Link>
 
+            <div className="mb-4 flex items-center justify-between">
+              <span className="text-sm text-white/50">Theme</span>
+              <ThemeToggle tone="shell" />
+            </div>
           </nav>
         </div>
       ) : null}
