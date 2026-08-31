@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { Check } from 'lucide-react'
 import { services, SOURCE_NOTE, verticals } from '@/lib/company/profile'
+import { photos } from '@/lib/company/imagery'
 
 export const metadata: Metadata = {
   title: 'Services',
@@ -18,8 +20,20 @@ export const metadata: Metadata = {
 export default function ServicesPage() {
   return (
     <>
-      <header className="border-b border-white/10 bg-shell text-white">
-        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
+      <header className="relative isolate overflow-hidden border-b border-white/10 bg-shell text-white">
+        <Image
+          src={photos.panel.src}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="pointer-events-none object-cover opacity-20"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-shell via-shell/85 to-shell/30"
+        />
+        <div className="relative mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
           <p className="text-xs font-semibold tracking-[0.18em] text-live-400 uppercase">
             Capability
           </p>
