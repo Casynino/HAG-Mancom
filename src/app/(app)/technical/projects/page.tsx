@@ -85,6 +85,13 @@ export default async function ProjectsPage() {
         eyebrow="Technical Office"
         title="Projects"
         description="A project is the workspace for a client engagement. Assigning an Engineer is what lets them file from site."
+        stats={[
+          { label: 'projects', value: data.projects.length },
+          {
+            label: 'active',
+            value: data.projects.filter((p) => p.status === 'active').length,
+          },
+        ]}
       />
       <ProjectManager {...data} />
     </>

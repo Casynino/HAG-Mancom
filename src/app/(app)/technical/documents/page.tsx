@@ -105,6 +105,11 @@ export default async function DocumentsPage() {
         eyebrow="Technical Office"
         title="Documents"
         description="Quotations, invoices, delivery notes, letters and certificates."
+        stats={[
+          { label: 'in the office', value: rows.length },
+          { label: 'being prepared', value: open.length },
+          { label: 'with the Director', value: awaiting.length },
+        ]}
       />
 
       {!readiness.ready ? (

@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import type { ComponentProps, ReactNode } from 'react'
-import { ArrowRight, ChevronRight } from 'lucide-react'
+import type { ComponentProps, CSSProperties, ReactNode } from 'react'
+import { ArrowRight, ChevronRight, Inbox } from 'lucide-react'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -50,8 +50,17 @@ export function Button({
 /* Surfaces                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * The surface everything sits on. `rise` here rather than on each caller, so
+ * every panel in the platform arrives the same way without any page opting in.
+ */
 export function Panel({ className, ...props }: ComponentProps<'div'>) {
-  return <div className={cn('rounded border border-ink-200 bg-panel', className)} {...props} />
+  return (
+    <div
+      className={cn('rise rounded-xl border border-ink-200 bg-panel shadow-sm', className)}
+      {...props}
+    />
+  )
 }
 
 export function PanelHeader({
@@ -64,10 +73,12 @@ export function PanelHeader({
   action?: ReactNode
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-200 px-4 py-3 sm:px-5">
+    <div className="flex flex-wrap items-start justify-between gap-3 border-b border-ink-200 px-4 py-3.5 sm:px-5">
       <div className="min-w-0">
-        <h2 className="text-sm font-semibold tracking-tight text-ink-900">{title}</h2>
-        {description ? <p className="mt-0.5 text-sm text-ink-500">{description}</p> : null}
+        <h2 className="font-display text-base font-semibold text-ink-950">{title}</h2>
+        {description ? (
+          <p className="mt-0.5 text-sm leading-relaxed text-ink-500">{description}</p>
+        ) : null}
       </div>
       {action}
     </div>
@@ -79,8 +90,8 @@ export function PanelHeader({
 /* -------------------------------------------------------------------------- */
 
 const CONTROL =
-  'w-full rounded border border-ink-300 bg-panel px-3 text-ink-900 placeholder:text-ink-400 ' +
-  'focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600 ' +
+  'w-full rounded-lg border border-ink-300 bg-panel px-3 text-ink-900 placeholder:text-ink-400 ' +
+  'transition-colors focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/25 ' +
   'disabled:bg-ink-50 disabled:text-ink-500 aria-[invalid=true]:border-risk-600'
 
 export function Field({
@@ -187,55 +198,85 @@ export function Notice({
 /* Empty state                                                                 */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * What a page shows when there is genuinely nothing yet.
+ *
+ * An empty screen is a place people get stuck, so this says what would fill it
+ * and, where there is one, offers the action that starts it. The dashed ring is
+ * doing a job: it reads as a space waiting to be filled rather than as a panel
+ * that failed to load.
+ */
 export function EmptyState({
   title,
   description,
   action,
+  icon,
 }: {
   title: string
-  description?: string
+  description?: ReactNode
   action?: ReactNode
+  icon?: ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 px-6 py-12 text-center">
-      <p className="text-sm font-medium text-ink-800">{title}</p>
-      {description ? <p className="max-w-sm text-sm text-ink-500">{description}</p> : null}
-      {action ? <div className="mt-2">{action}</div> : null}
+    <div className="flex flex-col items-center px-6 py-14 text-center">
+      <span className="flex size-14 items-center justify-center rounded-full border border-dashed border-ink-300 text-ink-400">
+        {icon ?? <Inbox className="size-5" aria-hidden="true" />}
+      </span>
+      <p className="font-display mt-4 text-base font-semibold text-ink-900">{title}</p>
+      {description ? (
+        <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-ink-500">{description}</p>
+      ) : null}
+      {action ? <div className="mt-5">{action}</div> : null}
     </div>
   )
 }
-
-/* -------------------------------------------------------------------------- */
-/* Page scaffolding                                                            */
-/* -------------------------------------------------------------------------- */
 
 export function PageHeader({
   eyebrow,
   title,
   description,
   action,
+  stats,
 }: {
   eyebrow?: ReactNode
   title: ReactNode
   description?: ReactNode
   action?: ReactNode
+  stats?: Array<{ label: string; value: ReactNode }>
 }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-3">
-      <div className="min-w-0">
-        {eyebrow ? (
-          <p className="text-[11px] font-semibold tracking-[0.16em] text-live-700 uppercase">
-            {eyebrow}
-          </p>
-        ) : null}
-        <h1 className="font-display mt-1.5 text-2xl font-bold tracking-tight text-ink-950 sm:text-3xl">
-          {title}
-        </h1>
-        {description ? (
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-500">{description}</p>
-        ) : null}
+    <div className="rise relative isolate overflow-hidden rounded-2xl border border-ink-200 bg-panel px-5 py-5 sm:px-7 sm:py-6">
+      <span
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-600/[0.07] via-transparent to-live-500/[0.05]"
+        aria-hidden="true"
+      />
+      <div className="relative flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+        <div className="min-w-0">
+          {eyebrow ? (
+            <span className="inline-flex items-center rounded-full bg-live-400/15 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-live-700 uppercase">
+              {eyebrow}
+            </span>
+          ) : null}
+          <h1 className="font-display mt-2.5 text-2xl font-bold tracking-tight text-ink-950 sm:text-3xl">
+            {title}
+          </h1>
+          {description ? (
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-500">{description}</p>
+          ) : null}
+        </div>
+        {action}
       </div>
-      {action}
+
+      {stats && stats.length > 0 ? (
+        <div className="relative mt-5 flex flex-wrap items-baseline gap-x-8 gap-y-3 border-t border-ink-200 pt-4">
+          {stats.map((s) => (
+            <span key={s.label} className="flex items-baseline gap-2">
+              <span className="font-display text-xl font-bold text-ink-950 tabular">{s.value}</span>
+              <span className="text-sm text-ink-500">{s.label}</span>
+            </span>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -758,5 +799,436 @@ export function InlineStats({
       })}
       {trailing ? <span className="ml-auto text-xs text-ink-400">{trailing}</span> : null}
     </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Department layout                                                           */
+/*                                                                            */
+/* A second, richer vocabulary for the pages that are read rather than filled  */
+/* in. Same rule as the strip above: layout only. Nothing here computes a      */
+/* figure, decides who may see one, or changes what a number means.            */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A section heading with a coloured rule down its left edge.
+ *
+ * The rule does real work: it tells you where one band of the page ends and
+ * the next begins, on a long console screen where whitespace alone stops being
+ * enough. The second line says what the numbers below are measured over —
+ * "this month", "all time", "since midnight" — which is the single most common
+ * thing to get wrong when reading somebody else's dashboard.
+ */
+export function SectionBar({
+  label,
+  scope,
+  tone = 'live',
+  action,
+}: {
+  label: string
+  scope?: string
+  tone?: 'live' | 'brand' | 'ok' | 'warn' | 'risk'
+  action?: ReactNode
+}) {
+  const bar = {
+    live: 'bg-live-400',
+    brand: 'bg-brand-600',
+    ok: 'bg-ok-600',
+    warn: 'bg-warn-600',
+    risk: 'bg-risk-600',
+  }[tone]
+
+  const text = {
+    live: 'text-live-700',
+    brand: 'text-brand-700',
+    ok: 'text-ok-700',
+    warn: 'text-warn-700',
+    risk: 'text-risk-700',
+  }[tone]
+
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1 border-l-2 border-transparent pl-3.5 [border-image:none]">
+      <div className="relative min-w-0">
+        <span
+          className={cn('absolute top-0.5 -left-3.5 h-full w-0.5 rounded-full', bar)}
+          aria-hidden="true"
+        />
+        <p className={cn('text-[11px] font-semibold tracking-[0.16em] uppercase', text)}>{label}</p>
+        {scope ? <p className="mt-1 text-sm text-ink-500">{scope}</p> : null}
+      </div>
+      {action}
+    </div>
+  )
+}
+
+/**
+ * A headline figure as its own card, with a tinted ground and an icon badge.
+ *
+ * Distinct from `Stat`, which lives inside a joined strip. Use this where the
+ * figures are the subject of the page rather than a summary of it — the tint
+ * carries meaning, so `risk` is for money going out or a count that is a
+ * problem, never for decoration.
+ */
+export function MetricCard({
+  label,
+  value,
+  prefix,
+  note,
+  icon,
+  href,
+  tone = 'neutral',
+  index,
+}: {
+  label: string
+  value: ReactNode
+  prefix?: string
+  note?: ReactNode
+  icon?: ReactNode
+  href?: string
+  tone?: 'neutral' | 'brand' | 'ok' | 'warn' | 'risk' | 'live'
+  index?: number
+}) {
+  const ground = {
+    neutral: 'from-ink-100/60',
+    brand: 'from-brand-600/15',
+    ok: 'from-ok-600/15',
+    warn: 'from-warn-600/15',
+    risk: 'from-risk-600/15',
+    live: 'from-live-500/15',
+  }[tone]
+
+  const badge = {
+    neutral: 'bg-ink-100 text-ink-500',
+    brand: 'bg-brand-600/15 text-brand-700',
+    ok: 'bg-ok-600/15 text-ok-700',
+    warn: 'bg-warn-600/15 text-warn-700',
+    risk: 'bg-risk-600/15 text-risk-700',
+    live: 'bg-live-500/20 text-live-700',
+  }[tone]
+
+  const figure = {
+    neutral: 'text-ink-950',
+    brand: 'text-brand-700',
+    ok: 'text-ok-700',
+    warn: 'text-warn-700',
+    risk: 'text-risk-700',
+    live: 'text-ink-950',
+  }[tone]
+
+  const body = (
+    <>
+      {/* The tint is a wash from the top-left rather than a flat fill, so a row
+          of these reads as lit from one direction instead of six flat swatches. */}
+      <span
+        className={cn(
+          'pointer-events-none absolute inset-0 bg-gradient-to-br to-transparent',
+          ground,
+        )}
+        aria-hidden="true"
+      />
+      <span className="relative flex items-start justify-between gap-3">
+        <span className="text-[11px] font-semibold tracking-[0.14em] text-ink-500 uppercase">
+          {label}
+        </span>
+        {icon ? (
+          <span
+            className={cn('flex size-8 shrink-0 items-center justify-center rounded-lg', badge)}
+          >
+            {icon}
+          </span>
+        ) : null}
+      </span>
+      <span className="font-display relative mt-4 flex items-baseline gap-1.5 tracking-tight tabular">
+        {prefix ? <span className="text-sm font-semibold text-ink-500">{prefix}</span> : null}
+        <span className={cn('text-3xl font-bold', figure)}>{value}</span>
+      </span>
+      {note ? <span className="relative mt-2 block text-xs text-ink-500">{note}</span> : null}
+    </>
+  )
+
+  const className = cn(
+    'rise relative flex flex-col overflow-hidden rounded-xl border border-ink-200 bg-panel p-5',
+    href ? 'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg' : '',
+  )
+  const style = index === undefined ? undefined : ({ '--i': index } as CSSProperties)
+
+  return href ? (
+    <Link href={href} className={className} style={style}>
+      {body}
+    </Link>
+  ) : (
+    <div className={className} style={style}>
+      {body}
+    </div>
+  )
+}
+
+/**
+ * A proportion as one bar with a legend under it.
+ *
+ * The segments must be mutually exclusive and add up to the whole — that is the
+ * only reading a stacked bar supports, and a bar whose parts overlap is a lie
+ * told in a convincing shape. Each legend row carries its own count and share
+ * so the bar never has to be measured by eye.
+ */
+export function SplitBar({
+  total,
+  totalLabel,
+  segments,
+}: {
+  total: ReactNode
+  totalLabel: string
+  segments: Array<{ label: string; value: number; tone: 'brand' | 'ok' | 'warn' | 'risk' | 'live' }>
+}) {
+  const sum = segments.reduce((n, s) => n + s.value, 0)
+  const fill = {
+    brand: 'bg-brand-600',
+    ok: 'bg-ok-600',
+    warn: 'bg-warn-600',
+    risk: 'bg-risk-600',
+    live: 'bg-live-500',
+  }
+  const dot = fill
+
+  return (
+    <div>
+      <p className="font-display flex items-baseline gap-2 tracking-tight">
+        <span className="text-4xl font-bold text-ink-950 tabular">{total}</span>
+        <span className="text-sm text-ink-500">{totalLabel}</span>
+      </p>
+
+      <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-ink-100">
+        {segments.map((s) => (
+          <span
+            key={s.label}
+            className={cn('transition-[width] duration-500', fill[s.tone])}
+            style={{ width: sum === 0 ? '0%' : `${(s.value / sum) * 100}%` }}
+            aria-hidden="true"
+          />
+        ))}
+      </div>
+
+      <ul className="mt-4 space-y-2.5">
+        {segments.map((s) => (
+          <li key={s.label} className="flex items-center gap-2.5">
+            <span className={cn('size-2 shrink-0 rounded-full', dot[s.tone])} aria-hidden="true" />
+            <span className="text-sm text-ink-700">{s.label}</span>
+            <span className="ml-auto text-sm font-medium text-ink-900 tabular">{s.value}</span>
+            <span className="w-10 text-right text-sm text-ink-400 tabular">
+              {sum === 0 ? '—' : `${Math.round((s.value / sum) * 100)}%`}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+/**
+ * A ranked list where each row carries its own bar.
+ *
+ * The bar is scaled against the largest row, not against a total: the question
+ * these answer is "who is ahead of whom", and scaling to a total flattens
+ * everything into slivers the moment one row dominates.
+ */
+export function RankedList({
+  items,
+  tone = 'brand',
+}: {
+  items: Array<{ label: string; sub?: string; value: ReactNode; amount: number; href?: string }>
+  tone?: 'brand' | 'ok' | 'live'
+}) {
+  const max = Math.max(1, ...items.map((i) => i.amount))
+  const fill = { brand: 'bg-brand-600', ok: 'bg-ok-600', live: 'bg-live-500' }[tone]
+
+  return (
+    <ol className="space-y-3.5">
+      {items.map((item, i) => {
+        const inner = (
+          <>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="flex min-w-0 items-baseline gap-2">
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-ink-100 text-[10px] font-bold text-ink-500 tabular">
+                  {i + 1}
+                </span>
+                <span className="truncate text-sm font-medium text-ink-900">{item.label}</span>
+              </span>
+              <span className="shrink-0 text-sm font-medium text-ink-900 tabular">
+                {item.value}
+              </span>
+            </div>
+            <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-ink-100">
+              <span
+                className={cn('block h-full transition-[width] duration-500', fill)}
+                style={{ width: `${Math.max(2, (item.amount / max) * 100)}%` }}
+                aria-hidden="true"
+              />
+            </div>
+            {item.sub ? <p className="mt-1 pl-7 text-xs text-ink-500">{item.sub}</p> : null}
+          </>
+        )
+        return (
+          <li key={item.label + i}>
+            {item.href ? (
+              <Link href={item.href} className="block rounded-lg hover:opacity-80">
+                {inner}
+              </Link>
+            ) : (
+              inner
+            )}
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+/**
+ * A bordered panel of prose sitting under a set of figures, explaining what
+ * they do and do not mean.
+ *
+ * The single most useful thing on a console screen, and the thing dashboards
+ * most often leave out: a number without its caveat gets misread, and gets
+ * misread confidently.
+ */
+export function NotePanel({
+  title,
+  children,
+  tone = 'neutral',
+}: {
+  title?: string
+  children: ReactNode
+  tone?: 'neutral' | 'warn' | 'brand'
+}) {
+  const border = {
+    neutral: 'border-ink-200 bg-ink-50',
+    warn: 'border-warn-600/25 bg-warn-50',
+    brand: 'border-brand-600/25 bg-brand-600/[0.04]',
+  }[tone]
+
+  return (
+    <div className={cn('rounded-xl border p-4 sm:p-5', border)}>
+      {title ? <p className="text-sm font-medium text-ink-900">{title}</p> : null}
+      <div className="mt-1.5 space-y-2 text-sm leading-relaxed text-ink-600">{children}</div>
+    </div>
+  )
+}
+
+/** A small labelled figure, for the grid inside an EntityCard. */
+export function MiniStat({
+  label,
+  value,
+  note,
+}: {
+  label: string
+  value: ReactNode
+  note?: string
+}) {
+  return (
+    <div className="rounded-lg border border-ink-200 bg-panel p-3.5">
+      <p className="text-[10px] font-semibold tracking-[0.12em] text-ink-500 uppercase">{label}</p>
+      <p className="font-display mt-1.5 text-xl font-bold text-ink-950 tabular">{value}</p>
+      {note ? <p className="mt-0.5 text-xs text-ink-500">{note}</p> : null}
+    </div>
+  )
+}
+
+/**
+ * A card about one named thing — a client, a project, a document type — with a
+ * pill for its identity and a grid of its figures inside.
+ */
+export function EntityCard({
+  name,
+  pill,
+  meta,
+  tone = 'brand',
+  children,
+  footer,
+  index,
+}: {
+  name: string
+  pill?: string
+  meta?: ReactNode
+  tone?: 'brand' | 'ok' | 'live' | 'warn'
+  children: ReactNode
+  footer?: ReactNode
+  index?: number
+}) {
+  const wash = {
+    brand: 'from-brand-600/10',
+    ok: 'from-ok-600/10',
+    live: 'from-live-500/10',
+    warn: 'from-warn-600/10',
+  }[tone]
+
+  const chip = {
+    brand: 'bg-brand-600/15 text-brand-700',
+    ok: 'bg-ok-600/15 text-ok-700',
+    live: 'bg-live-500/20 text-live-700',
+    warn: 'bg-warn-600/15 text-warn-700',
+  }[tone]
+
+  return (
+    <div
+      className="rise relative overflow-hidden rounded-xl border border-ink-200 bg-panel"
+      style={index === undefined ? undefined : ({ '--i': index } as CSSProperties)}
+    >
+      <span
+        className={cn(
+          'pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b to-transparent',
+          wash,
+        )}
+        aria-hidden="true"
+      />
+      <div className="relative p-4 sm:p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            {pill ? (
+              <span
+                className={cn(
+                  'inline-block rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide',
+                  chip,
+                )}
+              >
+                {pill}
+              </span>
+            ) : null}
+            <p className="font-display mt-2 truncate text-lg font-bold text-ink-950">{name}</p>
+          </div>
+          {meta ? <span className="shrink-0 text-xs text-ink-500">{meta}</span> : null}
+        </div>
+
+        <div className="mt-4">{children}</div>
+      </div>
+      {footer ? <div className="relative border-t border-ink-200 p-4 sm:px-5">{footer}</div> : null}
+    </div>
+  )
+}
+
+/** The "▼ 48% vs the daily average" pill. Direction is stated, not implied. */
+export function ComparisonPill({
+  direction,
+  children,
+}: {
+  direction: 'up' | 'down' | 'flat'
+  children: ReactNode
+}) {
+  const tone = {
+    up: 'border-ok-600/30 bg-ok-600/10 text-ok-700',
+    down: 'border-risk-600/30 bg-risk-600/10 text-risk-700',
+    flat: 'border-ink-200 bg-ink-50 text-ink-600',
+  }[direction]
+  const glyph = { up: '▲', down: '▼', flat: '—' }[direction]
+
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium',
+        tone,
+      )}
+    >
+      <span aria-hidden="true">{glyph}</span>
+      {children}
+    </span>
   )
 }

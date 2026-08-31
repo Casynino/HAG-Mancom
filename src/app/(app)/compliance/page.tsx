@@ -3,7 +3,15 @@ import { asc, eq } from 'drizzle-orm'
 import { complianceTypes, profiles } from '@/db/schema'
 import { ComplianceBoard } from '@/components/compliance-board'
 import { AlertTriangle, CalendarClock, CircleCheck, CircleX, ShieldCheck } from 'lucide-react'
-import { PageHeader, Panel, PanelHeader, Ring, StatCard } from '@/components/ui'
+import {
+  MetricCard,
+  PageHeader,
+  Panel,
+  PanelHeader,
+  Ring,
+  SectionBar,
+  SplitBar,
+} from '@/components/ui'
 import { formatDate } from '@/lib/display'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
@@ -72,36 +80,51 @@ export default async function CompliancePage() {
         eyebrow="Compliance"
         title="Statutory & regulatory command"
         description="Certificates, licences and registrations, with reminders at 90, 30, 14, 7 and 1 days before expiry."
+        stats={[
+          { label: 'tracked', value: tracked },
+          { label: 'with an expiry date', value: assessable },
+          { label: 'in good standing', value: valid },
+        ]}
+      />
+
+      <SectionBar
+        label="Where the company stands"
+        scope="Every certificate, licence and registration on record · right now"
+        tone={expired > 0 ? 'risk' : expiring > 0 ? 'warn' : 'ok'}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
+        <MetricCard
+          index={0}
           label="Tracked items"
           value={tracked}
-          meta={`${assessable} with an expiry date`}
+          note={`${assessable} carry an expiry date`}
           href="#all-records"
           icon={<ShieldCheck className="size-4" aria-hidden="true" />}
         />
-        <StatCard
+        <MetricCard
+          index={1}
           label="Expiring soon"
           value={expiring}
-          meta="Within the reminder window"
+          note="inside the reminder window"
           href="#all-records"
           tone={expiring > 0 ? 'warn' : 'neutral'}
           icon={<AlertTriangle className="size-4" aria-hidden="true" />}
         />
-        <StatCard
+        <MetricCard
+          index={2}
           label="Expired"
           value={expired}
-          meta={expired > 0 ? 'Renew immediately' : 'None'}
+          note={expired > 0 ? 'renew immediately' : 'none lapsed'}
           href="#all-records"
           tone={expired > 0 ? 'risk' : 'neutral'}
           icon={<CircleX className="size-4" aria-hidden="true" />}
         />
-        <StatCard
+        <MetricCard
+          index={3}
           label="In good standing"
           value={valid}
-          meta="Current and verified"
+          note="current and verified"
           href="#all-records"
           tone="ok"
           icon={<CircleCheck className="size-4" aria-hidden="true" />}

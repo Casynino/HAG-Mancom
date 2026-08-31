@@ -49,6 +49,10 @@ export default async function ClientsPage() {
         eyebrow="Technical Office"
         title="Clients"
         description="Client records feed every document. TIN and VRN print on tax invoices, so keep them current."
+        stats={[
+          { label: 'on the books', value: rows.length },
+          { label: 'with a VRN recorded', value: rows.filter((r) => r.vrn).length },
+        ]}
       />
       <ClientManager clients={rows} />
     </>

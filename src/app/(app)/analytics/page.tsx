@@ -1,7 +1,19 @@
 import type { Metadata } from 'next'
 import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
 import { clients, documents, engineerSubmissions } from '@/db/schema'
-import { Panel, PanelHeader, PageHeader } from '@/components/ui'
+import {
+  ComparisonPill,
+  EntityCard,
+  MetricCard,
+  NotePanel,
+  Panel,
+  PanelHeader,
+  PageHeader,
+  RankedList,
+  SectionBar,
+  SplitBar,
+} from '@/components/ui'
+import { CheckCircle2, Clock, FileStack, PenLine, Stamp, TrendingUp } from 'lucide-react'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
@@ -157,52 +169,67 @@ export default async function AnalyticsPage() {
       />
 
       {/* ------------------------------- Pipeline ----------------------------- */}
-      <Panel>
-        <PanelHeader
-          title="Document pipeline"
-          description="Where every document currently sits, and what it is worth."
+      <section className="space-y-4">
+        <SectionBar
+          label="The pipeline"
+          scope="Where every document sits right now, and what it is worth · all time"
+          action={
+            turnaroundSample > 0 ? (
+              <ComparisonPill direction={turnaroundHours <= 24 ? 'up' : 'flat'}>
+                {turnaroundHours < 1
+                  ? 'decided within the hour'
+                  : `${turnaroundHours.toFixed(0)}h to a decision`}
+              </ComparisonPill>
+            ) : null
+          }
         />
-        <div className="p-4 sm:p-5">
-          {pipelineTotal === 0 ? (
-            <p className="text-sm text-ink-500">No documents have been produced yet.</p>
-          ) : (
-            <>
-              <div className="flex h-3 overflow-hidden rounded-full bg-ink-100">
-                {stages.map((s, i) => {
-                  const pct = (s.count / pipelineTotal) * 100
-                  const fill = ['bg-ink-400', 'bg-warn-600', 'bg-ok-600', 'bg-ink-300'][i]
-                  return s.count === 0 ? null : (
-                    <div
-                      key={s.stage}
-                      className={fill}
-                      style={{ width: `${pct}%` }}
-                      title={`${s.stage}: ${s.count}`}
-                    />
-                  )
-                })}
-              </div>
 
-              <dl className="mt-6 grid gap-6 sm:grid-cols-4">
-                {stages.map((s, i) => (
-                  <div key={s.stage}>
-                    <dt className="flex items-center gap-2 text-xs text-ink-500">
-                      <span
-                        className={`size-2 rounded-full ${['bg-ink-400', 'bg-warn-600', 'bg-ok-600', 'bg-ink-300'][i]}`}
-                        aria-hidden="true"
-                      />
-                      {s.stage}
-                    </dt>
-                    <dd className="font-display mt-1.5 text-2xl font-bold text-ink-950 tabular">
-                      {s.count}
-                    </dd>
-                    <dd className="text-xs text-ink-500 tabular">{money(s.value)}</dd>
-                  </div>
-                ))}
-              </dl>
-            </>
-          )}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {stages.map((s, i) => (
+            <MetricCard
+              key={s.stage}
+              index={i}
+              label={s.stage}
+              value={s.count}
+              note={money(s.value)}
+              tone={(['brand', 'warn', 'ok', 'neutral'] as const)[i]}
+              icon={
+                [
+                  <PenLine key="a" className="size-4" aria-hidden="true" />,
+                  <Stamp key="b" className="size-4" aria-hidden="true" />,
+                  <CheckCircle2 key="c" className="size-4" aria-hidden="true" />,
+                  <FileStack key="d" className="size-4" aria-hidden="true" />,
+                ][i]
+              }
+            />
+          ))}
         </div>
-      </Panel>
+
+        {pipelineTotal > 0 ? (
+          <Panel>
+            <div className="p-4 sm:p-5">
+              <SplitBar
+                total={pipelineTotal}
+                totalLabel={`document${pipelineTotal === 1 ? '' : 's'} in the system`}
+                segments={stages
+                  .filter((s) => s.count > 0)
+                  .map((s, i) => ({
+                    label: s.stage,
+                    value: s.count,
+                    tone: (['brand', 'warn', 'ok', 'live'] as const)[STAGE_ORDER.indexOf(s.stage)]!,
+                  }))}
+              />
+            </div>
+          </Panel>
+        ) : (
+          <NotePanel title="No documents have been produced yet">
+            <p>
+              The pipeline fills as engineers submit from site and the Technical Office writes those
+              submissions up. Nothing here is a projection.
+            </p>
+          </NotePanel>
+        )}
+      </section>
 
       <div className="grid gap-5 lg:grid-cols-2">
         {/* ---------------------------- By client ---------------------------- */}

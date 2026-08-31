@@ -411,3 +411,39 @@
 :root[data-theme='light'] .theme-when-dark {
   display: none;
 }
+
+/*
+ * Entrance motion.
+ *
+ * One animation, used sparingly: content lifts a few pixels as it arrives, and
+ * a `--i` custom property staggers a row so cards land left to right rather
+ * than all at once. Deliberately short — 380ms — because this is an operations
+ * console somebody opens forty times a day, and an animation that is charming
+ * on the first visit is an obstacle on the fortieth.
+ *
+ * Anyone who has asked their system to stop moving things gets no motion at
+ * all, and no delay either: `animation: none` would still leave the element at
+ * its start position if the keyframes had set opacity, so the rule turns the
+ * animation off rather than pausing it.
+ */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}
