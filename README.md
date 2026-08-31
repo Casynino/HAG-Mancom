@@ -2,7 +2,8 @@
 
 Engineering operations and documentation platform for HA GROUP TZ LTD.
 
-**Phase 1 — Foundation, mobile engineer intake, and controlled configuration.**
+Public website: **separate WordPress site at hpcagroup.africa** — not in this
+repository. This is the secure staff portal it links to.
 
 ---
 
@@ -109,10 +110,15 @@ needs renaming to the next free number in this directory.
 | `0006` | Measurement delete grant |
 | `0007` | `resolve_session` returns `text[]` |
 | `0008` | Table-level insert grant on `profiles` |
+| `0009`–`0011` | Client contacts and Purchase Orders, with the PO protection trigger |
+| `0012`–`0013` | Document engine tables, then its grants, policies and guarantees |
+| `0014` | Notification kinds for documents, deliveries and compliance |
+| `0015` | Compliance status functions and the Tanzanian certificate types |
 
-Two of those exist because of bugs that only end-to-end running caught, and both
-notes explain why — worth reading before adding queries that return a custom
-enum array or rely on column-level `INSERT` grants.
+Several of these exist because of bugs that only end-to-end running caught —
+a custom enum array the driver could not parse, column-level `INSERT` grants
+that must cover every column an ORM names, and a bare `select()` asking for
+`password_hash`. Each carries a note explaining the trap.
 
 ---
 
@@ -138,16 +144,25 @@ surfaced rather than resolved.
 npm test
 ```
 
-117 tests. The database tests run against the real restricted role, so they
+241 tests. The database tests run against the real restricted role, so they
 exercise the same path a request takes.
 
 | File | Covers |
 |---|---|
 | `authorization.test.ts` | RLS per role, unauthenticated access, password material, session resolution |
-| `workflow.test.ts` | Legal and illegal status transitions, content locking, audit immutability |
-| `lifecycle.test.ts` | The full draft → ready-for-documentation path, including real file storage |
+| `workflow.test.ts` | Submission transitions, content locking, audit immutability |
+| `lifecycle.test.ts` | Draft → ready-for-documentation, including real file storage |
+| `documents.test.ts` | PO protection, document transitions, approved immutability, the invoice gate, seal authority |
+| `finance.test.ts` | The calculation engine against all four real HA GROUP sample invoices |
+| `rendering.test.ts` | Real PDF and DOCX bytes, per document type |
 | `numbering.test.ts` | Reference allocation under genuine concurrency |
+| `end-to-end.test.ts` | The whole chain: submission → quotation → approval → PO → delivery → invoice → EFD → searchable |
 | `validation.test.ts` | Permission matrix, file validation, passwords, input schemas |
+
+`finance.test.ts` is the one to read first. It treats HA GROUP's own documents
+as the specification and reproduces each of them to the cent — including the
+two arithmetic errors Phase 0 found in the originals, which it demonstrates
+rather than reproduces.
 
 ---
 
