@@ -368,3 +368,46 @@
     );
   }
 }
+
+/*
+ * Which glyph the one-button theme switch shows.
+ *
+ * Driven by exactly the same three selectors as the palette, and for the same
+ * reason: an explicit choice stamps `data-theme`, but the default — following
+ * the device — stamps nothing, so `prefers-color-scheme` is the only signal.
+ * Deciding this in JavaScript instead would either mismatch on hydration or
+ * show the wrong icon for a frame, because the server cannot know a visitor's
+ * system preference.
+ *
+ * `theme-when-light` is what you see while the page is light: a moon, because
+ * pressing it takes you to dark. The glyph is the label.
+ */
+.theme-when-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .theme-when-light {
+    display: none;
+  }
+
+  :root:not([data-theme='light']) .theme-when-dark {
+    display: inline-block;
+  }
+}
+
+:root[data-theme='dark'] .theme-when-light {
+  display: none;
+}
+
+:root[data-theme='dark'] .theme-when-dark {
+  display: inline-block;
+}
+
+:root[data-theme='light'] .theme-when-light {
+  display: inline-block;
+}
+
+:root[data-theme='light'] .theme-when-dark {
+  display: none;
+}
