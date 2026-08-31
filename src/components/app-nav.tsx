@@ -70,6 +70,65 @@ export interface NavItem {
 /** Fixed order, so the sidebar does not reshuffle as permissions differ. */
 const GROUP_ORDER = ['Overview', 'Operations', 'Records', 'Administration'] as const
 
+/**
+ * A mark beside each group heading.
+ *
+ * Small uppercase headings all look the same at a glance, which is what makes a
+ * long sidebar tiring to scan. A glyph gives each band a shape the eye can find
+ * without reading, so somebody who lives in Administration stops re-reading four
+ * headings to get there.
+ */
+const GROUP_ICONS: Record<(typeof GROUP_ORDER)[number] | 'System', LucideIcon> = {
+  Overview: Gauge,
+  Operations: Inbox,
+  Records: Layers,
+  Administration: SlidersHorizontal,
+  System: Bell,
+}
+
+/**
+ * One row in the sidebar. Extracted because it was written out three times —
+ * groups, System, and the phone menu — and the active treatment had already
+ * drifted between them.
+ *
+ * Active is an outlined pill in the live gold rather than a filled block: on a
+ * navy ground a fill reads as a button somebody is about to press, while an
+ * outline reads as "you are here", which is what it means.
+ */
+function NavRow({
+  href,
+  label,
+  Icon,
+  active,
+  trailing,
+  onClick,
+}: {
+  href: string
+  label: string
+  Icon: LucideIcon
+  active: boolean
+  trailing?: React.ReactNode
+  onClick?: () => void
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        'flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors',
+        active
+          ? 'border-live-400/45 bg-live-400/10 font-medium text-live-300'
+          : 'border-transparent text-white/60 hover:bg-sidebar-hover/60 hover:text-white',
+      )}
+    >
+      <Icon className="size-4 shrink-0" aria-hidden="true" />
+      {label}
+      {trailing}
+    </Link>
+  )
+}
+
 function isActive(pathname: string, href: string): boolean {
   if (href === '/engineer') return pathname === '/engineer' || pathname.startsWith('/engineer/')
   if (href === '/technical') {
@@ -99,6 +158,7 @@ export function AppNav({
   // The four most relevant destinations get the phone tab bar; everything else
   // lives behind the menu. More than five tabs stops being a tab bar.
   const primary = items.slice(0, 4)
+  const home = items.find((i) => i.label === 'Home')
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
@@ -121,95 +181,103 @@ export function AppNav({
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label="Main">
+          {/* Home stands outside the groups. It is the one destination that is
+              not a department, and giving it a heading of its own said nothing. */}
+          {home ? (
+            <div className="mb-4">
+              <NavRow
+                href={home.href}
+                label={home.label}
+                Icon={ICONS[home.icon] ?? Gauge}
+                active={isActive(pathname, home.href)}
+              />
+            </div>
+          ) : null}
+
           {GROUP_ORDER.map((group) => {
-            const inGroup = items.filter((i) => i.group === group)
+            const inGroup = items.filter((i) => i.group === group && i !== home)
             if (inGroup.length === 0) return null
+            const GroupIcon = GROUP_ICONS[group]
 
             return (
               <div key={group} className="mb-5">
-                <p className="px-3 pb-2 text-[10px] font-semibold tracking-[0.16em] text-white/35 uppercase">
+                <p className="flex items-center gap-2 px-3 pb-2 text-[10px] font-semibold tracking-[0.16em] text-white/35 uppercase">
+                  <GroupIcon className="size-3.5 shrink-0" aria-hidden="true" />
                   {group}
                 </p>
 
-                {inGroup.map((item) => {
-                  const Icon = ICONS[item.icon] ?? ClipboardList
-                  const active = isActive(pathname, item.href)
-                  return (
-                    <Link
+                {/* The rule ties a band together and the indent says these
+                    belong to the heading above rather than floating beside it. */}
+                <div className="ml-4 space-y-0.5 border-l border-white/10 pl-2.5">
+                  {inGroup.map((item) => (
+                    <NavRow
                       key={item.href}
                       href={item.href}
-                      aria-current={active ? 'page' : undefined}
-                      className={cn(
-                        'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
-                        active
-                          ? 'bg-sidebar-hover font-medium text-white'
-                          : 'text-white/60 hover:bg-sidebar-hover/60 hover:text-white',
-                      )}
-                    >
-                      {active ? (
-                        <span
-                          className="absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-r bg-live-400"
-                          aria-hidden="true"
-                        />
-                      ) : null}
-                      <Icon className="size-4 shrink-0" aria-hidden="true" />
-                      {item.label}
-                    </Link>
-                  )
-                })}
+                      label={item.label}
+                      Icon={ICONS[item.icon] ?? ClipboardList}
+                      active={isActive(pathname, item.href)}
+                    />
+                  ))}
+                </div>
               </div>
             )
           })}
 
           <div className="mb-5">
-            <p className="px-3 pb-2 text-[10px] font-semibold tracking-[0.16em] text-white/35 uppercase">
+            <p className="flex items-center gap-2 px-3 pb-2 text-[10px] font-semibold tracking-[0.16em] text-white/35 uppercase">
+              <Bell className="size-3.5 shrink-0" aria-hidden="true" />
               System
             </p>
-            <Link
-              href="/notifications"
-              aria-current={pathname === '/notifications' ? 'page' : undefined}
-              className={cn(
-                'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
-                pathname === '/notifications'
-                  ? 'bg-sidebar-hover font-medium text-white'
-                  : 'text-white/60 hover:bg-sidebar-hover/60 hover:text-white',
-              )}
-            >
-              {pathname === '/notifications' ? (
-                <span
-                  className="absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-r bg-live-400"
-                  aria-hidden="true"
-                />
-              ) : null}
-              <Bell className="size-4 shrink-0" aria-hidden="true" />
-              Notifications
-              {unread > 0 ? (
-                <span className="ml-auto rounded-full bg-live-400 px-1.5 py-0.5 text-[11px] font-semibold text-sidebar tabular">
-                  {unread > 99 ? '99+' : unread}
-                </span>
-              ) : null}
-            </Link>
+            <div className="ml-4 space-y-0.5 border-l border-white/10 pl-2.5">
+              <NavRow
+                href="/notifications"
+                label="Notifications"
+                Icon={Bell}
+                active={pathname === '/notifications'}
+                trailing={
+                  unread > 0 ? (
+                    <span className="ml-auto rounded-full bg-live-400 px-1.5 py-0.5 text-[11px] font-semibold text-sidebar tabular">
+                      {unread > 99 ? '99+' : unread}
+                    </span>
+                  ) : null
+                }
+              />
+            </div>
           </div>
         </nav>
 
-        <div className="border-t border-white/10 p-4">
-          <div className="mb-3 flex items-center justify-between">
+        <div className="border-t border-white/10 p-3">
+          <div className="mb-2 flex items-center justify-between px-1">
             <span className="text-[10px] tracking-[0.14em] text-white/35 uppercase">Theme</span>
             <ThemeToggle tone="shell" />
           </div>
 
-          <p className="truncate text-sm font-medium text-white">{user.name}</p>
-          <p className="truncate text-xs text-white/45">{user.roles.join(' · ')}</p>
+          {/* The person, as a card. An initial in a disc is faster to recognise
+              across a desk than a name in the same weight as everything else,
+              and the role beneath it answers "why can I not see that page". */}
+          <div className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2.5">
+            <span className="font-display flex size-9 shrink-0 items-center justify-center rounded-full bg-live-400/20 text-sm font-bold text-live-300">
+              {user.name.trim().charAt(0).toUpperCase()}
+            </span>
+            <span className="min-w-0">
+              <span className="block truncate text-sm font-medium text-white">{user.name}</span>
+              <span className="block truncate text-xs text-white/45">{user.roles.join(' · ')}</span>
+            </span>
+          </div>
 
-          <form action={signOutAction} className="mt-3">
+          <form action={signOutAction} className="mt-2">
             <button
               type="submit"
-              className="flex w-full items-center gap-2.5 rounded-lg py-2 text-sm text-white/55 transition-colors hover:text-white"
+              className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-white/12 py-2.5 text-sm text-white/70 transition-colors hover:border-white/25 hover:text-white"
             >
               <LogOut className="size-4" aria-hidden="true" />
               Sign out
             </button>
           </form>
+
+          <p className="mt-3 text-center text-[10px] tracking-[0.12em] text-white/25 uppercase">
+            HA GROUP TZ LTD
+          </p>
         </div>
       </aside>
 
