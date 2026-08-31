@@ -28,6 +28,9 @@
  */
 import { config } from 'dotenv'
 import { Client } from 'pg'
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { hashPassword } from '../src/lib/auth/password'
 
 config({ path: '.env.local', quiet: true })
@@ -324,6 +327,65 @@ async function main() {
           [subId],
         )
       }
+    }
+
+    // --------------------------------------------------------- brand assets
+    /*
+     * The company mark, the round DAR ES SALAAM stamp and the four principals'
+     * marks, lifted out of HA GROUP's own tax invoice HI_2670053 — so what the
+     * platform prints is exactly what the company already prints, rather than a
+     * redrawn approximation.
+     *
+     * No Director signature is loaded, and that is deliberate. A signature is
+     * bound to the person it belongs to and may only be uploaded by them; it is
+     * the one asset this script must not create on someone's behalf.
+     */
+    const assets = [
+      { file: 'ha-group-mark.png', kind: 'logo', label: 'HA GROUP mark', order: 0 },
+      { file: 'company-stamp.png', kind: 'stamp', label: 'HA GROUP TZ LIMITED company stamp', order: 0 },
+      { file: 'sew-eurodrive.png', kind: 'partner_mark', label: 'SEW Eurodrive', order: 0 },
+      { file: 'schneider-electric.png', kind: 'partner_mark', label: 'Schneider Electric', order: 1 },
+      { file: 'optimised-power.png', kind: 'partner_mark', label: 'Optimised Power Products', order: 2 },
+      { file: 'hpc-africa.png', kind: 'partner_mark', label: 'HPC Africa', order: 3 },
+    ]
+
+    /*
+     * Written straight through the Blob SDK rather than the application's
+     * storage module: that module is marked `server-only` and cannot be
+     * imported by a plain script. The key convention and the private access
+     * level are kept identical to src/lib/storage so the app reads these back
+     * exactly as if it had written them itself.
+     */
+    const { put } = await import('@vercel/blob')
+
+    for (const a of assets) {
+      const exists = await c.query('select 1 from public.company_assets where label = $1', [a.label])
+      if (exists.rows.length > 0) continue
+
+      const bytes = readFileSync(join(process.cwd(), 'public', 'brand', a.file))
+      const key = `company-assets/${a.kind}/${a.file}`
+      await put(key, bytes, {
+        access: 'private',
+        contentType: 'image/png',
+        addRandomSuffix: false,
+        allowOverwrite: true,
+      })
+
+      await c.query(
+        `insert into public.company_assets
+           (kind, label, storage_key, content_type, byte_size, checksum_sha256,
+            display_order, is_default, state, notes, created_by, approved_by, approved_at)
+         values ($1::public.asset_kind, $2, $3, 'image/png', $4, $5, $6,
+                 $7, 'approved', $8, $9, $10, now())`,
+        [
+          a.kind, a.label, key, bytes.byteLength,
+          createHash('sha256').update(bytes).digest('hex'),
+          a.order,
+          a.kind !== 'partner_mark',
+          'Extracted from HA GROUP tax invoice HI_2670053.',
+          officer, director,
+        ],
+      )
     }
 
     // ------------------------------------------------------------ compliance

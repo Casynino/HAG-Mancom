@@ -49,6 +49,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         show: hasPermission(actor.roles, 'submission.review'),
       },
       {
+        href: '/technical/studio',
+        label: 'AI Document Studio',
+        short: 'Studio',
+        icon: 'sparkles',
+        group: 'Operations',
+        show: hasPermission(actor.roles, 'document.create'),
+      },
+      {
         href: '/approvals',
         label: 'Approvals',
         short: 'Approve',

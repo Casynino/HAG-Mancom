@@ -17,6 +17,7 @@ import {
   Shield,
   ShieldCheck,
   SlidersHorizontal,
+  Sparkles,
   Stamp,
   Truck,
   Image as ImageIcon,
@@ -51,6 +52,7 @@ const ICONS: Record<string, LucideIcon> = {
   shieldcheck: ShieldCheck,
   truck: Truck,
   image: ImageIcon,
+  sparkles: Sparkles,
 }
 
 export interface NavItem {
