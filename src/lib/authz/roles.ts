@@ -219,10 +219,22 @@ export function canApplyStamp(roles: readonly AppRole[]): boolean {
  * of them, since that is where their work queue lives.
  */
 export function defaultRouteFor(roles: readonly AppRole[]): string {
-  if (roles.includes('technical_officer')) return '/technical'
-  // A Director's work is the approval inbox, not a dashboard.
-  if (roles.includes('director')) return '/approvals'
-  if (roles.includes('administrator')) return '/admin'
+  /*
+   * Anybody who can see the command centre lands there.
+   *
+   * An earlier version sent each role straight to its own queue, on the
+   * reasoning that a Director's work is the approval inbox rather than a
+   * dashboard. HA GROUP disagreed, and they are right: the queue tells you
+   * what is on your desk, and Home tells you whether the business is all
+   * right — which is the question a Director and an Administrator open the
+   * platform to answer. Their queue is one click away and carries its count in
+   * the navigation.
+   *
+   * An Engineer still lands on their own portal, because they cannot see the
+   * command centre at all: it reports on everybody's work, and
+   * `submission.view_all` is the permission an Engineer must not hold.
+   */
+  if (hasPermission(roles, 'submission.view_all')) return '/dashboard'
   if (roles.includes('engineer')) return '/engineer'
   return '/dashboard'
 }

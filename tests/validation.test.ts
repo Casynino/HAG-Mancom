@@ -77,12 +77,24 @@ describe('permission matrix', () => {
     expect(canApplyStamp(['administrator'])).toBe(true)
   })
 
-  it('routes each role to where their work is', () => {
+  it('lands anyone who can see the command centre on it, and an Engineer on their own portal', () => {
+    /*
+     * This used to send each role to its own queue. HA GROUP asked for the
+     * command centre instead, and they are right: a queue says what is on your
+     * desk, Home says whether the business is all right, and that is the
+     * question a Director or an Administrator opens the platform to answer.
+     *
+     * The Engineer case is the one that carries a rule rather than a
+     * preference. The command centre reports on everybody's work, so it is
+     * gated on `submission.view_all` — the permission an Engineer must never
+     * hold, because they see their own site reports and nobody else's. If this
+     * assertion ever flips, an Engineer has been given sight of the whole
+     * company's submissions.
+     */
     expect(defaultRouteFor(['engineer'])).toBe('/engineer')
-    expect(defaultRouteFor(['technical_officer'])).toBe('/technical')
-    // A Director's work is the approval inbox, not a dashboard to read.
-    expect(defaultRouteFor(['director'])).toBe('/approvals')
-    expect(defaultRouteFor(['administrator'])).toBe('/admin')
+    expect(defaultRouteFor(['technical_officer'])).toBe('/dashboard')
+    expect(defaultRouteFor(['director'])).toBe('/dashboard')
+    expect(defaultRouteFor(['administrator'])).toBe('/dashboard')
     expect(defaultRouteFor([])).toBe('/dashboard')
   })
 

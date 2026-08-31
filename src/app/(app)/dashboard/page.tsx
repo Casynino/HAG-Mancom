@@ -14,6 +14,9 @@ import { ArrowRight, FilePlus2, FileText, HardHat, ShieldCheck, Stamp } from 'lu
 import type { ReactNode } from 'react'
 import {
   AttentionItem,
+  RankedList,
+  SectionBar,
+  SplitBar,
   Badge,
   BannerPill,
   Desk,
@@ -86,6 +89,8 @@ export default async function DashboardPage() {
       expiring,
       approvedThisMonth,
       activeProjects,
+      topClients,
+      byType,
     ] = await Promise.all([
       db
         .select({ status: engineerSubmissions.status, count: sql<number>`count(*)::int` })
@@ -176,6 +181,32 @@ export default async function DashboardPage() {
         .select({ count: sql<number>`count(*)::int` })
         .from(projects)
         .where(and(eq(projects.status, 'active'), isNull(projects.archivedAt))),
+
+      // Who the work is actually for, by approved value. Ranked against each
+      // other, not against a total, because the question is who is largest.
+      db
+        .select({
+          name: clients.legalName,
+          value: sql<string>`coalesce(sum(${documents.grandTotal}), 0)::text`,
+          documents: sql<number>`count(*)::int`,
+        })
+        .from(documents)
+        .innerJoin(clients, eq(clients.id, documents.clientId))
+        .where(inArray(documents.status, ['approved', 'issued']))
+        .groupBy(clients.id, clients.legalName)
+        .orderBy(sql`sum(${documents.grandTotal}) desc nulls last`)
+        .limit(5),
+
+      // What the office actually produces, by count.
+      db
+        .select({
+          documentType: documents.documentType,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(documents)
+        .groupBy(documents.documentType)
+        .orderBy(sql`count(*) desc`)
+        .limit(6),
     ])
 
     const total = (rows: Array<{ status: string; count: number }>, ...want: string[]) =>
@@ -194,6 +225,8 @@ export default async function DashboardPage() {
       recentDocuments,
       latestSubmissions,
       expiring,
+      topClients,
+      byType,
       canCreateDocument: hasPermission(actor.roles, 'document.create'),
       canSubmit: hasPermission(actor.roles, 'submission.create'),
     }
@@ -376,6 +409,72 @@ export default async function DashboardPage() {
             tone="ok"
           />
         </StatStrip>
+      </section>
+
+      <section className="space-y-3">
+        <SectionBar
+          label="Who the work is for"
+          scope="By approved value · quotations and invoices a Director has signed"
+          tone="ok"
+          action={
+            <Link
+              href="/analytics"
+              className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline"
+            >
+              Analytics
+              <ArrowRight className="size-3.5" aria-hidden="true" />
+            </Link>
+          }
+        />
+
+        <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
+          <Panel>
+            <PanelHeader
+              title="Clients by approved value"
+              description="Largest first. Ranked against each other, not against a total."
+            />
+            <div className="p-4 sm:p-5">
+              {data.topClients.length === 0 ? (
+                <p className="text-sm text-ink-500">
+                  Nothing has been approved yet, so there is no value to rank.
+                </p>
+              ) : (
+                <RankedList
+                  tone="ok"
+                  items={data.topClients.map((c) => ({
+                    label: c.name,
+                    sub: `${c.documents} document${c.documents === 1 ? '' : 's'}`,
+                    value: `TZS ${formatAmount(Decimal.from(c.value), 0)}`,
+                    amount: Number(c.value),
+                    href: '/technical/clients',
+                  }))}
+                />
+              )}
+            </div>
+          </Panel>
+
+          <Panel>
+            <PanelHeader
+              title="What the office produces"
+              description="Every document ever started, by type."
+            />
+            <div className="p-4 sm:p-5">
+              {data.byType.length === 0 ? (
+                <p className="text-sm text-ink-500">Nothing has been produced yet.</p>
+              ) : (
+                <SplitBar
+                  total={data.byType.reduce((n, t) => n + t.count, 0)}
+                  totalLabel="documents in total"
+                  segments={data.byType.slice(0, 5).map((t, i) => ({
+                    label: DOCUMENT_TYPE_LABELS[t.documentType] ?? t.documentType,
+                    value: t.count,
+                    tone: (['brand', 'ok', 'live', 'warn', 'risk'] as const)[i]!,
+                  }))}
+                />
+              )}
+            </div>
+          </Panel>
+        </div>
       </section>
 
       <section className="space-y-3">
