@@ -25,9 +25,9 @@ nothing else changes and nothing silently degrades.
 **Pick the Neon region to match the Vercel region.** Every page render makes
 several database round-trips, so the distance between the function and the
 database matters far more than the distance between the function and Dar es
-Salaam. `vercel.json` sets `fra1` (Frankfurt), which pairs with Neon's
-`aws-eu-central-1`. If you choose a different Neon region, change `regions` in
-`vercel.json` to match.
+Salaam. `vercel.json` sets `iad1` (US East, Virginia), which pairs with Neon's
+`aws-us-east-2` and with the Blob store. If you move the database, change
+`regions` in `vercel.json` to match it.
 
 ---
 

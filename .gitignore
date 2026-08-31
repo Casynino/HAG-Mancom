@@ -7,7 +7,7 @@ node_modules/
 *.log
 .DS_Store
 .vercel
-storage/
+/storage/
 coverage/
 next-env.d.ts
 *.tsbuildinfo
@@ -16,3 +16,4 @@ next-env.d.ts
 # each machine that needs them — they are licensed per seat, not redistributable.
 assets/fonts/*
 !assets/fonts/README.md
+.env*

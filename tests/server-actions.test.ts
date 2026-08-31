@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -62,6 +63,45 @@ describe("'use server' modules", () => {
         ? `A "use server" file may only export async functions. Move these to a ` +
             `plain module (for example src/lib/…) and import them from there:\n` +
             offenders.join('\n')
+        : undefined,
+    ).toEqual([])
+  })
+})
+
+/**
+ * Nothing the application needs may be excluded from the repository.
+ *
+ * A `.gitignore` pattern without a leading slash matches at every level, so the
+ * entry meant to exclude the local upload directory (`storage/`) also excluded
+ * `src/lib/storage/` — the storage driver itself. The working tree built fine;
+ * a clone of the repository would not have. That failure only appears on a
+ * fresh checkout, which is to say in CI or on the deployment platform, long
+ * after the mistake was made.
+ */
+describe('repository completeness', () => {
+  it('no source file is excluded from version control', () => {
+    let ignored: string
+    try {
+      ignored = execFileSync(
+        'git',
+        ['ls-files', '--others', '--ignored', '--exclude-standard', '--directory', '--', 'src', 'scripts', 'drizzle', 'tests'],
+        { cwd: process.cwd(), encoding: 'utf8' },
+      )
+    } catch {
+      // Not a git checkout (a tarball, a sandbox). Nothing to assert.
+      return
+    }
+
+    const paths = ignored.split('\n').filter(Boolean)
+
+    expect(
+      paths,
+      paths.length > 0
+        ? `These are excluded by .gitignore but the application needs them. A ` +
+            `pattern like "storage/" matches at every level — anchor it with a ` +
+            `leading slash ("/storage/") so it only applies at the repository ` +
+            `root:\n` +
+            paths.join('\n')
         : undefined,
     ).toEqual([])
   })
