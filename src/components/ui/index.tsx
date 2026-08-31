@@ -246,8 +246,20 @@ export function PageHeader({
 }) {
   return (
     <div className="rise relative isolate overflow-hidden rounded-2xl border border-ink-200 bg-panel px-5 py-5 sm:px-7 sm:py-6">
+      {/* A band of colour rather than a suggestion of one. Two washes from
+          opposite corners give it depth without a photograph competing with the
+          type, and the hairline at the top edge catches the light the way a
+          physical panel does. */}
       <span
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-600/[0.07] via-transparent to-live-500/[0.05]"
+        className="pointer-events-none absolute -top-24 -left-16 size-[26rem] rounded-full bg-brand-600/25 blur-[80px]"
+        aria-hidden="true"
+      />
+      <span
+        className="pointer-events-none absolute -right-24 -bottom-28 size-[22rem] rounded-full bg-live-500/20 blur-[80px]"
+        aria-hidden="true"
+      />
+      <span
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-live-400/40 to-transparent"
         aria-hidden="true"
       />
       <div className="relative flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
@@ -271,7 +283,9 @@ export function PageHeader({
         <div className="relative mt-5 flex flex-wrap items-baseline gap-x-8 gap-y-3 border-t border-ink-200 pt-4">
           {stats.map((s) => (
             <span key={s.label} className="flex items-baseline gap-2">
-              <span className="font-display text-xl font-bold text-ink-950 tabular">{s.value}</span>
+              <span className="font-display text-2xl font-bold text-ink-950 tabular">
+                {s.value}
+              </span>
               <span className="text-sm text-ink-500">{s.label}</span>
             </span>
           ))}
@@ -888,22 +902,29 @@ export function MetricCard({
   tone?: 'neutral' | 'brand' | 'ok' | 'warn' | 'risk' | 'live'
   index?: number
 }) {
+  /*
+   * A visible wash, not a hint of one. The first version was so faint it read
+   * as a rendering artefact rather than a decision, which is worse than a flat
+   * card: it looks like something went wrong. The tint still carries meaning —
+   * risk is money going out or a count that is a problem — so it is never
+   * chosen for variety.
+   */
   const ground = {
-    neutral: 'from-ink-100/60',
-    brand: 'from-brand-600/15',
-    ok: 'from-ok-600/15',
-    warn: 'from-warn-600/15',
-    risk: 'from-risk-600/15',
-    live: 'from-live-500/15',
+    neutral: 'from-ink-200/50 via-ink-100/20',
+    brand: 'from-brand-600/25 via-brand-600/[0.07]',
+    ok: 'from-ok-600/25 via-ok-600/[0.07]',
+    warn: 'from-warn-600/25 via-warn-600/[0.07]',
+    risk: 'from-risk-600/25 via-risk-600/[0.07]',
+    live: 'from-live-500/30 via-live-500/[0.08]',
   }[tone]
 
   const badge = {
     neutral: 'bg-ink-100 text-ink-500',
-    brand: 'bg-brand-600/15 text-brand-700',
-    ok: 'bg-ok-600/15 text-ok-700',
-    warn: 'bg-warn-600/15 text-warn-700',
-    risk: 'bg-risk-600/15 text-risk-700',
-    live: 'bg-live-500/20 text-live-700',
+    brand: 'bg-brand-600 text-white',
+    ok: 'bg-ok-600 text-white',
+    warn: 'bg-warn-600 text-white',
+    risk: 'bg-risk-600 text-white',
+    live: 'bg-live-400 text-sidebar',
   }[tone]
 
   const figure = {
@@ -940,9 +961,11 @@ export function MetricCard({
       </span>
       <span className="font-display relative mt-4 flex items-baseline gap-1.5 tracking-tight tabular">
         {prefix ? <span className="text-sm font-semibold text-ink-500">{prefix}</span> : null}
-        <span className={cn('text-3xl font-bold', figure)}>{value}</span>
+        <span className={cn('text-[2rem] leading-none font-bold', figure)}>{value}</span>
       </span>
-      {note ? <span className="relative mt-2 block text-xs text-ink-500">{note}</span> : null}
+      {note ? (
+        <span className="relative mt-2.5 block text-xs leading-relaxed text-ink-500">{note}</span>
+      ) : null}
     </>
   )
 

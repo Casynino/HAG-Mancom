@@ -152,14 +152,16 @@ export function ProjectManager({
         </Panel>
       ) : null}
 
-      <Panel className="divide-y divide-ink-100">
-        {projects.length === 0 ? (
+      {projects.length === 0 ? (
+        <Panel>
           <EmptyState
             title="No projects yet"
             description="Create a project against a client, then assign the Engineers who will visit the site."
           />
-        ) : (
-          projects.map((p) => {
+        </Panel>
+      ) : (
+        <div className="grid gap-4 xl:grid-cols-2">
+          {projects.map((p, cardIndex) => {
             const projectMembers = members.filter((m) => m.projectId === p.id)
             const isOpen = expanded === p.id
             const unassigned = engineers.filter(
@@ -167,115 +169,130 @@ export function ProjectManager({
             )
 
             return (
-              <div key={p.id} className="px-4 py-3.5 sm:px-5">
-                <div className="flex flex-wrap items-start gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Link
-                        href={`/technical/projects/${p.id}`}
-                        className="font-medium text-brand-700 hover:underline"
-                      >
-                        {p.name}
-                      </Link>
-                      <Badge tone={STATUS_TONE[p.status] ?? 'neutral'}>
-                        {p.status.replace(/_/g, ' ')}
-                      </Badge>
-                    </div>
-                    <p className="mt-0.5 text-sm text-ink-500">{p.clientName}</p>
-                    <p className="mt-1 font-mono text-xs text-ink-400 tabular">
-                      {p.reference}
-                      {p.location ? <span className="font-sans"> · {p.location}</span> : null}
-                      <span className="font-sans">
-                        {' '}
-                        · {p.submissionCount} submission
-                        {p.submissionCount === 1 ? '' : 's'}
-                      </span>
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setExpanded(isOpen ? null : p.id)}
-                    className="tap flex items-center gap-1.5 rounded border border-ink-300 bg-panel px-3 text-sm text-ink-700 hover:bg-ink-50"
-                    aria-expanded={isOpen}
-                  >
-                    <UserPlus className="size-4" aria-hidden="true" />
-                    Team ({projectMembers.length})
-                  </button>
-                </div>
-
-                {isOpen ? (
-                  <div className="mt-3 rounded border border-ink-200 bg-ink-50 p-3">
-                    {projectMembers.length === 0 ? (
-                      <p className="text-sm text-ink-500">
-                        Nobody is assigned. An Engineer cannot file against this project until they
-                        are.
+              <div
+                key={p.id}
+                className="rise relative overflow-hidden rounded-xl border border-ink-200 bg-panel p-4 shadow-sm sm:p-5"
+                style={{ '--i': cardIndex } as React.CSSProperties}
+              >
+                {/* A wash from the top so a row of these reads as lit from one
+                    direction rather than as flat swatches. */}
+                <span
+                  className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-brand-600/[0.07] to-transparent"
+                  aria-hidden="true"
+                />
+                <div className="relative">
+                  <div className="flex flex-wrap items-start gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                          href={`/technical/projects/${p.id}`}
+                          className="font-medium text-brand-700 hover:underline"
+                        >
+                          {p.name}
+                        </Link>
+                        <Badge tone={STATUS_TONE[p.status] ?? 'neutral'}>
+                          {p.status.replace(/_/g, ' ')}
+                        </Badge>
+                      </div>
+                      <p className="mt-0.5 text-sm text-ink-500">{p.clientName}</p>
+                      <p className="mt-1 font-mono text-xs text-ink-400 tabular">
+                        {p.reference}
+                        {p.location ? <span className="font-sans"> · {p.location}</span> : null}
+                        <span className="font-sans">
+                          {' '}
+                          · {p.submissionCount} submission
+                          {p.submissionCount === 1 ? '' : 's'}
+                        </span>
                       </p>
-                    ) : (
-                      <ul className="divide-y divide-ink-200">
-                        {projectMembers.map((m) => (
-                          <li key={m.id} className="flex items-center gap-2 py-2">
-                            <span className="flex-1 text-sm text-ink-800">
-                              {m.fullName}
-                              {m.isLead ? (
-                                <Badge tone="brand" className="ml-2">
-                                  Lead
-                                </Badge>
-                              ) : null}
-                            </span>
-                            {canAssign ? (
-                              <form action={removeAction}>
-                                <input type="hidden" name="memberId" value={m.id} />
-                                <input type="hidden" name="projectId" value={p.id} />
-                                <SubmitButton variant="ghost" size="sm" pendingLabel="Removing…">
-                                  <UserMinus className="size-4 text-risk-600" aria-hidden="true" />
-                                  <span className="sr-only">Remove {m.fullName}</span>
-                                </SubmitButton>
-                              </form>
-                            ) : null}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    </div>
 
-                    {canAssign && unassigned.length > 0 ? (
-                      <form action={addAction} className="mt-3 flex flex-wrap items-end gap-2">
-                        <input type="hidden" name="projectId" value={p.id} />
-                        <div className="min-w-48 flex-1">
-                          <label
-                            htmlFor={`assign-${p.id}`}
-                            className="mb-1 block text-xs font-medium text-ink-700"
-                          >
-                            Assign someone
-                          </label>
-                          <Select id={`assign-${p.id}`} name="userId" required>
-                            {unassigned.map((e) => (
-                              <option key={e.id} value={e.id}>
-                                {e.fullName}
-                              </option>
-                            ))}
-                          </Select>
-                        </div>
-                        <label className="tap flex items-center gap-2 text-sm text-ink-700">
-                          <input
-                            type="checkbox"
-                            name="isLead"
-                            className="size-4 accent-brand-600"
-                          />
-                          Lead
-                        </label>
-                        <SubmitButton variant="secondary" pendingLabel="Assigning…">
-                          Assign
-                        </SubmitButton>
-                      </form>
-                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setExpanded(isOpen ? null : p.id)}
+                      className="tap flex items-center gap-1.5 rounded border border-ink-300 bg-panel px-3 text-sm text-ink-700 hover:bg-ink-50"
+                      aria-expanded={isOpen}
+                    >
+                      <UserPlus className="size-4" aria-hidden="true" />
+                      Team ({projectMembers.length})
+                    </button>
                   </div>
-                ) : null}
+
+                  {isOpen ? (
+                    <div className="mt-3 rounded border border-ink-200 bg-ink-50 p-3">
+                      {projectMembers.length === 0 ? (
+                        <p className="text-sm text-ink-500">
+                          Nobody is assigned. An Engineer cannot file against this project until
+                          they are.
+                        </p>
+                      ) : (
+                        <ul className="divide-y divide-ink-200">
+                          {projectMembers.map((m) => (
+                            <li key={m.id} className="flex items-center gap-2 py-2">
+                              <span className="flex-1 text-sm text-ink-800">
+                                {m.fullName}
+                                {m.isLead ? (
+                                  <Badge tone="brand" className="ml-2">
+                                    Lead
+                                  </Badge>
+                                ) : null}
+                              </span>
+                              {canAssign ? (
+                                <form action={removeAction}>
+                                  <input type="hidden" name="memberId" value={m.id} />
+                                  <input type="hidden" name="projectId" value={p.id} />
+                                  <SubmitButton variant="ghost" size="sm" pendingLabel="Removing…">
+                                    <UserMinus
+                                      className="size-4 text-risk-600"
+                                      aria-hidden="true"
+                                    />
+                                    <span className="sr-only">Remove {m.fullName}</span>
+                                  </SubmitButton>
+                                </form>
+                              ) : null}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {canAssign && unassigned.length > 0 ? (
+                        <form action={addAction} className="mt-3 flex flex-wrap items-end gap-2">
+                          <input type="hidden" name="projectId" value={p.id} />
+                          <div className="min-w-48 flex-1">
+                            <label
+                              htmlFor={`assign-${p.id}`}
+                              className="mb-1 block text-xs font-medium text-ink-700"
+                            >
+                              Assign someone
+                            </label>
+                            <Select id={`assign-${p.id}`} name="userId" required>
+                              {unassigned.map((e) => (
+                                <option key={e.id} value={e.id}>
+                                  {e.fullName}
+                                </option>
+                              ))}
+                            </Select>
+                          </div>
+                          <label className="tap flex items-center gap-2 text-sm text-ink-700">
+                            <input
+                              type="checkbox"
+                              name="isLead"
+                              className="size-4 accent-brand-600"
+                            />
+                            Lead
+                          </label>
+                          <SubmitButton variant="secondary" pendingLabel="Assigning…">
+                            Assign
+                          </SubmitButton>
+                        </form>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             )
-          })
-        )}
-      </Panel>
+          })}
+        </div>
+      )}
     </>
   )
 }
