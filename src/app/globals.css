@@ -1,0 +1,129 @@
+@import 'tailwindcss';
+
+/*
+ * HA GROUP AI Operations Platform — design tokens.
+ *
+ * The brief asks for something that reads as a serious engineering company's
+ * internal system, so: a cool steel-grey neutral ramp, one accent, dense but
+ * legible type, and no decoration that does not carry information.
+ *
+ * The accent is #1B3FA0, sampled from the blue ink of HA GROUP's own company
+ * stamp — the only colour that appears anywhere in their document set. Status
+ * colours are separate from it and are never used decoratively.
+ *
+ * Century Gothic is the company's DOCUMENT font and is deliberately not used
+ * for the interface. It is a licensed print face with poor screen hinting at
+ * small sizes; the brief also separates the two explicitly. Rendered documents
+ * will use it in a later phase.
+ */
+
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Cool steel neutrals, biased slightly toward the accent hue. */
+  --color-ink-50: #f6f8fa;
+  --color-ink-100: #eef1f5;
+  --color-ink-200: #dfe4ec;
+  --color-ink-300: #c5cddb;
+  --color-ink-400: #94a1b6;
+  --color-ink-500: #6b7a91;
+  --color-ink-600: #4e5c72;
+  --color-ink-700: #3a465a;
+  --color-ink-800: #262f3e;
+  --color-ink-900: #171d28;
+  --color-ink-950: #0e131b;
+
+  /* HA GROUP stamp blue. */
+  --color-brand-50: #eef2fc;
+  --color-brand-100: #dbe3f8;
+  --color-brand-200: #b9c9f1;
+  --color-brand-300: #8ba5e6;
+  --color-brand-400: #5878d3;
+  --color-brand-500: #2f52b8;
+  --color-brand-600: #1b3fa0;
+  --color-brand-700: #163382;
+  --color-brand-800: #142b6a;
+  --color-brand-900: #132555;
+
+  /* Status. Semantic only — never used as an accent. */
+  --color-ok-50: #e9f5ee;
+  --color-ok-600: #1e6b45;
+  --color-ok-700: #175536;
+  --color-warn-50: #fdf3e3;
+  --color-warn-600: #8a5a00;
+  --color-warn-700: #6e4800;
+  --color-risk-50: #fdecea;
+  --color-risk-600: #b3261e;
+  --color-risk-700: #8f1e18;
+}
+
+@layer base {
+  :root {
+    --surface: var(--color-ink-50);
+    --panel: #ffffff;
+    --line: var(--color-ink-200);
+    --line-strong: var(--color-ink-300);
+    --text: var(--color-ink-900);
+    --text-muted: var(--color-ink-500);
+    --text-subtle: var(--color-ink-400);
+    color-scheme: light;
+  }
+
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Inputs at 16px on small screens: anything smaller makes iOS Safari zoom in
+     when the field is focused, which is disorienting on a phone in the field. */
+  @media (max-width: 767px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Numbers that sit in columns must line up. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* Large tap targets. Engineers use this one-handed, outdoors, in gloves. */
+  .tap {
+    min-height: 44px;
+  }
+  .tap-lg {
+    min-height: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
