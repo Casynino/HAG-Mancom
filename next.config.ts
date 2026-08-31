@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ['pg'],
   experimental: {
+    // Enables forbidden() and unauthorized(), so an authorisation refusal
+    // returns a real 403 with its own page instead of a 200 carrying a
+    // client-side redirect. Streaming commits the status before a page
+    // component runs, so this is the only way to get the status right without
+    // moving role checks into middleware and a database round-trip per request.
+    authInterrupts: true,
     // Attachment uploads are streamed through Server Actions; the cap here is a
     // backstop only. The authoritative per-kind limits live in src/lib/storage/limits.ts
     // and are enforced server-side before a byte is persisted.

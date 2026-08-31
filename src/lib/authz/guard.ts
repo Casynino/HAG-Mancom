@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { redirect } from 'next/navigation'
+import { forbidden, redirect } from 'next/navigation'
 import { withUser, type Database } from '@/db/client'
 import { AuthenticationError, AuthorizationError } from '@/lib/errors'
 import { resolveSession, type AuthenticatedUser } from '@/lib/auth/session'
@@ -92,8 +92,32 @@ export async function asActorWith<T>(
   return withUser(actor.id, (db) => fn(db, actor))
 }
 
-/** For pages: an actor plus a scoped database handle, redirecting if signed out. */
+/**
+ * For pages: an actor plus a scoped database handle.
+ *
+ * An AuthorizationError from inside the callback becomes a redirect to a page
+ * that says plainly what happened, rather than a thrown error the boundary
+ * renders as "Something went wrong". Two reasons that matters:
+ *
+ *   * the person gets a sentence they can act on, not a shrug;
+ *   * the response carries a real 403, so a smoke test or an uptime check can
+ *     tell a refusal from a success. Streaming commits the status before the
+ *     page component runs, so forbidden() is what makes that possible.
+ *
+ * The data was never at risk either way — the throw happens before rendering,
+ * and Row Level Security independently hides the rows. This is about the
+ * refusal being legible.
+ */
 export async function pageContext<T>(fn: (db: Database, actor: Actor) => Promise<T>): Promise<T> {
   const actor = await requireActor()
-  return withUser(actor.id, (db) => fn(db, actor))
+
+  try {
+    return await withUser(actor.id, (db) => fn(db, actor))
+  } catch (err) {
+    if (err instanceof AuthorizationError) {
+      // Renders forbidden.tsx with a 403.
+      forbidden()
+    }
+    throw err
+  }
 }

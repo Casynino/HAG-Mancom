@@ -151,8 +151,59 @@ exercise the same path a request takes.
 
 ---
 
-## Not in this phase
+## The public website
 
-Quotation, invoice and document rendering belong to the Document Engine phase
-and are deliberately absent rather than stubbed. The approval policy data model,
-the delegation rules and the decision ledger are already in place beneath them.
+HA GROUP's public site is a **separate WordPress installation** at
+`hpcagroup.africa` and is not part of this repository. Nothing here modifies it.
+
+This platform exposes `/portal` as the staff entry point. To link the two, add
+one menu item in WordPress — see **Adding the Staff Login link** below.
+
+## Adding the Staff Login link (WordPress)
+
+1. Sign in to the WordPress admin at `hpcagroup.africa/hpc/wp-admin`.
+2. **Appearance → Menus**, and select the main navigation menu.
+3. Open **Custom Links** and add:
+   - **URL**: `https://portal.hpcagroup.africa/portal` (or wherever this app is
+     deployed — Vercel will also give you a `*.vercel.app` URL to start with)
+   - **Link Text**: `Staff Login`
+4. Drag it to the end of the menu, then **Save Menu**.
+5. Optional, and worth doing: open **Screen Options** at the top of the Menus
+   screen, tick **Link Target**, then set the new item to open in a new tab.
+
+No plugin, no theme edit and no code change to the public site. If HA GROUP
+would rather the portal sat on a subdomain, point a CNAME for
+`portal.hpcagroup.africa` at the deployment and use that URL instead — the app
+does not care which hostname serves it.
+
+## Known limitation: the status code on a refusal
+
+When a signed-in user opens a section their role does not cover, they get the
+correct refusal page — verified, with no data leaking into the response — but
+the HTTP status is `200` rather than `403`.
+
+The cause is streaming SSR: the layout renders and the response status is
+committed before the page component runs and calls `forbidden()`. Redirecting
+instead has the same problem for the same reason.
+
+Fixing the status properly means moving the role check into middleware, which
+runs before the response starts. That needs a database round-trip per
+navigation to resolve roles, and caching roles in a cookie would create a second
+source of truth that goes stale the moment an Administrator changes someone's
+role — worse than a wrong status code. It is left as a deliberate trade, not an
+oversight. Unauthenticated requests already return a proper `307` to sign-in,
+because that check happens in the layout before anything is flushed.
+
+## Not built
+
+- **Brand Training UI.** The schema, storage and analysis prompts exist;
+  the upload-and-review screen does not. Brand Profile values are reviewed and
+  approved through Company settings today.
+- **AI Document Studio as a standalone surface.** The drafting assistant is
+  embedded in the document editor, which is where the work happens; there is no
+  separate studio page.
+- **Partial delivery and partial invoicing.** Explicitly out of scope per the
+  brief.
+- **A live TRA/EFD integration.** The adapter and the manual recording path are
+  built; no integration is configured, and the platform never claims to issue a
+  TRA receipt.
