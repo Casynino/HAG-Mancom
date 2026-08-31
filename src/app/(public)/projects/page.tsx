@@ -21,7 +21,7 @@ export default function ProjectsPage() {
 
   return (
     <>
-      <header className="border-b border-white/10 bg-shell text-white">
+      <header className="border-b border-shell-fg/10 bg-shell text-shell-fg">
         <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
           <p className="text-xs font-semibold tracking-[0.18em] text-live-400 uppercase">
             Completed work

@@ -84,11 +84,19 @@
   --color-panel: #ffffff;
 
   /*
-   * `shell` is the deep ground the public site's hero, header and footer are
-   * built on. It deliberately does NOT invert: those surfaces are dark by
-   * design in both themes, and the white type on them must stay readable.
+   * `shell` is the ground the public site's header, hero and footer are built
+   * on, and `shell-fg` is whatever reads on top of it.
+   *
+   * They invert together with the theme. An earlier version pinned the shell
+   * dark in both themes, on the reasoning that a hero is dark by convention.
+   * That was wrong in practice: choosing light mode left a black header and
+   * hero stapled to a light page, which reads as a mistake rather than a
+   * decision. Because the pair always inverts together, `bg-shell` with
+   * `text-shell-fg` is legible in both themes, and `bg-shell-fg` with
+   * `text-shell` gives a high-contrast button in both.
    */
-  --color-shell: #0e131b;
+  --color-shell: #10141c;
+  --color-shell-fg: #ffffff;
 
   /*
    * The application sidebar. Navy rather than the public site's near-black,
@@ -112,6 +120,18 @@
     --text: var(--color-ink-900);
     --text-muted: var(--color-ink-500);
     --text-subtle: var(--color-ink-400);
+
+    /* Light theme: the public shell is a soft near-white with dark type. */
+    --color-shell: #f4f6f9;
+    --color-shell-fg: #141922;
+
+    /*
+     * HA GROUP's mark is drawn in black. On the light shell it stays as drawn;
+     * on the dark shell it is knocked out to white. One filter rather than two
+     * image files, so there is only ever one logo to replace.
+     */
+    --logo-filter: none;
+
     color-scheme: light;
   }
 
@@ -170,6 +190,11 @@
 
       --color-panel: #151b24;
 
+      /* Dark theme: the shell returns to the deep ground with white type. */
+      --color-shell: #0e131b;
+      --color-shell-fg: #ffffff;
+      --logo-filter: brightness(0) invert(1);
+
       color-scheme: dark;
     }
   }
@@ -207,6 +232,11 @@
     --color-risk-700: #f0a19b;
 
     --color-panel: #151b24;
+
+    /* Dark theme: the shell returns to the deep ground with white type. */
+    --color-shell: #0e131b;
+    --color-shell-fg: #ffffff;
+    --logo-filter: brightness(0) invert(1);
 
     color-scheme: dark;
   }

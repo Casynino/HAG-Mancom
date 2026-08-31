@@ -341,7 +341,7 @@ async function main() {
      * the one asset this script must not create on someone's behalf.
      */
     const assets = [
-      { file: 'ha-group-mark.png', kind: 'logo', label: 'HA GROUP mark', order: 0 },
+      { file: 'ha-group-logo-transparent.png', kind: 'logo', label: 'HA GROUP mark', order: 0 },
       { file: 'company-stamp.png', kind: 'stamp', label: 'HA GROUP TZ LIMITED company stamp', order: 0 },
       { file: 'sew-eurodrive.png', kind: 'partner_mark', label: 'SEW Eurodrive', order: 0 },
       { file: 'schneider-electric.png', kind: 'partner_mark', label: 'Schneider Electric', order: 1 },

@@ -57,4 +57,62 @@ export const photos = {
     src: '/imagery/electrician.jpeg',
     alt: 'An electrician working on a control panel',
   },
+  powerPlant: {
+    src: '/imagery/band-power-plant.jpeg',
+    alt: 'A power generation plant at scale',
+  },
+  team: {
+    src: '/imagery/band-team.jpeg',
+    alt: 'Engineers reviewing work together on site',
+  },
 } as const satisfies Record<string, Photo>
+
+/**
+ * One photograph per service line, keyed by the slug in `services`.
+ *
+ * Same rule as everything else here: the picture shows the kind of work, never
+ * a job HA GROUP delivered. `svc-electrical` is a switchyard, not *their*
+ * switchyard.
+ */
+export const servicePhotos: Record<string, Photo> = {
+  'electrical-services': {
+    src: '/imagery/svc-electrical.jpeg',
+    alt: 'High-voltage switchgear in an outdoor substation',
+  },
+  design: {
+    src: '/imagery/svc-design.jpeg',
+    alt: 'An engineer working over technical drawings',
+  },
+  construction: {
+    src: '/imagery/svc-construction.jpeg',
+    alt: 'An industrial construction site in progress',
+  },
+  'hazardous-areas': {
+    src: '/imagery/svc-hazardous.jpeg',
+    alt: 'Hot work being carried out under protective equipment',
+  },
+  manufacture: {
+    src: '/imagery/svc-manufacture.jpeg',
+    alt: 'A switchboard under assembly',
+  },
+  installation: {
+    src: '/imagery/svc-installation.jpeg',
+    alt: 'Cable being run and terminated on site',
+  },
+  maintenance: {
+    src: '/imagery/svc-maintenance.jpeg',
+    alt: 'A technician servicing plant equipment',
+  },
+  'labour-hire': {
+    src: '/imagery/svc-labour.jpeg',
+    alt: 'An engineering crew at work',
+  },
+  distributorship: {
+    src: '/imagery/svc-distribution.jpeg',
+    alt: 'Electrical stock held in a distribution warehouse',
+  },
+  'design-development': {
+    src: '/imagery/svc-development.jpeg',
+    alt: 'A monitoring and control room',
+  },
+}

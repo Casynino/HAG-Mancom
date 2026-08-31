@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -35,14 +36,25 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-shell/90 backdrop-blur">
+    <header className="absolute inset-x-0 top-0 z-50">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5 sm:px-8">
         <Link
           href="/"
-          className="font-display text-lg font-bold tracking-tight text-white"
+          className="flex items-center gap-3"
           onClick={() => setOpen(false)}
+          aria-label="HA GROUP — home"
         >
-          HA GROUP
+          {/* The company's own mark, taken from its invoices. */}
+          <Image
+            src="/brand/ha-group-logo-transparent.png"
+            alt=""
+            width={301}
+            height={254}
+            priority
+            className="h-9 w-auto"
+            style={{ filter: 'var(--logo-filter)' }}
+          />
+          <span className="sr-only">HA GROUP</span>
         </Link>
 
         <nav className="ml-auto hidden items-center gap-7 md:flex">
@@ -53,7 +65,7 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
                 key={item.href}
                 href={item.href}
                 className={`relative text-sm transition-colors ${
-                  active ? 'text-white' : 'text-white/60 hover:text-white'
+                  active ? 'text-shell-fg' : 'text-shell-fg/60 hover:text-shell-fg'
                 }`}
               >
                 {item.label}
@@ -74,7 +86,7 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
 
         <Link
           href={signedIn ? '/dashboard' : '/sign-in'}
-          className="hidden h-9 items-center rounded border border-white/25 px-4 text-sm font-medium text-white transition-colors hover:border-live-400 hover:text-live-300 md:inline-flex"
+          className="hidden h-9 items-center rounded border border-shell-fg/25 px-4 text-sm font-medium text-shell-fg transition-colors hover:border-live-400 hover:text-live-300 md:inline-flex"
         >
           {signedIn ? 'Go to portal' : 'Staff login'}
         </Link>
@@ -82,7 +94,7 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="ml-auto flex size-10 items-center justify-center rounded text-white md:hidden"
+          className="ml-auto flex size-10 items-center justify-center rounded text-shell-fg md:hidden"
           aria-expanded={open}
           aria-label={open ? 'Close menu' : 'Open menu'}
         >
@@ -91,14 +103,14 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
       </div>
 
       {open ? (
-        <div className="border-t border-white/10 bg-shell md:hidden">
+        <div className="bg-shell/95 backdrop-blur md:hidden">
           <nav className="mx-auto flex max-w-6xl flex-col px-5 py-2 sm:px-8">
             {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="border-b border-white/5 py-3.5 text-white/80"
+                className="border-b border-shell-fg/5 py-3.5 text-shell-fg/80"
               >
                 {item.label}
               </Link>
@@ -112,7 +124,7 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
             </Link>
 
             <div className="mb-4 flex items-center justify-between">
-              <span className="text-sm text-white/50">Theme</span>
+              <span className="text-sm text-shell-fg/50">Theme</span>
               <ThemeToggle tone="shell" />
             </div>
           </nav>

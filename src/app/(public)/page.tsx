@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react'
+import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { GridCanvas } from '@/components/public/grid-canvas'
 import { NetworkMap } from '@/components/public/network-map'
 import { Counter, Reveal } from '@/components/public/motion'
@@ -46,7 +46,7 @@ export default function HomePage() {
   return (
     <>
       {/* ------------------------------ Hero ------------------------------ */}
-      <section className="relative isolate overflow-hidden bg-shell text-white">
+      <section className="relative isolate overflow-hidden bg-shell text-shell-fg">
         {/* A photographic ground, heavily darkened. It carries the subject —
             high-voltage transmission — without competing with the type, and the
             live network is drawn on top of it. */}
@@ -56,9 +56,9 @@ export default function HomePage() {
           fill
           priority
           sizes="100vw"
-          className="pointer-events-none object-cover opacity-45"
+          className="pointer-events-none object-cover opacity-30"
         />
-        <GridCanvas className="absolute inset-0 size-full" />
+        <GridCanvas className="absolute inset-0 z-10 size-full" />
 
         <div
           aria-hidden="true"
@@ -76,26 +76,17 @@ export default function HomePage() {
         */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-shell via-shell/80 to-shell/25"
+          className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-r from-shell via-shell/75 to-shell/20"
         />
         {/* Fades the network into the section below rather than cutting it. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-shell"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-40 bg-gradient-to-b from-transparent to-shell"
         />
 
-        <div className="relative mx-auto max-w-6xl px-5 py-28 sm:px-8 sm:py-36">
+        <div className="relative z-30 mx-auto max-w-6xl px-5 pt-36 pb-28 sm:px-8 sm:pt-44 sm:pb-36">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 py-1.5 pr-4 pl-2 text-sm text-white/75 backdrop-blur">
-              <span className="flex size-6 items-center justify-center rounded-full bg-live-400/15">
-                <Sparkles className="size-3 text-live-300" aria-hidden="true" />
-              </span>
-              Turnkey electrical projects since {company.foundedYear}
-            </span>
-          </Reveal>
-
-          <Reveal delay={80}>
-            <h1 className="font-display mt-8 max-w-4xl text-[2.6rem] leading-[1.02] font-bold tracking-tight text-balance sm:text-6xl lg:text-[4.6rem]">
+            <h1 className="font-display max-w-4xl text-[2.6rem] leading-[1.02] font-bold tracking-tight text-balance sm:text-6xl lg:text-[4.6rem]">
               We build the power that keeps industry{' '}
               <span className="bg-gradient-to-r from-live-300 to-live-400 bg-clip-text text-transparent">
                 running
@@ -105,7 +96,7 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={160}>
-            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/65 sm:text-xl">
+            <p className="mt-8 max-w-2xl text-lg leading-relaxed text-shell-fg/65 sm:text-xl">
               {company.overview}
             </p>
           </Reveal>
@@ -114,7 +105,7 @@ export default function HomePage() {
             <div className="mt-10 flex flex-wrap gap-3">
               <Link
                 href="/services"
-                className="group inline-flex h-13 items-center gap-2 rounded-full bg-white px-7 font-medium text-shell transition-colors hover:bg-live-300"
+                className="group inline-flex h-13 items-center gap-2 rounded-full bg-shell-fg px-7 font-medium text-shell transition-colors hover:bg-live-300"
               >
                 What we do
                 <ArrowRight
@@ -124,7 +115,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex h-13 items-center gap-2 rounded-full border border-white/25 px-7 font-medium text-white backdrop-blur transition-colors hover:border-white/60 hover:bg-white/5"
+                className="inline-flex h-13 items-center gap-2 rounded-full border border-shell-fg/25 px-7 font-medium text-shell-fg backdrop-blur transition-colors hover:border-shell-fg/60 hover:bg-shell-fg/5"
               >
                 Talk to an engineer
               </Link>
@@ -132,7 +123,7 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={320}>
-            <dl className="mt-24 grid max-w-3xl grid-cols-3 gap-8 border-t border-white/15 pt-10">
+            <dl className="mt-24 grid max-w-3xl grid-cols-3 gap-8 border-t border-shell-fg/15 pt-10">
               {[
                 {
                   to: countries.length,
@@ -148,7 +139,9 @@ export default function HomePage() {
                     <span className="font-display block text-5xl font-bold sm:text-6xl">
                       <Counter to={s.to} suffix={s.suffix} />
                     </span>
-                    <span className="mt-2 block text-xs leading-snug text-white/45">{s.label}</span>
+                    <span className="mt-2 block text-xs leading-snug text-shell-fg/45">
+                      {s.label}
+                    </span>
                   </dd>
                 </div>
               ))}
@@ -299,7 +292,7 @@ export default function HomePage() {
       </section>
 
       {/* --------------------------- Green growth ------------------------- */}
-      <section className="relative isolate overflow-hidden border-y border-white/10 bg-shell text-white">
+      <section className="relative isolate overflow-hidden border-y border-shell-fg/10 bg-shell text-shell-fg">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-[0.06]"
@@ -331,7 +324,7 @@ export default function HomePage() {
             </h2>
           </Reveal>
           <Reveal delay={100}>
-            <p className="text-lg leading-relaxed text-white/65">{greenGrowth.body}</p>
+            <p className="text-lg leading-relaxed text-shell-fg/65">{greenGrowth.body}</p>
           </Reveal>
         </div>
       </section>
@@ -389,7 +382,7 @@ export default function HomePage() {
           </div>
           <a
             href={`mailto:${company.primaryEmail}`}
-            className="group inline-flex h-13 shrink-0 items-center gap-2 rounded-full bg-brand-600 px-7 font-medium text-white transition-colors"
+            className="group inline-flex h-13 shrink-0 items-center gap-2 rounded-full bg-brand-600 px-7 font-medium text-shell-fg transition-colors"
           >
             {company.primaryEmail}
             <ArrowRight

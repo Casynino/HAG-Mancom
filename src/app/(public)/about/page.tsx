@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { company, countries, divisions, partners, values } from '@/lib/company/profile'
-import { photos } from '@/lib/company/imagery'
+import { IMAGERY_NOTE, photos } from '@/lib/company/imagery'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <header className="relative isolate overflow-hidden border-b border-white/10 bg-shell text-white">
+      <header className="relative isolate overflow-hidden border-b border-shell-fg/10 bg-shell text-shell-fg">
         <Image
           src={photos.electrician.src}
           alt=""
@@ -26,29 +26,44 @@ export default function AboutPage() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-gradient-to-r from-shell via-shell/85 to-shell/30"
         />
-        <div className="relative mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
+        <div className="relative mx-auto max-w-6xl px-5 pt-28 pb-20 sm:px-8 sm:pt-32 sm:pb-24">
           <p className="text-xs font-semibold tracking-[0.18em] text-live-400 uppercase">
             Who we are
           </p>
           <h1 className="font-display mt-5 max-w-3xl text-4xl font-bold tracking-tight text-balance sm:text-5xl">
             {company.benchmark.split('.')[0]}.
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/70">
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-shell-fg/70">
             {company.benchmark.split('.').slice(1).join('.').trim()}
           </p>
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[1fr_1fr] lg:gap-20">
-        <div>
-          <h2 className="font-display text-2xl font-bold tracking-tight text-ink-950">
-            Group overview
-          </h2>
-          <p className="mt-5 leading-relaxed text-ink-600">{company.overview}</p>
-          <p className="mt-4 leading-relaxed text-ink-600">{company.ownership}</p>
+      <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
+          <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl bg-ink-100">
+            <Image
+              src={photos.team.src}
+              alt={photos.team.alt}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover transition-transform duration-[900ms] group-hover:scale-105"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-t from-shell/60 to-transparent"
+            />
+          </div>
+          <div className="self-center">
+            <h2 className="font-display text-3xl font-bold tracking-tight text-ink-950">
+              Group overview
+            </h2>
+            <p className="mt-5 leading-relaxed text-ink-600">{company.overview}</p>
+            <p className="mt-4 leading-relaxed text-ink-600">{company.ownership}</p>
+          </div>
         </div>
 
-        <dl className="grid grid-cols-2 gap-px self-start overflow-hidden rounded border border-ink-200 bg-ink-200">
+        <dl className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-ink-200 bg-ink-200">
           <div className="bg-panel p-6">
             <dt className="text-xs tracking-[0.14em] text-ink-500 uppercase">Registered</dt>
             <dd className="font-display mt-2 text-3xl font-bold text-ink-950 tabular">
@@ -79,9 +94,29 @@ export default function AboutPage() {
         </dl>
       </section>
 
+      <section className="relative isolate overflow-hidden bg-shell py-24 text-shell-fg sm:py-28">
+        <Image
+          src={photos.pylons.src}
+          alt={photos.pylons.alt}
+          fill
+          sizes="100vw"
+          className="pointer-events-none object-cover opacity-30"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-shell via-shell/80 to-shell/25"
+        />
+        <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
+          <p className="text-xs font-semibold tracking-[0.18em] text-live-400 uppercase">Reach</p>
+          <h2 className="font-display mt-5 max-w-3xl text-3xl font-bold tracking-tight text-balance sm:text-5xl">
+            Eight countries, one performance benchmark.
+          </h2>
+        </div>
+      </section>
+
       <section className="border-y border-ink-200 bg-ink-50">
         <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
-          <h2 className="font-display text-2xl font-bold tracking-tight text-ink-950">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-ink-950">
             How we expect our people to work
           </h2>
           <div className="mt-10 grid gap-px overflow-hidden rounded border border-ink-200 bg-ink-200 sm:grid-cols-2 lg:grid-cols-4">
@@ -118,6 +153,8 @@ export default function AboutPage() {
           ))}
         </div>
       </section>
+
+      <p className="mx-auto max-w-6xl px-5 pb-10 text-xs text-ink-400 sm:px-8">{IMAGERY_NOTE}</p>
     </>
   )
 }
