@@ -37,15 +37,16 @@ export default async function EngineerHome() {
       .orderBy(desc(engineerSubmissions.updatedAt))
       .limit(100)
 
-    return { rows: result, canCreate: hasPermission(actor.roles, 'submission.create') }
+    return {
+      rows: result,
+      canCreate: hasPermission(actor.roles, 'submission.create'),
+    }
   })
 
   const needsAttention = rows.filter(
     (r) => r.status === 'changes_requested' || r.status === 'draft',
   )
-  const inProgress = rows.filter(
-    (r) => r.status === 'submitted' || r.status === 'under_review',
-  )
+  const inProgress = rows.filter((r) => r.status === 'submitted' || r.status === 'under_review')
   const closed = rows.filter((r) =>
     ['accepted', 'ready_for_documentation', 'cancelled'].includes(r.status),
   )
@@ -60,7 +61,7 @@ export default async function EngineerHome() {
           canCreate ? (
             <Link
               href="/engineer/new"
-              className="tap hidden items-center rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700 sm:inline-flex"
+              className="tap hidden items-center btn-primary rounded-lg px-4 text-sm font-medium text-white sm:inline-flex"
             >
               New site submission
             </Link>
@@ -71,7 +72,7 @@ export default async function EngineerHome() {
       {canCreate ? (
         <Link
           href="/engineer/new"
-          className="tap-lg flex items-center justify-center rounded bg-brand-600 px-5 font-medium text-white sm:hidden"
+          className="tap-lg flex items-center justify-center btn-primary rounded-lg px-5 font-medium text-white sm:hidden"
         >
           New site submission
         </Link>
@@ -86,7 +87,7 @@ export default async function EngineerHome() {
               canCreate ? (
                 <Link
                   href="/engineer/new"
-                  className="tap inline-flex items-center rounded bg-brand-600 px-4 text-sm font-medium text-white"
+                  className="tap inline-flex items-center btn-primary rounded-lg px-4 text-sm font-medium text-white"
                 >
                   Start a submission
                 </Link>
@@ -99,7 +100,9 @@ export default async function EngineerHome() {
       {needsAttention.length > 0 ? (
         <Section title="Needs you" rows={needsAttention} highlight />
       ) : null}
-      {inProgress.length > 0 ? <Section title="With the Technical Office" rows={inProgress} /> : null}
+      {inProgress.length > 0 ? (
+        <Section title="With the Technical Office" rows={inProgress} />
+      ) : null}
       {closed.length > 0 ? <Section title="Closed" rows={closed} /> : null}
     </>
   )
@@ -118,15 +121,7 @@ type Row = {
   clientName: string
 }
 
-function Section({
-  title,
-  rows,
-  highlight,
-}: {
-  title: string
-  rows: Row[]
-  highlight?: boolean
-}) {
+function Section({ title, rows, highlight }: { title: string; rows: Row[]; highlight?: boolean }) {
   return (
     <section className="space-y-2">
       <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">{title}</h2>

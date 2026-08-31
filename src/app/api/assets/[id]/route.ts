@@ -21,11 +21,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
 
   try {
     const result = await asActor(async (db) => {
-      const [asset] = await db
-        .select()
-        .from(companyAssets)
-        .where(eq(companyAssets.id, id))
-        .limit(1)
+      const [asset] = await db.select().from(companyAssets).where(eq(companyAssets.id, id)).limit(1)
 
       if (!asset) return null
 

@@ -247,7 +247,8 @@ async function insertDraft(
   switch (table) {
     case 'legal_entities': {
       const v = legalEntitySchema.safeParse(Object.fromEntries(formData))
-      if (!v.success) throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
+      if (!v.success)
+        throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
       const r = await db.execute(sql`
         insert into public.legal_entities
           (name, entity_suffix, country_code, registration_number, tin, vrn,
@@ -262,7 +263,8 @@ async function insertDraft(
 
     case 'bank_accounts': {
       const v = bankAccountSchema.safeParse(Object.fromEntries(formData))
-      if (!v.success) throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
+      if (!v.success)
+        throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
       const r = await db.execute(sql`
         insert into public.bank_accounts
           (legal_entity_id, currency, account_name, bank_name, branch, branch_code,
@@ -277,7 +279,8 @@ async function insertDraft(
 
     case 'numbering_rules': {
       const v = numberingRuleSchema.safeParse(Object.fromEntries(formData))
-      if (!v.success) throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
+      if (!v.success)
+        throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
       const r = await db.execute(sql`
         insert into public.numbering_rules
           (document_type, pattern, prefix, sequence_padding, sequence_start,
@@ -292,7 +295,8 @@ async function insertDraft(
 
     case 'charge_rules': {
       const v = chargeRuleSchema.safeParse(Object.fromEntries(formData))
-      if (!v.success) throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
+      if (!v.success)
+        throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
       const docType = v.data.documentType || null
       const r = await db.execute(sql`
         insert into public.charge_rules
@@ -307,7 +311,8 @@ async function insertDraft(
 
     case 'tax_rules': {
       const v = taxRuleSchema.safeParse(Object.fromEntries(formData))
-      if (!v.success) throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
+      if (!v.success)
+        throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
       const docType = v.data.documentType || null
       const r = await db.execute(sql`
         insert into public.tax_rules
@@ -321,7 +326,8 @@ async function insertDraft(
 
     case 'rounding_policies': {
       const v = roundingPolicySchema.safeParse(Object.fromEntries(formData))
-      if (!v.success) throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
+      if (!v.success)
+        throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
       const r = await db.execute(sql`
         insert into public.rounding_policies
           (scope, currency, decimal_places, mode, round_at_step, state, notes, created_by)
@@ -334,7 +340,8 @@ async function insertDraft(
 
     case 'approval_policies': {
       const v = approvalPolicySchema.safeParse(Object.fromEntries(formData))
-      if (!v.success) throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
+      if (!v.success)
+        throw new ValidationError('Check the details below.', fieldErrorsFrom(v.error))
 
       // Delegation is meaningless without also standing down the Director
       // requirement, and allowing both would make the effective rule ambiguous.

@@ -39,7 +39,11 @@ export function SiteFooter() {
               </address>
               <p className="mt-2 text-sm tabular">
                 {head.phones.map((p) => (
-                  <a key={p} href={`tel:${p.replace(/\s/g, '')}`} className="block hover:text-white">
+                  <a
+                    key={p}
+                    href={`tel:${p.replace(/\s/g, '')}`}
+                    className="block hover:text-white"
+                  >
                     {p}
                   </a>
                 ))}

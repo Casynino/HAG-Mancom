@@ -116,7 +116,11 @@ export default function HomePage() {
           <Reveal delay={320}>
             <dl className="mt-24 grid max-w-3xl grid-cols-3 gap-8 border-t border-white/15 pt-10">
               {[
-                { to: countries.length, suffix: '', label: 'countries incorporated' },
+                {
+                  to: countries.length,
+                  suffix: '',
+                  label: 'countries incorporated',
+                },
                 { to: services.length, suffix: '', label: 'service lines' },
                 { to: years, suffix: '', label: 'years operating' },
               ].map((s) => (
@@ -346,7 +350,7 @@ export default function HomePage() {
           </div>
           <a
             href={`mailto:${company.primaryEmail}`}
-            className="group inline-flex h-13 shrink-0 items-center gap-2 rounded-full bg-brand-600 px-7 font-medium text-white transition-colors hover:bg-brand-700"
+            className="group inline-flex h-13 shrink-0 items-center gap-2 rounded-full bg-brand-600 px-7 font-medium text-white transition-colors"
           >
             {company.primaryEmail}
             <ArrowRight

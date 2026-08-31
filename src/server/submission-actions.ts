@@ -270,7 +270,9 @@ export async function uploadAttachmentAction(
     const files = formData.getAll('files').filter((f): f is File => f instanceof File && f.size > 0)
 
     if (files.length === 0) {
-      throw new ValidationError('Choose at least one file.', { files: ['Choose at least one file.'] })
+      throw new ValidationError('Choose at least one file.', {
+        files: ['Choose at least one file.'],
+      })
     }
 
     const stored = await asActor(async (db, actor) => {
@@ -521,9 +523,7 @@ export async function submitSubmissionAction(
         officers.map((o) => o.userId),
         {
           kind: 'submission_submitted',
-          title: isResubmission
-            ? `Corrected submission ${ref}`
-            : `New site submission ${ref}`,
+          title: isResubmission ? `Corrected submission ${ref}` : `New site submission ${ref}`,
           body: `${current.title} — ${current.urgency} urgency, from ${actor.fullName}.`,
           entityType: 'engineer_submissions',
           entityId: submissionId,

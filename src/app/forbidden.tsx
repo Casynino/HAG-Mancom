@@ -24,12 +24,11 @@ export default function Forbidden() {
             </h1>
             <p className="text-sm text-ink-600">
               Permissions are set by your administrator and are not something you can change
-              yourself. If you need access to this part of the platform, ask them to grant the
-              role.
+              yourself. If you need access to this part of the platform, ask them to grant the role.
             </p>
             <Link
               href="/"
-              className="tap inline-flex items-center rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700"
+              className="tap inline-flex items-center btn-primary rounded-lg px-4 text-sm font-medium text-white"
             >
               Back to your work
             </Link>

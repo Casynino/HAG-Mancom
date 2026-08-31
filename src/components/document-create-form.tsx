@@ -69,7 +69,7 @@ export function DocumentCreateForm({
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="tap flex items-center gap-2 rounded bg-brand-600 px-3 text-sm font-medium text-white hover:bg-brand-700"
+            className="tap flex items-center gap-2 btn-primary rounded-lg px-3 text-sm font-medium text-white"
           >
             <FilePlus2 className="size-4" aria-hidden="true" />
             {open ? 'Close' : 'New document'}
@@ -139,7 +139,12 @@ export function DocumentCreateForm({
                 <Input id="title" name="title" required minLength={3} maxLength={200} />
               </Field>
 
-              <Field label="Currency" htmlFor="currency" required errors={errorsFor(state, 'currency')}>
+              <Field
+                label="Currency"
+                htmlFor="currency"
+                required
+                errors={errorsFor(state, 'currency')}
+              >
                 <Select id="currency" name="currency" defaultValue="TZS" required>
                   {currencies.map((c) => (
                     <option key={c} value={c}>

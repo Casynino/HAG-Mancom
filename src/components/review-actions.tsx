@@ -141,7 +141,10 @@ export function ReviewActions({
         ) : null}
 
         {panel === 'changes' ? (
-          <form action={changesAction} className="space-y-3 rounded border border-warn-600/25 bg-warn-50 p-3">
+          <form
+            action={changesAction}
+            className="space-y-3 rounded border border-warn-600/25 bg-warn-50 p-3"
+          >
             <input type="hidden" name="submissionId" value={submissionId} />
             <Field
               label="What does the Engineer need to correct?"
@@ -215,7 +218,14 @@ export function ReviewActions({
                   required
                   errors={errorsFor(relinkState, 'reason')}
                 >
-                  <Textarea id="reason" name="reason" rows={2} minLength={5} maxLength={500} required />
+                  <Textarea
+                    id="reason"
+                    name="reason"
+                    rows={2}
+                    minLength={5}
+                    maxLength={500}
+                    required
+                  />
                 </Field>
                 <SubmitButton variant="secondary" pendingLabel="Saving…">
                   Correct the link

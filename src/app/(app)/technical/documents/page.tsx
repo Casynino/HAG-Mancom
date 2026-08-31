@@ -14,84 +14,85 @@ import { DOCUMENT_STATUS, DOCUMENT_TYPE_LABELS, relativeTime } from '@/lib/displ
 export const metadata: Metadata = { title: 'Documents' }
 
 export default async function DocumentsPage() {
-  const { rows, readiness, canCreate, projectOptions, poOptions, currencies } =
-    await pageContext(async (db, actor) => {
-    if (!hasPermission(actor.roles, 'document.view')) {
-      throw new AuthorizationError('Documents are prepared by the Technical Office.')
-    }
+  const { rows, readiness, canCreate, projectOptions, poOptions, currencies } = await pageContext(
+    async (db, actor) => {
+      if (!hasPermission(actor.roles, 'document.view')) {
+        throw new AuthorizationError('Documents are prepared by the Technical Office.')
+      }
 
-    const result = await db
-      .select({
-        id: documents.id,
-        reference: documents.reference,
-        documentType: documents.documentType,
-        title: documents.title,
-        status: documents.status,
-        currency: documents.currency,
-        grandTotal: documents.grandTotal,
-        updatedAt: documents.updatedAt,
-        submittedForApprovalAt: documents.submittedForApprovalAt,
-        clientName: clients.legalName,
-        projectName: projects.name,
-        preparedByName: profiles.fullName,
-      })
-      .from(documents)
-      .innerJoin(clients, eq(clients.id, documents.clientId))
-      .innerJoin(projects, eq(projects.id, documents.projectId))
-      .leftJoin(profiles, eq(profiles.id, documents.preparedBy))
-      .orderBy(desc(documents.updatedAt))
-      .limit(200)
-
-    // Surfaced up front rather than at submission time, so a Technical Officer
-    // is never halfway through a quotation before learning it cannot be issued.
-    const quotationReadiness = await checkConfigReadiness(db, 'quotation', 'TZS')
-
-    // What the "start a document" form needs to offer real choices rather than
-    // free text: live projects, the Purchase Orders the clients actually sent,
-    // and the currencies an approved rounding policy exists for.
-    const [projectRows, poRows, currencyRows] = await Promise.all([
-      db
+      const result = await db
         .select({
-          id: projects.id,
-          name: projects.name,
-          reference: projects.reference,
+          id: documents.id,
+          reference: documents.reference,
+          documentType: documents.documentType,
+          title: documents.title,
+          status: documents.status,
+          currency: documents.currency,
+          grandTotal: documents.grandTotal,
+          updatedAt: documents.updatedAt,
+          submittedForApprovalAt: documents.submittedForApprovalAt,
           clientName: clients.legalName,
+          projectName: projects.name,
+          preparedByName: profiles.fullName,
         })
-        .from(projects)
-        .innerJoin(clients, eq(clients.id, projects.clientId))
-        .where(inArray(projects.status, ['planning', 'active', 'on_hold']))
-        .orderBy(asc(clients.legalName), asc(projects.name)),
+        .from(documents)
+        .innerJoin(clients, eq(clients.id, documents.clientId))
+        .innerJoin(projects, eq(projects.id, documents.projectId))
+        .leftJoin(profiles, eq(profiles.id, documents.preparedBy))
+        .orderBy(desc(documents.updatedAt))
+        .limit(200)
 
-      db
-        .select({
-          id: clientPurchaseOrders.id,
-          projectId: clientPurchaseOrders.projectId,
-          poNumber: clientPurchaseOrders.poNumber,
-        })
-        .from(clientPurchaseOrders)
-        .where(inArray(clientPurchaseOrders.status, ['open', 'partially_fulfilled']))
-        .orderBy(desc(clientPurchaseOrders.createdAt)),
+      // Surfaced up front rather than at submission time, so a Technical Officer
+      // is never halfway through a quotation before learning it cannot be issued.
+      const quotationReadiness = await checkConfigReadiness(db, 'quotation', 'TZS')
 
-      db.execute(sql`
+      // What the "start a document" form needs to offer real choices rather than
+      // free text: live projects, the Purchase Orders the clients actually sent,
+      // and the currencies an approved rounding policy exists for.
+      const [projectRows, poRows, currencyRows] = await Promise.all([
+        db
+          .select({
+            id: projects.id,
+            name: projects.name,
+            reference: projects.reference,
+            clientName: clients.legalName,
+          })
+          .from(projects)
+          .innerJoin(clients, eq(clients.id, projects.clientId))
+          .where(inArray(projects.status, ['planning', 'active', 'on_hold']))
+          .orderBy(asc(clients.legalName), asc(projects.name)),
+
+        db
+          .select({
+            id: clientPurchaseOrders.id,
+            projectId: clientPurchaseOrders.projectId,
+            poNumber: clientPurchaseOrders.poNumber,
+          })
+          .from(clientPurchaseOrders)
+          .where(inArray(clientPurchaseOrders.status, ['open', 'partially_fulfilled']))
+          .orderBy(desc(clientPurchaseOrders.createdAt)),
+
+        db.execute(sql`
         select distinct currency from public.rounding_policies
         where state = 'approved' order by currency`),
-    ])
+      ])
 
-    const approvedCurrencies = (currencyRows.rows as Array<{ currency: string }>).map(
-      (r) => r.currency,
-    )
+      const approvedCurrencies = (currencyRows.rows as Array<{ currency: string }>).map(
+        (r) => r.currency,
+      )
 
-    return {
-      rows: result,
-      readiness: quotationReadiness,
-      canCreate: hasPermission(actor.roles, 'document.create'),
-      projectOptions: projectRows,
-      poOptions: poRows,
-      // Never an empty select: if no policy is approved yet the readiness
-      // notice above already explains why nothing can be issued.
-      currencies: approvedCurrencies.length > 0 ? approvedCurrencies : ['TZS'],
-    }
-  })
+      return {
+        rows: result,
+        readiness: quotationReadiness,
+        canCreate: hasPermission(actor.roles, 'document.create'),
+        projectOptions: projectRows,
+        poOptions: poRows,
+        // Never an empty select: if no policy is approved yet the readiness
+        // notice above already explains why nothing can be issued.
+        currencies: approvedCurrencies.length > 0 ? approvedCurrencies : ['TZS'],
+      }
+    },
+  )
 
   const open = rows.filter((r) => ['draft', 'changes_requested', 'rejected'].includes(r.status))
   const awaiting = rows.filter((r) => ['pending_review', 'pending_approval'].includes(r.status))
@@ -107,7 +108,10 @@ export default async function DocumentsPage() {
       />
 
       {!readiness.ready ? (
-        <Notice tone="warn" title="Company settings must be approved before documents can be issued">
+        <Notice
+          tone="warn"
+          title="Company settings must be approved before documents can be issued"
+        >
           <ul className="mt-1 list-disc space-y-1 pl-5">
             {readiness.missing.map((m, i) => (
               <li key={i}>{m}</li>
@@ -182,7 +186,10 @@ function Section({ title, rows, muted }: { title: string; rows: Row[]; muted?: b
       </div>
       <Panel className="divide-y divide-ink-100">
         {rows.map((row) => {
-          const status = DOCUMENT_STATUS[row.status] ?? { label: row.status, tone: 'neutral' as const }
+          const status = DOCUMENT_STATUS[row.status] ?? {
+            label: row.status,
+            tone: 'neutral' as const,
+          }
           return (
             <Link
               key={row.id}

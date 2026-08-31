@@ -115,7 +115,10 @@ export async function saveClientContactAction(
         jobTitle: String(formData.get('jobTitle') ?? '').trim() || null,
         department: String(formData.get('department') ?? '').trim() || null,
         phone: String(formData.get('phone') ?? '').trim() || null,
-        email: String(formData.get('email') ?? '').trim().toLowerCase() || null,
+        email:
+          String(formData.get('email') ?? '')
+            .trim()
+            .toLowerCase() || null,
         isPrimary,
         receivesDocuments: formData.get('receivesDocuments') === 'on',
         notes: String(formData.get('notes') ?? '').trim() || null,
@@ -170,7 +173,9 @@ export async function recordPurchaseOrderAction(
         .limit(1)
 
       if (!project) {
-        throw new ValidationError('Choose a project.', { projectId: ['That project was not found.'] })
+        throw new ValidationError('Choose a project.', {
+          projectId: ['That project was not found.'],
+        })
       }
 
       const stored = hasFile
@@ -213,7 +218,10 @@ export async function recordPurchaseOrderAction(
         return created!.id
       } catch (err) {
         // Roll the stored bytes back with the transaction.
-        if (stored) await getStorage().remove(stored.storageKey).catch(() => undefined)
+        if (stored)
+          await getStorage()
+            .remove(stored.storageKey)
+            .catch(() => undefined)
         throw err
       }
     })
@@ -505,7 +513,9 @@ export async function addDeliveryPhotoAction(
 ): Promise<ActionResult<null>> {
   try {
     const deliveryId = String(formData.get('deliveryId') ?? '')
-    const files = formData.getAll('photos').filter((f): f is File => f instanceof File && f.size > 0)
+    const files = formData
+      .getAll('photos')
+      .filter((f): f is File => f instanceof File && f.size > 0)
 
     if (files.length === 0) {
       throw new ValidationError('Choose at least one photo.')
@@ -609,7 +619,10 @@ export async function recordCompletionAction(
 
         return created!.id
       } catch (err) {
-        if (stored) await getStorage().remove(stored.storageKey).catch(() => undefined)
+        if (stored)
+          await getStorage()
+            .remove(stored.storageKey)
+            .catch(() => undefined)
         throw err
       }
     })
@@ -662,7 +675,11 @@ export async function verifyCompletionAction(
     })
 
     revalidatePath('/technical/projects')
-    return { ok: true, data: null, message: 'Verified. Invoicing is now unlocked for this project.' }
+    return {
+      ok: true,
+      data: null,
+      message: 'Verified. Invoicing is now unlocked for this project.',
+    }
   } catch (err) {
     return actionError(err)
   }
@@ -748,7 +765,10 @@ export async function recordEfdReceiptAction(
 
         return created!.id
       } catch (err) {
-        if (stored) await getStorage().remove(stored.storageKey).catch(() => undefined)
+        if (stored)
+          await getStorage()
+            .remove(stored.storageKey)
+            .catch(() => undefined)
         throw err
       }
     })

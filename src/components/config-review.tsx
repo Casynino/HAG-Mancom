@@ -95,7 +95,10 @@ export function ConfigReview({ records }: { records: ConfigRecord[] }) {
 
             <div className="divide-y divide-ink-100">
               {rows.map((r) => {
-                const state = CONFIG_STATE[r.state] ?? { label: r.state, tone: 'neutral' as const }
+                const state = CONFIG_STATE[r.state] ?? {
+                  label: r.state,
+                  tone: 'neutral' as const,
+                }
                 const key = `${r.table_name}:${r.id}`
 
                 return (

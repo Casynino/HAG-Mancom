@@ -78,7 +78,7 @@ export function ProjectManager({
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="tap flex items-center justify-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700 sm:w-auto sm:self-start"
+          className="tap flex items-center justify-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white sm:w-auto sm:self-start"
         >
           <Plus className="size-4" aria-hidden="true" />
           {showForm ? 'Close' : 'New project'}
@@ -136,11 +136,7 @@ export function ProjectManager({
                   <Input id="startDate" name="startDate" type="date" />
                 </Field>
                 <Field label="Expected completion" htmlFor="expectedCompletionDate">
-                  <Input
-                    id="expectedCompletionDate"
-                    name="expectedCompletionDate"
-                    type="date"
-                  />
+                  <Input id="expectedCompletionDate" name="expectedCompletionDate" type="date" />
                 </Field>
               </div>
             )}
@@ -191,7 +187,8 @@ export function ProjectManager({
                       {p.location ? <span className="font-sans"> · {p.location}</span> : null}
                       <span className="font-sans">
                         {' '}
-                        · {p.submissionCount} submission{p.submissionCount === 1 ? '' : 's'}
+                        · {p.submissionCount} submission
+                        {p.submissionCount === 1 ? '' : 's'}
                       </span>
                     </p>
                   </div>
@@ -230,11 +227,7 @@ export function ProjectManager({
                               <form action={removeAction}>
                                 <input type="hidden" name="memberId" value={m.id} />
                                 <input type="hidden" name="projectId" value={p.id} />
-                                <SubmitButton
-                                  variant="ghost"
-                                  size="sm"
-                                  pendingLabel="Removing…"
-                                >
+                                <SubmitButton variant="ghost" size="sm" pendingLabel="Removing…">
                                   <UserMinus className="size-4 text-risk-600" aria-hidden="true" />
                                   <span className="sr-only">Remove {m.fullName}</span>
                                 </SubmitButton>

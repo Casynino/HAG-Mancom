@@ -55,7 +55,7 @@ export function ConfigDraftForm({
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="tap flex items-center gap-2 rounded bg-brand-600 px-3 text-sm font-medium text-white hover:bg-brand-700"
+            className="tap flex items-center gap-2 btn-primary rounded-lg px-3 text-sm font-medium text-white"
           >
             <Plus className="size-4" aria-hidden="true" />
             {open ? 'Close' : 'New setting'}
@@ -94,8 +94,19 @@ export function ConfigDraftForm({
               >
                 <Input id="entitySuffix" name="entitySuffix" maxLength={40} />
               </Field>
-              <Field label="Country code" htmlFor="countryCode" required errors={err('countryCode')}>
-                <Input id="countryCode" name="countryCode" defaultValue="TZ" maxLength={2} required />
+              <Field
+                label="Country code"
+                htmlFor="countryCode"
+                required
+                errors={err('countryCode')}
+              >
+                <Input
+                  id="countryCode"
+                  name="countryCode"
+                  defaultValue="TZ"
+                  maxLength={2}
+                  required
+                />
               </Field>
               <Field label="Registration number" htmlFor="registrationNumber">
                 <Input id="registrationNumber" name="registrationNumber" maxLength={60} />
@@ -140,7 +151,12 @@ export function ConfigDraftForm({
                 <Field label="Currency" htmlFor="currency" required errors={err('currency')}>
                   <Input id="currency" name="currency" defaultValue="TZS" maxLength={3} required />
                 </Field>
-                <Field label="Account name" htmlFor="accountName" required errors={err('accountName')}>
+                <Field
+                  label="Account name"
+                  htmlFor="accountName"
+                  required
+                  errors={err('accountName')}
+                >
                   <Input id="accountName" name="accountName" required maxLength={200} />
                 </Field>
                 <Field label="Bank name" htmlFor="bankName" required errors={err('bankName')}>
@@ -195,7 +211,12 @@ export function ConfigDraftForm({
               <Field label="Prefix" htmlFor="prefix" required errors={err('prefix')}>
                 <Input id="prefix" name="prefix" required maxLength={20} />
               </Field>
-              <Field label="Digits" htmlFor="sequencePadding" required errors={err('sequencePadding')}>
+              <Field
+                label="Digits"
+                htmlFor="sequencePadding"
+                required
+                errors={err('sequencePadding')}
+              >
                 <Input
                   id="sequencePadding"
                   name="sequencePadding"
@@ -206,7 +227,12 @@ export function ConfigDraftForm({
                   required
                 />
               </Field>
-              <Field label="Start at" htmlFor="sequenceStart" required errors={err('sequenceStart')}>
+              <Field
+                label="Start at"
+                htmlFor="sequenceStart"
+                required
+                errors={err('sequenceStart')}
+              >
                 <Input
                   id="sequenceStart"
                   name="sequenceStart"
@@ -433,7 +459,9 @@ export function ConfigDraftForm({
               </fieldset>
 
               <fieldset className="space-y-2 rounded border border-ink-200 p-3">
-                <legend className="px-1 text-xs font-medium text-ink-700">What must be applied</legend>
+                <legend className="px-1 text-xs font-medium text-ink-700">
+                  What must be applied
+                </legend>
                 <label className="tap flex items-center gap-2 text-sm text-ink-700">
                   <input
                     type="checkbox"

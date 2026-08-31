@@ -53,16 +53,18 @@ export default async function TechnicalQueue() {
           'ready_for_documentation',
         ]),
       )
-      .orderBy(URGENCY_RANK, asc(engineerSubmissions.submittedAt), desc(engineerSubmissions.updatedAt))
+      .orderBy(
+        URGENCY_RANK,
+        asc(engineerSubmissions.submittedAt),
+        desc(engineerSubmissions.updatedAt),
+      )
       .limit(200)
 
     return {
       waiting: rows.filter((r) => r.status === 'submitted'),
       inReview: rows.filter((r) => r.status === 'under_review'),
       returned: rows.filter((r) => r.status === 'changes_requested'),
-      ready: rows.filter(
-        (r) => r.status === 'accepted' || r.status === 'ready_for_documentation',
-      ),
+      ready: rows.filter((r) => r.status === 'accepted' || r.status === 'ready_for_documentation'),
     }
   })
 
@@ -80,7 +82,10 @@ export default async function TechnicalQueue() {
         }
       />
 
-      {waiting.length === 0 && inReview.length === 0 && returned.length === 0 && ready.length === 0 ? (
+      {waiting.length === 0 &&
+      inReview.length === 0 &&
+      returned.length === 0 &&
+      ready.length === 0 ? (
         <Panel>
           <EmptyState
             title="The queue is empty"

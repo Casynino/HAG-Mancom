@@ -76,11 +76,7 @@ export default async function NotificationsPage() {
             )
 
             return n.href ? (
-              <Link
-                key={n.id}
-                href={n.href}
-                className="block px-4 py-3.5 hover:bg-ink-50 sm:px-5"
-              >
+              <Link key={n.id} href={n.href} className="block px-4 py-3.5 hover:bg-ink-50 sm:px-5">
                 {body}
               </Link>
             ) : (

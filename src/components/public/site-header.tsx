@@ -1,11 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { projects } from '@/lib/company/profile'
 
 /**
@@ -40,21 +38,10 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5 sm:px-8">
         <Link
           href="/"
-          className="flex items-center gap-2.5"
+          className="font-display text-lg font-bold tracking-tight text-white"
           onClick={() => setOpen(false)}
-          aria-label="HA GROUP — home"
         >
-          <Image
-            src="/brand/ha-group-logo.png"
-            alt=""
-            width={3508}
-            height={2481}
-            priority
-            className="h-8 w-auto"
-          />
-          <span className="font-display text-lg font-bold tracking-tight text-white">
-            HA GROUP
-          </span>
+          HA GROUP
         </Link>
 
         <nav className="ml-auto hidden items-center gap-7 md:flex">
@@ -80,9 +67,6 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
           })}
         </nav>
 
-        <div className="hidden md:block">
-          <ThemeToggle tone="shell" />
-        </div>
 
         <Link
           href={signedIn ? '/dashboard' : '/sign-in'}
@@ -123,10 +107,6 @@ export function SiteHeader({ signedIn }: { signedIn: boolean }) {
               {signedIn ? 'Go to portal' : 'Staff login'}
             </Link>
 
-            <div className="mb-4 flex items-center justify-between">
-              <span className="text-sm text-white/50">Theme</span>
-              <ThemeToggle tone="shell" />
-            </div>
           </nav>
         </div>
       ) : null}

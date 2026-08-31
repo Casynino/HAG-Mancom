@@ -3,12 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { eq } from 'drizzle-orm'
 import type { Database } from '@/db/client'
-import {
-  approvalDecisions,
-  engineerSubmissions,
-  projects,
-  submissionEvents,
-} from '@/db/schema'
+import { approvalDecisions, engineerSubmissions, projects, submissionEvents } from '@/db/schema'
 import { notify, recordAudit } from '@/lib/audit'
 import { asActorWith, type Actor } from '@/lib/authz/guard'
 import {
@@ -154,7 +149,11 @@ export async function saveReviewNotesAction(
     })
 
     revalidatePath(`/technical/submissions/${submissionId}`)
-    return { ok: true, data: null, message: 'Notes saved. These are internal and not shown to the Engineer.' }
+    return {
+      ok: true,
+      data: null,
+      message: 'Notes saved. These are internal and not shown to the Engineer.',
+    }
   } catch (err) {
     return actionError(err)
   }

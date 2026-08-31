@@ -17,12 +17,7 @@
  */
 
 export type AttachmentKind =
-  | 'photo'
-  | 'video'
-  | 'voice_note'
-  | 'drawing'
-  | 'spreadsheet'
-  | 'document'
+  'photo' | 'video' | 'voice_note' | 'drawing' | 'spreadsheet' | 'document'
 
 const MB = 1024 * 1024
 
@@ -130,14 +125,7 @@ const SIGNATURES: Array<{ bytes: number[]; offset: number; types: string[] }> = 
   {
     bytes: [0x66, 0x74, 0x79, 0x70],
     offset: 4,
-    types: [
-      'video/mp4',
-      'video/quicktime',
-      'audio/mp4',
-      'audio/aac',
-      'image/heic',
-      'image/heif',
-    ],
+    types: ['video/mp4', 'video/quicktime', 'audio/mp4', 'audio/aac', 'image/heic', 'image/heif'],
   },
   // EBML — webm, for both video and audio tracks.
   {

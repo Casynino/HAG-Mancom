@@ -190,7 +190,7 @@ export function DocumentWorkflow({
                 <button
                   type="button"
                   onClick={() => setPanel(panel === 'email' ? 'none' : 'email')}
-                  className="tap inline-flex items-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700"
+                  className="tap inline-flex items-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white"
                 >
                   <Mail className="size-4" aria-hidden="true" />
                   Send to client
@@ -303,7 +303,12 @@ export function DocumentWorkflow({
                     required
                   />
                 </Field>
-                <Field label="Message" htmlFor="body" required errors={errorsFor(emailState, 'body')}>
+                <Field
+                  label="Message"
+                  htmlFor="body"
+                  required
+                  errors={errorsFor(emailState, 'body')}
+                >
                   <Textarea
                     id="body"
                     name="body"
@@ -356,7 +361,12 @@ export function DocumentWorkflow({
                     <Input id="verificationCode" name="verificationCode" className="font-mono" />
                   </Field>
                   <Field label="Receipt total" htmlFor="receiptTotal">
-                    <Input id="receiptTotal" name="receiptTotal" inputMode="decimal" className="tabular" />
+                    <Input
+                      id="receiptTotal"
+                      name="receiptTotal"
+                      inputMode="decimal"
+                      className="tabular"
+                    />
                   </Field>
                 </div>
 

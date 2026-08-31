@@ -186,10 +186,7 @@ describe('file validation', () => {
   it('recognises OOXML containers by their ZIP signature', () => {
     const zip = new Uint8Array([0x50, 0x4b, 0x03, 0x04])
     expect(
-      contentMatchesType(
-        zip,
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      ),
+      contentMatchesType(zip, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
     ).toBe(true)
   })
 
@@ -308,9 +305,9 @@ describe('input schemas', () => {
       resetPeriod: 'yearly' as const,
     }
     expect(numberingRuleSchema.safeParse({ ...base, pattern: 'HQ_{YY}{M}' }).success).toBe(false)
-    expect(numberingRuleSchema.safeParse({ ...base, pattern: '{PREFIX}_{YY}{M}{SEQ}' }).success).toBe(
-      true,
-    )
+    expect(
+      numberingRuleSchema.safeParse({ ...base, pattern: '{PREFIX}_{YY}{M}{SEQ}' }).success,
+    ).toBe(true)
   })
 
   it('will not let a new password match the old one', () => {

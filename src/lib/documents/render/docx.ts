@@ -67,7 +67,11 @@ function text(
 
 function para(
   value: string,
-  opts: { bold?: boolean; size?: number; align?: (typeof AlignmentType)[keyof typeof AlignmentType] } = {},
+  opts: {
+    bold?: boolean
+    size?: number
+    align?: (typeof AlignmentType)[keyof typeof AlignmentType]
+  } = {},
 ): Paragraph {
   return new Paragraph({
     alignment: opts.align,
@@ -148,7 +152,9 @@ export async function renderDocumentDocx(doc: RenderDocument): Promise<Buffer> {
         heading: HeadingLevel.HEADING_1,
         children: [
           text(layout.label, { bold: true, size: SZ.title }),
-          ...(doc.reference ? [text(`          ${doc.reference}`, { bold: true, size: SZ.title })] : []),
+          ...(doc.reference
+            ? [text(`          ${doc.reference}`, { bold: true, size: SZ.title })]
+            : []),
         ],
       }),
     )
@@ -159,10 +165,9 @@ export async function renderDocumentDocx(doc: RenderDocument): Promise<Buffer> {
     new TableRow({
       children: [
         cell('Customer', { bold: true, width: 25 }),
-        cell(
-          doc.client.accountNumber ? `Account number: ${doc.client.accountNumber}` : '',
-          { width: 75 },
-        ),
+        cell(doc.client.accountNumber ? `Account number: ${doc.client.accountNumber}` : '', {
+          width: 75,
+        }),
       ],
     }),
     new TableRow({
@@ -180,9 +185,7 @@ export async function renderDocumentDocx(doc: RenderDocument): Promise<Buffer> {
     customerRows.push(new TableRow({ children: [cell('VRN'), cell(doc.client.vrn ?? '')] }))
   }
 
-  children.push(
-    new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: customerRows }),
-  )
+  children.push(new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: customerRows }))
   children.push(new Paragraph({ text: '' }))
 
   const miscRows: TableRow[] = [
@@ -376,7 +379,9 @@ export async function renderDocumentDocx(doc: RenderDocument): Promise<Buffer> {
       )
     }
     if (doc.footer.directorsLine) {
-      children.push(para(doc.footer.directorsLine, { size: SZ.footer, align: AlignmentType.CENTER }))
+      children.push(
+        para(doc.footer.directorsLine, { size: SZ.footer, align: AlignmentType.CENTER }),
+      )
     }
   }
 

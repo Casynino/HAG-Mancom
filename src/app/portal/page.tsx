@@ -40,13 +40,13 @@ export default async function PortalPage() {
           Operations Portal
         </h1>
         <p className="mt-2 text-sm text-ink-500">
-          Internal system for site submissions, quotations, invoices, approvals and company
-          records. Access is restricted to HA GROUP staff.
+          Internal system for site submissions, quotations, invoices, approvals and company records.
+          Access is restricted to HA GROUP staff.
         </p>
 
         <Link
           href="/sign-in"
-          className="tap-lg mt-6 flex w-full items-center justify-center gap-2 rounded bg-brand-600 px-5 font-medium text-white hover:bg-brand-700"
+          className="tap-lg mt-6 flex w-full items-center justify-center gap-2 btn-primary rounded-lg px-5 font-medium text-white"
         >
           <Lock className="size-4" aria-hidden="true" />
           Staff login

@@ -47,7 +47,9 @@ export default async function RepositoryPage({
 
     const filters = sql`
       where 1 = 1
-        ${like ? sql`and (
+        ${
+          like
+            ? sql`and (
             d.reference ilike ${like}
             or d.title ilike ${like}
             or d.scope_description ilike ${like}
@@ -56,7 +58,9 @@ export default async function RepositoryPage({
             or p.name ilike ${like}
             or p.reference ilike ${like}
             or po.po_number ilike ${like}
-          )` : sql``}
+          )`
+            : sql``
+        }
         ${documentType ? sql`and d.document_type = ${documentType}::public.document_type` : sql``}
         ${status ? sql`and d.status = ${status}::public.document_status` : sql``}
         ${from ? sql`and d.document_date >= ${from}::date` : sql``}
@@ -180,7 +184,7 @@ export default async function RepositoryPage({
           <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
             <button
               type="submit"
-              className="tap rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700"
+              className="tap btn-primary rounded-lg px-4 text-sm font-medium text-white"
             >
               Search
             </button>

@@ -3,20 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { and, eq, isNull, sql } from 'drizzle-orm'
 import type { Database } from '@/db/client'
-import {
-  complianceAlerts,
-  complianceRecords,
-  complianceTypes,
-  userRoles,
-} from '@/db/schema'
+import { complianceAlerts, complianceRecords, complianceTypes, userRoles } from '@/db/schema'
 import { notifyMany, recordAudit } from '@/lib/audit'
 import { asActorWith, type Actor } from '@/lib/authz/guard'
-import {
-  actionError,
-  NotFoundError,
-  ValidationError,
-  type ActionResult,
-} from '@/lib/errors'
+import { actionError, NotFoundError, ValidationError, type ActionResult } from '@/lib/errors'
 import { checksum, getStorage } from '@/lib/storage'
 import { checkFile, sanitiseFilename } from '@/lib/storage/limits'
 import {
@@ -197,7 +187,10 @@ export async function recordComplianceAction(
 
         return created!.id
       } catch (err) {
-        if (stored) await getStorage().remove(stored.storageKey).catch(() => undefined)
+        if (stored)
+          await getStorage()
+            .remove(stored.storageKey)
+            .catch(() => undefined)
         throw err
       }
     })
@@ -319,7 +312,9 @@ export async function runComplianceRemindersAction(): Promise<
         // The first threshold this record has now crossed. Past expiry, the
         // reminder repeats daily, so the threshold is the day count itself.
         const crossed =
-          remaining < 0 ? remaining : thresholds.filter((t) => remaining <= t).sort((a, b) => a - b)[0]
+          remaining < 0
+            ? remaining
+            : thresholds.filter((t) => remaining <= t).sort((a, b) => a - b)[0]
 
         if (crossed === undefined) continue
 

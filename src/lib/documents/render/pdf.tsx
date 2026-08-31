@@ -37,9 +37,11 @@ function ensureFonts() {
   const choice = resolveFont()
 
   if (choice.isLicensedCenturyGothic && choice.files.regular) {
-    const variants: Array<{ src: string; fontWeight?: 'normal' | 'bold'; fontStyle?: 'italic' }> = [
-      { src: choice.files.regular, fontWeight: 'normal' },
-    ]
+    const variants: Array<{
+      src: string
+      fontWeight?: 'normal' | 'bold'
+      fontStyle?: 'italic'
+    }> = [{ src: choice.files.regular, fontWeight: 'normal' }]
     if (choice.files.bold) variants.push({ src: choice.files.bold, fontWeight: 'bold' })
     if (choice.files.italic) variants.push({ src: choice.files.italic, fontStyle: 'italic' })
 
@@ -92,12 +94,27 @@ function buildStyles(family: string) {
     addressHeading: { fontSize: PT.denseLabel, fontWeight: 'bold' },
     addressLine: { fontSize: PT.denseLabel, lineHeight: 1.25 },
     contactRow: { flexDirection: 'row', gap: 12, marginTop: 1 },
-    fineprint: { fontSize: PT.fineprint, color: COLOURS.ink, lineHeight: 1.3, marginTop: 4 },
+    fineprint: {
+      fontSize: PT.fineprint,
+      color: COLOURS.ink,
+      lineHeight: 1.3,
+      marginTop: 4,
+    },
 
-    partnerRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 6 },
+    partnerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 14,
+      marginTop: 6,
+    },
     partnerMark: { height: 22, objectFit: 'contain' },
 
-    referenceAbove: { textAlign: 'right', fontSize: PT.title, fontWeight: 'bold', marginBottom: 2 },
+    referenceAbove: {
+      textAlign: 'right',
+      fontSize: PT.title,
+      fontWeight: 'bold',
+      marginBottom: 2,
+    },
 
     statutoryBand: {
       flexDirection: 'row',
@@ -130,7 +147,11 @@ function buildStyles(family: string) {
       borderBottomWidth: 0.5,
       borderColor: COLOURS.rule,
     },
-    partyRowCell: { flexDirection: 'row', borderBottomWidth: 0.5, borderColor: COLOURS.rule },
+    partyRowCell: {
+      flexDirection: 'row',
+      borderBottomWidth: 0.5,
+      borderColor: COLOURS.rule,
+    },
     partyLabel: {
       width: 74,
       padding: 3,
@@ -140,11 +161,24 @@ function buildStyles(family: string) {
     },
     partyValue: { flex: 1, padding: 3, fontSize: PT.body },
 
-    scopeLine: { fontSize: PT.subHeading, fontWeight: 'bold', marginTop: 4, marginBottom: 6 },
+    scopeLine: {
+      fontSize: PT.subHeading,
+      fontWeight: 'bold',
+      marginTop: 4,
+      marginBottom: 6,
+    },
 
     table: { borderWidth: 0.5, borderColor: COLOURS.rule },
-    tableHeaderRow: { flexDirection: 'row', borderBottomWidth: 0.5, borderColor: COLOURS.rule },
-    tableRow: { flexDirection: 'row', borderBottomWidth: 0.5, borderColor: COLOURS.rule },
+    tableHeaderRow: {
+      flexDirection: 'row',
+      borderBottomWidth: 0.5,
+      borderColor: COLOURS.rule,
+    },
+    tableRow: {
+      flexDirection: 'row',
+      borderBottomWidth: 0.5,
+      borderColor: COLOURS.rule,
+    },
     th: {
       fontSize: PT.tableHeader,
       fontWeight: 'bold',
@@ -152,7 +186,12 @@ function buildStyles(family: string) {
       borderRightWidth: 0.5,
       borderColor: COLOURS.rule,
     },
-    td: { fontSize: PT.body, padding: 3, borderRightWidth: 0.5, borderColor: COLOURS.rule },
+    td: {
+      fontSize: PT.body,
+      padding: 3,
+      borderRightWidth: 0.5,
+      borderColor: COLOURS.rule,
+    },
     colItem: { width: 30, textAlign: 'center' },
     colQty: { width: 38, textAlign: 'center' },
     colDescription: { flex: 1 },
@@ -160,7 +199,11 @@ function buildStyles(family: string) {
     colUnit: { width: 84, textAlign: 'right' },
     colTotal: { width: 96, textAlign: 'right', borderRightWidth: 0 },
 
-    totalsRow: { flexDirection: 'row', borderBottomWidth: 0.5, borderColor: COLOURS.rule },
+    totalsRow: {
+      flexDirection: 'row',
+      borderBottomWidth: 0.5,
+      borderColor: COLOURS.rule,
+    },
     totalsLabel: {
       flex: 1,
       padding: 3,
@@ -170,7 +213,12 @@ function buildStyles(family: string) {
       borderRightWidth: 0.5,
       borderColor: COLOURS.rule,
     },
-    totalsValue: { width: 96, padding: 3, fontSize: PT.body, textAlign: 'right' },
+    totalsValue: {
+      width: 96,
+      padding: 3,
+      fontSize: PT.body,
+      textAlign: 'right',
+    },
     totalsValueBold: {
       width: 96,
       padding: 3,
@@ -185,7 +233,11 @@ function buildStyles(family: string) {
       marginTop: 12,
       marginBottom: 4,
     },
-    termsHeading: { fontSize: PT.tableHeader, fontWeight: 'bold', marginTop: 6 },
+    termsHeading: {
+      fontSize: PT.tableHeader,
+      fontWeight: 'bold',
+      marginTop: 6,
+    },
     termsBody: { fontSize: PT.body, marginTop: 1, lineHeight: 1.35 },
 
     body: { fontSize: PT.bodyAlt, lineHeight: 1.5, marginTop: 8 },
@@ -209,11 +261,25 @@ function buildStyles(family: string) {
       borderColor: COLOURS.rule,
     },
 
-    sealRow: { flexDirection: 'row', gap: 24, marginTop: 12, alignItems: 'flex-end' },
+    sealRow: {
+      flexDirection: 'row',
+      gap: 24,
+      marginTop: 12,
+      alignItems: 'flex-end',
+    },
     sealImage: { height: 84, objectFit: 'contain' },
-    sealCaption: { fontSize: PT.fineprint, color: COLOURS.secondary, marginTop: 2 },
+    sealCaption: {
+      fontSize: PT.fineprint,
+      color: COLOURS.secondary,
+      marginTop: 2,
+    },
 
-    bankHeading: { fontSize: PT.subHeading, fontWeight: 'bold', marginTop: 20, marginBottom: 4 },
+    bankHeading: {
+      fontSize: PT.subHeading,
+      fontWeight: 'bold',
+      marginTop: 20,
+      marginBottom: 4,
+    },
     bankRow: { flexDirection: 'row', marginBottom: 1 },
     bankLabel: { width: 150, fontSize: PT.bodyAlt },
     bankValue: { flex: 1, fontSize: PT.bodyAlt },
@@ -227,7 +293,11 @@ function buildStyles(family: string) {
       borderColor: COLOURS.rule,
       paddingTop: 3,
     },
-    footerTagline: { fontSize: PT.footer, fontWeight: 'bold', textAlign: 'center' },
+    footerTagline: {
+      fontSize: PT.footer,
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
     footerDirectors: { fontSize: PT.footer, textAlign: 'center' },
     footerNotice: {
       fontSize: PT.fineprint,
@@ -235,7 +305,12 @@ function buildStyles(family: string) {
       textAlign: 'center',
       marginTop: 2,
     },
-    pageNumber: { position: 'absolute', bottom: 18, right: 36, fontSize: PT.footer },
+    pageNumber: {
+      position: 'absolute',
+      bottom: 18,
+      right: 36,
+      fontSize: PT.footer,
+    },
 
     watermark: {
       position: 'absolute',
@@ -570,9 +645,7 @@ export function DocumentPdf({ doc }: { doc: RenderDocument }) {
                 <Text style={styles.signOffTitle}>{doc.preparedBy.title}</Text>
               ) : null}
               <View style={styles.signOffContacts}>
-                <Text style={styles.signOffContactCell}>
-                  Direct: {doc.preparedBy.phone ?? ''}
-                </Text>
+                <Text style={styles.signOffContactCell}>Direct: {doc.preparedBy.phone ?? ''}</Text>
                 <Text style={[styles.signOffContactCell, { borderRightWidth: 0 }]}>
                   Email: {doc.preparedBy.email ?? ''}
                 </Text>
@@ -589,7 +662,10 @@ export function DocumentPdf({ doc }: { doc: RenderDocument }) {
               [
                 ['Account Name', doc.bank.accountName],
                 ['Bank', doc.bank.bankName],
-                ['Branch', doc.bank.branch ? `${doc.bank.branch} (${doc.bank.branchCode ?? ''})` : null],
+                [
+                  'Branch',
+                  doc.bank.branch ? `${doc.bank.branch} (${doc.bank.branchCode ?? ''})` : null,
+                ],
                 ['Account Number', `${doc.bank.accountNumber} (${doc.bank.currency})`],
                 ['Swift Code', doc.bank.swiftCode],
                 ['Sort Code', doc.bank.sortCode],

@@ -75,7 +75,12 @@ function sampleDocument(overrides: Partial<RenderDocument> = {}): RenderDocument
     totals: {
       subTotal: '14827307.68',
       charges: [
-        { label: 'Administration', ratePercent: '20', amount: '2965461.54', appliesBeforeVat: true },
+        {
+          label: 'Administration',
+          ratePercent: '20',
+          amount: '2965461.54',
+          appliesBeforeVat: true,
+        },
       ],
       taxableTotal: '17792769.22',
       taxLabel: 'VAT',

@@ -215,10 +215,7 @@ describe('director and administrator', () => {
 
   it('director cannot manage users', async () => {
     const err = await expectFailure(app, director.id, (c) =>
-      c.query('insert into user_roles (user_id, role) values ($1, $2)', [
-        engineerA.id,
-        'director',
-      ]),
+      c.query('insert into user_roles (user_id, role) values ($1, $2)', [engineerA.id, 'director']),
     )
     expect(err.message).toMatch(/row-level security/i)
   })

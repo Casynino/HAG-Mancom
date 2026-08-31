@@ -54,7 +54,7 @@ export function ComplianceBoard({
           <button
             type="button"
             onClick={() => setShowForm((v) => !v)}
-            className="tap inline-flex items-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700"
+            className="tap inline-flex items-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white"
           >
             <Plus className="size-4" aria-hidden="true" />
             {showForm ? 'Close' : 'Record a certificate'}
@@ -176,7 +176,11 @@ export function ComplianceBoard({
                 <Input id="referenceNumber" name="referenceNumber" maxLength={120} />
               </Field>
 
-              <Field label="Issued on" htmlFor="issuedOn" errors={errorsFor(recordState, 'issuedOn')}>
+              <Field
+                label="Issued on"
+                htmlFor="issuedOn"
+                errors={errorsFor(recordState, 'issuedOn')}
+              >
                 <Input id="issuedOn" name="issuedOn" type="date" />
               </Field>
 

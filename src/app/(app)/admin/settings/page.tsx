@@ -108,7 +108,10 @@ export default async function SettingsPage() {
       />
 
       {drafts.length > 0 ? (
-        <Notice tone="warn" title={`${drafts.length} setting${drafts.length === 1 ? '' : 's'} awaiting your decision`}>
+        <Notice
+          tone="warn"
+          title={`${drafts.length} setting${drafts.length === 1 ? '' : 's'} awaiting your decision`}
+        >
           These were extracted from HA GROUP&rsquo;s own historical documents during Phase 0
           analysis. Several conflict with each other — the entity name and the numbering pattern in
           particular — so read the note on each before approving.

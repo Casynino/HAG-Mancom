@@ -137,9 +137,7 @@ describe('1. an Administrator approves the company settings', () => {
     // same supersession decideConfigAction performs. Doing it here keeps the
     // test idempotent against records left by an earlier run.
     await o.query("update legal_entities set is_default = false where state = 'approved'")
-    await o.query(
-      "update entity_addresses set is_default = false where state = 'approved'",
-    )
+    await o.query("update entity_addresses set is_default = false where state = 'approved'")
     await o.query("update bank_accounts set is_default = false where state = 'approved'")
     await o.query(
       "update rounding_policies set state = 'superseded' where state = 'approved' and currency = 'TZS'",
@@ -230,7 +228,11 @@ describe('1. an Administrator approves the company settings', () => {
     expect(config.charges).toHaveLength(1)
     expect(config.charges[0]!.ratePercent).toBe('20.00000')
     expect(config.charges[0]!.appliesBeforeVat).toBe(true)
-    expect(config.rounding).toEqual({ decimalPlaces: 2, mode: 'half_up', roundAtStep: 'line_total' })
+    expect(config.rounding).toEqual({
+      decimalPlaces: 2,
+      mode: 'half_up',
+      roundAtStep: 'line_total',
+    })
   })
 })
 
@@ -273,9 +275,10 @@ describe('2. an Engineer files from site', () => {
         .where(sql`id = ${submissionId}::uuid`)
     })
 
-    const { rows } = await o.query('select status, reference from engineer_submissions where id = $1', [
-      submissionId,
-    ])
+    const { rows } = await o.query(
+      'select status, reference from engineer_submissions where id = $1',
+      [submissionId],
+    )
     expect(rows[0]!.status).toBe('submitted')
     expect(rows[0]!.reference).toMatch(/^SUB-\d{4}-\d{5}$/)
   })
@@ -346,7 +349,9 @@ describe('3. the Technical Officer prepares a quotation', () => {
       const config = await loadDocumentConfig(d, 'quotation', 'TZS')
       const totals = computeDocumentTotals({
         currency: 'TZS',
-        lines: [{ description: 'July 2026 Maintenance Services', quantity: '8', unitPrice: '1853413.46' }],
+        lines: [
+          { description: 'July 2026 Maintenance Services', quantity: '8', unitPrice: '1853413.46' },
+        ],
         charges: config.charges,
         tax: config.tax,
         rounding: config.rounding,
@@ -495,10 +500,7 @@ describe('4. the Director approves', () => {
     // silently producing a document without a logo.
     expect(warnings.some((w) => /logo/i.test(w))).toBe(true)
 
-    const [pdf, docx] = await Promise.all([
-      renderDocumentPdf(model),
-      renderDocumentDocx(model),
-    ])
+    const [pdf, docx] = await Promise.all([renderDocumentPdf(model), renderDocumentDocx(model)])
 
     expect(pdf.subarray(0, 5).toString('latin1')).toBe('%PDF-')
     expect(pdf.byteLength).toBeGreaterThan(1000)
@@ -581,7 +583,10 @@ describe('6. materials are delivered and signed for', () => {
     await as(officer.id, (d) =>
       d
         .update(schema.deliveries)
-        .set({ handoverSignatureKey: `deliveries/${deliveryId}/ha.png`, handoverSignedAt: new Date() })
+        .set({
+          handoverSignatureKey: `deliveries/${deliveryId}/ha.png`,
+          handoverSignedAt: new Date(),
+        })
         .where(sql`id = ${deliveryId}::uuid`),
     )
 
@@ -613,7 +618,9 @@ describe('7. the tax invoice', () => {
 
       const quotationTotals = computeDocumentTotals({
         currency: 'TZS',
-        lines: [{ description: 'July 2026 Maintenance Services', quantity: '8', unitPrice: '1853413.46' }],
+        lines: [
+          { description: 'July 2026 Maintenance Services', quantity: '8', unitPrice: '1853413.46' },
+        ],
         charges: [
           {
             code: 'ADMIN',
@@ -672,10 +679,9 @@ describe('7. the tax invoice', () => {
         .where(sql`id = ${invoiceId}::uuid`)
     })
 
-    const { rows } = await o.query(
-      'select sub_total, grand_total from documents where id = $1',
-      [invoiceId],
-    )
+    const { rows } = await o.query('select sub_total, grand_total from documents where id = $1', [
+      invoiceId,
+    ])
     // 1,853,413.46 × 1.20 ÷ 1 per unit → the loaded unit price, ×8.
     expect(Decimal.from(rows[0]!.sub_total).toFixed(2)).toBe('17792769.20')
     expect(Decimal.from(rows[0]!.grand_total).toFixed(2)).toBe('20995467.66')
@@ -732,7 +738,12 @@ describe('7. the tax invoice', () => {
 
       await d
         .update(schema.documents)
-        .set({ status: 'approved', currentVersion: 2, approvedBy: director.id, approvedAt: new Date() })
+        .set({
+          status: 'approved',
+          currentVersion: 2,
+          approvedBy: director.id,
+          approvedAt: new Date(),
+        })
         .where(sql`id = ${invoiceId}::uuid`)
     })
 
@@ -791,7 +802,11 @@ describe('9. everything is findable and attributable', () => {
         where d.title ilike ${`%${RUN_ID}%`}
         order by d.document_type
       `)
-      return result.rows as Array<{ reference: string; document_type: string; po_number: string | null }>
+      return result.rows as Array<{
+        reference: string
+        document_type: string
+        po_number: string | null
+      }>
     })
 
     expect(found).toHaveLength(2)

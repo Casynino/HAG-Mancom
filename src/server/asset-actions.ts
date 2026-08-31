@@ -124,7 +124,9 @@ export async function uploadCompanyAssetAction(
 
         return created!.id
       } catch (err) {
-        await getStorage().remove(storageKey).catch(() => undefined)
+        await getStorage()
+          .remove(storageKey)
+          .catch(() => undefined)
         throw err
       }
     })

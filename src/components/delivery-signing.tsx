@@ -132,7 +132,7 @@ function SignatureForm({
   label: string
   personName: string | null
   action: (formData: FormData) => void
-  }) {
+}) {
   const [blob, setBlob] = useState<Blob | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -146,7 +146,9 @@ function SignatureForm({
     // travels as an ordinary upload and is validated like one.
     const input = formRef.current?.querySelector<HTMLInputElement>('input[name="signature"]')
     if (input) {
-      const file = new File([blob], `${side}-signature.png`, { type: 'image/png' })
+      const file = new File([blob], `${side}-signature.png`, {
+        type: 'image/png',
+      })
       const transfer = new DataTransfer()
       transfer.items.add(file)
       input.files = transfer.files

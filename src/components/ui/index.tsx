@@ -18,9 +18,8 @@ const BUTTON_BASE =
   'disabled:pointer-events-none disabled:opacity-50 whitespace-nowrap'
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800',
-  secondary:
-    'bg-panel text-ink-800 border border-ink-300 hover:bg-ink-50 active:bg-ink-100',
+  primary: 'bg-brand-600 text-white active:bg-brand-800',
+  secondary: 'bg-panel text-ink-800 border border-ink-300 hover:bg-ink-50 active:bg-ink-100',
   ghost: 'text-ink-600 hover:bg-ink-100 hover:text-ink-900',
   danger: 'bg-risk-600 text-white hover:bg-risk-700',
 }
@@ -223,12 +222,16 @@ export function PageHeader({
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
         {eyebrow ? (
-          <p className="text-xs font-medium tracking-wider text-brand-600 uppercase">{eyebrow}</p>
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-live-700 uppercase">
+            {eyebrow}
+          </p>
         ) : null}
-        <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">
+        <h1 className="font-display mt-1.5 text-2xl font-bold tracking-tight text-ink-950 sm:text-3xl">
           {title}
         </h1>
-        {description ? <p className="mt-1 max-w-2xl text-sm text-ink-500">{description}</p> : null}
+        {description ? (
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-500">{description}</p>
+        ) : null}
       </div>
       {action}
     </div>

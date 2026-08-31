@@ -123,13 +123,17 @@ describe('submitted content is locked', () => {
       id,
     ])
 
-    const { rows } = await o.query('select project_id from engineer_submissions where id = $1', [id])
+    const { rows } = await o.query('select project_id from engineer_submissions where id = $1', [
+      id,
+    ])
     expect(rows[0]!.project_id).toBe(otherProject)
   })
 
   it('allows the engineer to edit again after a correction is requested', async () => {
     const id = await fresh('submitted')
-    await o.query("update engineer_submissions set status = 'changes_requested' where id = $1", [id])
+    await o.query("update engineer_submissions set status = 'changes_requested' where id = $1", [
+      id,
+    ])
 
     await o.query('update engineer_submissions set problem_description = $1 where id = $2', [
       'corrected as asked',
@@ -192,10 +196,9 @@ describe('attachments and measurements follow the parent', () => {
 
 describe('audit log immutability', () => {
   it('cannot be updated, even by the schema owner', async () => {
-    await o.query(
-      "insert into audit_log (action, entity_type) values ($1, 'test')",
-      [`test.immutable.${RUN_ID}`],
-    )
+    await o.query("insert into audit_log (action, entity_type) values ($1, 'test')", [
+      `test.immutable.${RUN_ID}`,
+    ])
     const err = await expectFailure(o, null, (c) =>
       c.query('update audit_log set action = $1 where action = $2', [
         'rewritten',

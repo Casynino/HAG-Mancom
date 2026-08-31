@@ -12,7 +12,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/"
-        className="tap mt-6 inline-flex items-center rounded bg-brand-600 px-5 text-sm font-medium text-white hover:bg-brand-700"
+        className="tap mt-6 inline-flex items-center btn-primary rounded-lg px-5 text-sm font-medium text-white"
       >
         Back to your work
       </Link>

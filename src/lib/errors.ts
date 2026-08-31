@@ -129,7 +129,10 @@ export function toUserMessage(err: unknown): { message: string; code: string; st
 
 /** Strips the Postgres context suffix so only the raised sentence remains. */
 function sanitise(message: string): string {
-  return message.split('\n')[0]!.replace(/^ERROR:\s*/i, '').trim()
+  return message
+    .split('\n')[0]!
+    .replace(/^ERROR:\s*/i, '')
+    .trim()
 }
 
 /** Shape returned by every Server Action, so forms can render results uniformly. */

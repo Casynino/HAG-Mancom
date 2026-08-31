@@ -68,7 +68,10 @@ export default async function DeliveryPage({ params }: { params: Promise<{ id: s
   if (!data) notFound()
 
   const d = data.delivery
-  const status = DELIVERY_STATUS[d.status] ?? { label: d.status, tone: 'neutral' as const }
+  const status = DELIVERY_STATUS[d.status] ?? {
+    label: d.status,
+    tone: 'neutral' as const,
+  }
 
   return (
     <>

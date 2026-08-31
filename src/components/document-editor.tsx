@@ -108,7 +108,10 @@ function previewTotals(
   return {
     lineTotals,
     subTotal: subTotal.toFixed(decimalPlaces),
-    charges: chargeAmounts.map((c) => ({ ...c, amount: c.amount.toFixed(decimalPlaces) })),
+    charges: chargeAmounts.map((c) => ({
+      ...c,
+      amount: c.amount.toFixed(decimalPlaces),
+    })),
     taxable: taxable.toFixed(decimalPlaces),
     tax: tax.toFixed(decimalPlaces),
     grand: grand.toFixed(decimalPlaces),
@@ -148,7 +151,11 @@ export function DocumentEditor({
     documentDate: string
     filename: string
     bodyContent: string
-    terms: { paymentTerms?: string; vatStatement?: string; deliveryTime?: string }
+    terms: {
+      paymentTerms?: string
+      vatStatement?: string
+      deliveryTime?: string
+    }
   }
   initialLines: LineDraft[]
   aiAvailable: boolean
@@ -362,13 +369,9 @@ export function DocumentEditor({
                   type="button"
                   onClick={() =>
                     setBody(
-                      [
-                        letterDraft.salutation,
-                        '',
-                        letterDraft.body,
-                        '',
-                        letterDraft.closing,
-                      ].join('\n'),
+                      [letterDraft.salutation, '', letterDraft.body, '', letterDraft.closing].join(
+                        '\n',
+                      ),
                     )
                   }
                   className="tap rounded border border-brand-600 bg-panel px-3 text-sm font-medium text-brand-700 hover:bg-brand-50"
@@ -416,7 +419,13 @@ export function DocumentEditor({
           <PanelHeader title="Document details" />
           <fieldset disabled={!editable} className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5">
             <Field label="Title" htmlFor="title" required errors={errorsFor(state, 'title')}>
-              <Input id="title" name="title" defaultValue={initial.title} required maxLength={200} />
+              <Input
+                id="title"
+                name="title"
+                defaultValue={initial.title}
+                required
+                maxLength={200}
+              />
             </Field>
             <Field label="Document date" htmlFor="documentDate">
               <Input
@@ -467,7 +476,12 @@ export function DocumentEditor({
               hint="Editable until the document is approved."
               errors={errorsFor(state, 'filename')}
             >
-              <Input id="filename" name="filename" defaultValue={initial.filename} maxLength={200} />
+              <Input
+                id="filename"
+                name="filename"
+                defaultValue={initial.filename}
+                maxLength={200}
+              />
             </Field>
           </fieldset>
         </Panel>
@@ -480,11 +494,7 @@ export function DocumentEditor({
               description="This is the text that will be printed under the letterhead."
             />
             <div className="space-y-3 p-4 sm:p-5">
-              <Field
-                label="Body"
-                htmlFor="bodyContent"
-                errors={errorsFor(state, 'bodyContent')}
-              >
+              <Field label="Body" htmlFor="bodyContent" errors={errorsFor(state, 'bodyContent')}>
                 <Textarea
                   id="bodyContent"
                   name="bodyContent"
@@ -551,7 +561,9 @@ export function DocumentEditor({
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="mb-1 block text-xs font-medium text-ink-700">Unit price</label>
+                    <label className="mb-1 block text-xs font-medium text-ink-700">
+                      Unit price
+                    </label>
                     <Input
                       value={line.unitPrice}
                       onChange={(e) => update(index, { unitPrice: e.target.value })}
@@ -613,7 +625,9 @@ export function DocumentEditor({
                     <dt className="text-ink-600">
                       {c.label} ({c.ratePercent}%)
                     </dt>
-                    <dd className="text-ink-900 tabular">{formatAmount(c.amount, decimalPlaces)}</dd>
+                    <dd className="text-ink-900 tabular">
+                      {formatAmount(c.amount, decimalPlaces)}
+                    </dd>
                   </div>
                 ))}
 
@@ -631,7 +645,9 @@ export function DocumentEditor({
                   <dt className="text-ink-600">
                     {taxLabel ?? 'VAT'} ({taxRatePercent}%)
                   </dt>
-                  <dd className="text-ink-900 tabular">{formatAmount(totals.tax, decimalPlaces)}</dd>
+                  <dd className="text-ink-900 tabular">
+                    {formatAmount(totals.tax, decimalPlaces)}
+                  </dd>
                 </div>
               ) : null}
 

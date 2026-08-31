@@ -320,7 +320,9 @@ export async function decideDocumentAction(
         )
       }
       if (applyStamp && !canApplyStamp(actor.roles)) {
-        throw new AuthorizationError('Only a Director or Administrator may apply the company stamp.')
+        throw new AuthorizationError(
+          'Only a Director or Administrator may apply the company stamp.',
+        )
       }
       if (authority.requiresSignature && !applySignature) {
         throw new ValidationError('This document type requires a signature.', {
@@ -381,9 +383,7 @@ export async function decideDocumentAction(
           .where(eq(companyAssets.state, 'approved'))
 
         if (applySignature) {
-          const signature = assets.find(
-            (a) => a.kind === 'signature' && a.ownerUserId === actor.id,
-          )
+          const signature = assets.find((a) => a.kind === 'signature' && a.ownerUserId === actor.id)
           if (!signature) {
             throw new ConflictError(
               'You have no approved signature on file. Upload one in your profile before approving documents that need signing.',
@@ -533,8 +533,7 @@ export async function decideDocumentAction(
     return {
       ok: true,
       data: { status: outcome.status },
-      message:
-        outcome.warnings.length > 0 ? `${base} Note: ${outcome.warnings.join(' ')}` : base,
+      message: outcome.warnings.length > 0 ? `${base} Note: ${outcome.warnings.join(' ')}` : base,
     }
   } catch (err) {
     return actionError(err)

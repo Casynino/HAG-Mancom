@@ -72,10 +72,7 @@ export const createUserSchema = z.object({
   fullName: requiredText('Full name', 2, 160),
   phone: phone.optional().transform((v) => (v === '' ? undefined : v)),
   jobTitle: optionalText(120),
-  roles: z
-    .array(z.enum(APP_ROLES))
-    .min(1, 'Select at least one role.')
-    .max(APP_ROLES.length),
+  roles: z.array(z.enum(APP_ROLES)).min(1, 'Select at least one role.').max(APP_ROLES.length),
   temporaryPassword: z.string().min(12, 'Use at least 12 characters.').max(200),
 })
 

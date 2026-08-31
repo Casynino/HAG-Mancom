@@ -49,7 +49,12 @@ export function ProjectWorkspace(props: {
   projectId: string
   clientId: string
   clientName: string
-  members: Array<{ id: string; userId: string; isLead: boolean; fullName: string }>
+  members: Array<{
+    id: string
+    userId: string
+    isLead: boolean
+    fullName: string
+  }>
   contacts: Array<{
     id: string
     fullName: string
@@ -124,9 +129,9 @@ export function ProjectWorkspace(props: {
   const [verifyState, verifyAction] = useActionState(verifyCompletionAction, null)
 
   const [showForm, setShowForm] = useState(false)
-  const [items, setItems] = useState<Array<{ description: string; quantity: string; unit: string }>>(
-    [{ description: '', quantity: '1', unit: '' }],
-  )
+  const [items, setItems] = useState<
+    Array<{ description: string; quantity: string; unit: string }>
+  >([{ description: '', quantity: '1', unit: '' }])
 
   const tabs: Array<[Tab, string, number]> = [
     ['overview', 'Overview', props.submissions.length + props.documents.length],
@@ -281,7 +286,7 @@ export function ProjectWorkspace(props: {
             <button
               type="button"
               onClick={() => setShowForm((v) => !v)}
-              className="tap inline-flex items-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700 sm:self-start"
+              className="tap inline-flex items-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white sm:self-start"
             >
               <Plus className="size-4" aria-hidden="true" />
               {showForm ? 'Close' : 'Record a Purchase Order'}
@@ -307,10 +312,20 @@ export function ProjectWorkspace(props: {
                     required
                     errors={errorsFor(poState, 'poNumber')}
                   >
-                    <Input id="poNumber" name="poNumber" required maxLength={80} className="font-mono" />
+                    <Input
+                      id="poNumber"
+                      name="poNumber"
+                      required
+                      maxLength={80}
+                      className="font-mono"
+                    />
                   </Field>
 
-                  <Field label="Their PO date" htmlFor="poDate" errors={errorsFor(poState, 'poDate')}>
+                  <Field
+                    label="Their PO date"
+                    htmlFor="poDate"
+                    errors={errorsFor(poState, 'poDate')}
+                  >
                     <Input id="poDate" name="poDate" type="date" />
                   </Field>
 
@@ -324,7 +339,12 @@ export function ProjectWorkspace(props: {
                     hint="As stated on their PO, for reconciliation."
                     errors={errorsFor(poState, 'orderValue')}
                   >
-                    <Input id="orderValue" name="orderValue" inputMode="decimal" className="tabular" />
+                    <Input
+                      id="orderValue"
+                      name="orderValue"
+                      inputMode="decimal"
+                      className="tabular"
+                    />
                   </Field>
                 </div>
 
@@ -359,7 +379,10 @@ export function ProjectWorkspace(props: {
               </p>
             ) : (
               props.purchaseOrders.map((po) => {
-                const status = PO_STATUS[po.status] ?? { label: po.status, tone: 'neutral' as const }
+                const status = PO_STATUS[po.status] ?? {
+                  label: po.status,
+                  tone: 'neutral' as const,
+                }
                 return (
                   <div key={po.id} className="px-4 py-3.5 sm:px-5">
                     <div className="flex flex-wrap items-start gap-3">
@@ -414,7 +437,7 @@ export function ProjectWorkspace(props: {
             <button
               type="button"
               onClick={() => setShowForm((v) => !v)}
-              className="tap inline-flex items-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700 sm:self-start"
+              className="tap inline-flex items-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white sm:self-start"
             >
               <Plus className="size-4" aria-hidden="true" />
               {showForm ? 'Close' : 'Record a delivery'}
@@ -473,7 +496,12 @@ export function ProjectWorkspace(props: {
                     required
                     errors={errorsFor(deliveryState, 'handoverPersonName')}
                   >
-                    <Input id="handoverPersonName" name="handoverPersonName" required maxLength={160} />
+                    <Input
+                      id="handoverPersonName"
+                      name="handoverPersonName"
+                      required
+                      maxLength={160}
+                    />
                   </Field>
 
                   <Field label="Received by (client)" htmlFor="receiverName">
@@ -527,7 +555,9 @@ export function ProjectWorkspace(props: {
                           value={item.unit}
                           onChange={(e) =>
                             setItems((prev) =>
-                              prev.map((it, i) => (i === index ? { ...it, unit: e.target.value } : it)),
+                              prev.map((it, i) =>
+                                i === index ? { ...it, unit: e.target.value } : it,
+                              ),
                             )
                           }
                         />
@@ -601,7 +631,7 @@ export function ProjectWorkspace(props: {
             <button
               type="button"
               onClick={() => setShowForm((v) => !v)}
-              className="tap inline-flex items-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700 sm:self-start"
+              className="tap inline-flex items-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white sm:self-start"
             >
               <Plus className="size-4" aria-hidden="true" />
               {showForm ? 'Close' : 'Record completion evidence'}
@@ -756,7 +786,7 @@ export function ProjectWorkspace(props: {
             <button
               type="button"
               onClick={() => setShowForm((v) => !v)}
-              className="tap inline-flex items-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700 sm:self-start"
+              className="tap inline-flex items-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white sm:self-start"
             >
               <UserPlus className="size-4" aria-hidden="true" />
               {showForm ? 'Close' : 'Add a contact'}

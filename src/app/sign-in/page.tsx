@@ -5,7 +5,9 @@ import { defaultRouteFor } from '@/lib/authz/roles'
 import { SignInForm } from './sign-in-form'
 
 export const metadata: Metadata = {
-  robots: { index: false, follow: false }, title: 'Sign in' }
+  robots: { index: false, follow: false },
+  title: 'Sign in',
+}
 
 export default async function SignInPage() {
   const actor = await getActor()

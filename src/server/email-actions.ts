@@ -2,12 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { and, eq } from 'drizzle-orm'
-import {
-  documentVersions,
-  documents,
-  emailAttachments,
-  emailMessages,
-} from '@/db/schema'
+import { documentVersions, documents, emailAttachments, emailMessages } from '@/db/schema'
 import { recordAudit } from '@/lib/audit'
 import { asActorWith } from '@/lib/authz/guard'
 import {
@@ -49,11 +44,7 @@ export async function sendDocumentEmailAction(
     const v = parsed.data
 
     const outcome = await asActorWith('document.send', async (db, actor) => {
-      const [doc] = await db
-        .select()
-        .from(documents)
-        .where(eq(documents.id, v.documentId))
-        .limit(1)
+      const [doc] = await db.select().from(documents).where(eq(documents.id, v.documentId)).limit(1)
 
       if (!doc) throw new NotFoundError('That document no longer exists.')
 
@@ -200,7 +191,11 @@ export async function sendDocumentEmailAction(
     revalidatePath(`/technical/documents/${parsed.data.documentId}`)
 
     if (outcome.status === 'sent') {
-      return { ok: true, data: { status: 'sent' }, message: 'Sent, and logged against the document.' }
+      return {
+        ok: true,
+        data: { status: 'sent' },
+        message: 'Sent, and logged against the document.',
+      }
     }
     if (outcome.status === 'not_configured') {
       return {

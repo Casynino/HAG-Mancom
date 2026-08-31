@@ -90,6 +90,14 @@
    */
   --color-shell: #0e131b;
 
+  /*
+   * The application sidebar. Navy rather than the public site's near-black,
+   * and fixed in both themes: it is a permanent frame the eye stops noticing,
+   * and a frame that inverts under the user is a frame they have to re-learn.
+   */
+  --color-sidebar: #16233a;
+  --color-sidebar-hover: #1f3050;
+
   /* Display face for the public site; the app keeps the system stack. */
   --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
@@ -256,5 +264,29 @@
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@layer components {
+  /*
+   * The primary action, matching the platform's established look: a short
+   * blue gradient rather than a flat fill. Defined once here because it is
+   * repeated across roughly twenty screens, and a gradient copied twenty times
+   * is a gradient that drifts.
+   */
+  .btn-primary {
+    background-image: linear-gradient(
+      to bottom right,
+      var(--color-brand-600),
+      var(--color-brand-800)
+    );
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background-image: linear-gradient(
+      to bottom right,
+      var(--color-brand-500),
+      var(--color-brand-700)
+    );
   }
 }

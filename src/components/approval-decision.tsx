@@ -167,9 +167,7 @@ export function ApprovalDecision({
           <form
             action={formAction}
             className={`space-y-3 rounded border p-3 ${
-              mode === 'reject'
-                ? 'border-risk-600/25 bg-risk-50'
-                : 'border-warn-600/25 bg-warn-50'
+              mode === 'reject' ? 'border-risk-600/25 bg-risk-50' : 'border-warn-600/25 bg-warn-50'
             }`}
           >
             <input type="hidden" name="documentId" value={documentId} />
@@ -180,11 +178,7 @@ export function ApprovalDecision({
             />
 
             <Field
-              label={
-                mode === 'reject'
-                  ? 'Why are you rejecting this?'
-                  : 'What needs correcting?'
-              }
+              label={mode === 'reject' ? 'Why are you rejecting this?' : 'What needs correcting?'}
               htmlFor="decision-comment"
               hint="This goes back to the Technical Office."
               required

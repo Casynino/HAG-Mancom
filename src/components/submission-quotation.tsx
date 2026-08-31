@@ -29,7 +29,12 @@ export function SubmissionQuotation({
 }: {
   submissionId: string
   status: string
-  existing: Array<{ id: string; reference: string | null; documentType: string; status: string }>
+  existing: Array<{
+    id: string
+    reference: string | null
+    documentType: string
+    status: string
+  }>
   canCreate: boolean
   configReady: boolean
   configMissing: string[]

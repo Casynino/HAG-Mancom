@@ -130,7 +130,12 @@ function ClientFields({
           <Input id={p('city')} name="city" maxLength={120} defaultValue={client?.city ?? ''} />
         </Field>
         <Field label="Region" htmlFor={p('region')}>
-          <Input id={p('region')} name="region" maxLength={120} defaultValue={client?.region ?? ''} />
+          <Input
+            id={p('region')}
+            name="region"
+            maxLength={120}
+            defaultValue={client?.region ?? ''}
+          />
         </Field>
         <Field label="Country" htmlFor={p('country')}>
           <Input
@@ -223,7 +228,7 @@ export function ClientManager({ clients }: { clients: ClientRow[] }) {
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="tap flex items-center justify-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700 sm:ml-auto"
+          className="tap flex items-center justify-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white sm:ml-auto"
         >
           <Plus className="size-4" aria-hidden="true" />
           {showForm ? 'Close' : 'Add a client'}
@@ -260,7 +265,9 @@ export function ClientManager({ clients }: { clients: ClientRow[] }) {
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-ink-900">{c.legalName}</p>
                   {c.status !== 'active' ? (
-                    <Badge tone="neutral">{c.status === 'archived' ? 'Archived' : 'Inactive'}</Badge>
+                    <Badge tone="neutral">
+                      {c.status === 'archived' ? 'Archived' : 'Inactive'}
+                    </Badge>
                   ) : null}
                 </div>
                 <p className="mt-0.5 text-sm text-ink-500">

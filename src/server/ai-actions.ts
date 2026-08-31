@@ -150,7 +150,11 @@ export async function draftScopeFromSubmissionAction(
           action: 'ai.draft_generated',
           entityType: 'engineer_submissions',
           entityId: submissionId,
-          metadata: { purpose: 'scope_draft', model: AI_MODEL, lines: value.lineDescriptions.length },
+          metadata: {
+            purpose: 'scope_draft',
+            model: AI_MODEL,
+            lines: value.lineDescriptions.length,
+          },
         })
 
         return value
@@ -190,7 +194,9 @@ export async function draftLetterAction(
     const tone = String(formData.get('tone') ?? 'neutral')
 
     if (subject.length < 3) {
-      throw new ValidationError('Give the letter a subject.', { subject: ['A subject is required.'] })
+      throw new ValidationError('Give the letter a subject.', {
+        subject: ['A subject is required.'],
+      })
     }
     if (intent.length < 20) {
       throw new ValidationError('Say what the letter should cover.', {
@@ -260,7 +266,11 @@ export async function draftLetterAction(
       }
     })
 
-    return { ok: true, data: draft, message: 'Draft ready. Edit it before submitting for approval.' }
+    return {
+      ok: true,
+      data: draft,
+      message: 'Draft ready. Edit it before submitting for approval.',
+    }
   } catch (err) {
     return actionError(err)
   }

@@ -85,7 +85,10 @@ function Group({ title, rows, muted }: { title: string; rows: Row[]; muted?: boo
       <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">{title}</h2>
       <Panel className="divide-y divide-ink-100">
         {rows.map((row) => {
-          const status = DELIVERY_STATUS[row.status] ?? { label: row.status, tone: 'neutral' as const }
+          const status = DELIVERY_STATUS[row.status] ?? {
+            label: row.status,
+            tone: 'neutral' as const,
+          }
           return (
             <Link
               key={row.id}

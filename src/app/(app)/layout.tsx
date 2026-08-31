@@ -27,110 +27,129 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     return { actor, unread: row?.count ?? 0 }
   })
 
-  const items: NavItem[] = [
-    {
-      href: '/engineer',
-      label: 'My site work',
-      short: 'Site',
-      icon: 'clipboard',
-      show: hasPermission(actor.roles, 'submission.create'),
-    },
-    {
-      href: '/technical',
-      label: 'Review queue',
-      short: 'Review',
-      icon: 'inbox',
-      show: hasPermission(actor.roles, 'submission.review'),
-    },
-    {
-      href: '/approvals',
-      label: 'Approvals',
-      short: 'Approve',
-      icon: 'stamp',
-      show: hasPermission(actor.roles, 'approval.decide') && actor.roles.includes('director'),
-    },
-    {
-      href: '/technical/documents',
-      label: 'Documents',
-      short: 'Docs',
-      icon: 'file',
-      show: hasPermission(actor.roles, 'document.create'),
-    },
-    {
-      href: '/repository',
-      label: 'Repository',
-      short: 'Search',
-      icon: 'search',
-      show: hasPermission(actor.roles, 'document.view'),
-    },
-    {
-      href: '/technical/clients',
-      label: 'Clients',
-      short: 'Clients',
-      icon: 'building',
-      show: hasPermission(actor.roles, 'client.manage'),
-    },
-    {
-      href: '/technical/deliveries',
-      label: 'Deliveries',
-      short: 'Deliver',
-      icon: 'truck',
-      show: hasPermission(actor.roles, 'delivery.sign'),
-    },
-    {
-      href: '/compliance',
-      label: 'Compliance',
-      short: 'Comply',
-      icon: 'shieldcheck',
-      show: hasPermission(actor.roles, 'compliance.view'),
-    },
-    {
-      href: '/technical/projects',
-      label: 'Projects',
-      short: 'Projects',
-      icon: 'layers',
-      show: hasPermission(actor.roles, 'project.view_all'),
-    },
-    {
-      href: '/dashboard',
-      label: 'Overview',
-      short: 'Overview',
-      icon: 'gauge',
-      show: hasPermission(actor.roles, 'submission.view_all'),
-    },
-    {
-      href: '/admin/settings',
-      label: 'Company settings',
-      short: 'Settings',
-      icon: 'sliders',
-      show: hasPermission(actor.roles, 'config.manage'),
-    },
-    {
-      href: '/admin/assets',
-      label: 'Brand assets',
-      short: 'Brand',
-      icon: 'image',
-      // Also reachable by Directors, who are the only people who can upload
-      // their own signature.
-      show:
-        hasPermission(actor.roles, 'asset.manage') ||
-        hasPermission(actor.roles, 'asset.upload_own_signature'),
-    },
-    {
-      href: '/admin/users',
-      label: 'People and roles',
-      short: 'People',
-      icon: 'users',
-      show: hasPermission(actor.roles, 'user.manage'),
-    },
-    {
-      href: '/admin/audit',
-      label: 'Audit trail',
-      short: 'Audit',
-      icon: 'shield',
-      show: hasPermission(actor.roles, 'audit.view'),
-    },
-  ].filter((item) => item.show)
+  // `satisfies` rather than a plain annotation: the trailing .filter() means the
+  // array literal is not contextually typed by `NavItem[]`, so 'Operations'
+  // would widen to string and the group union would go unchecked.
+  const items: NavItem[] = (
+    [
+      {
+        href: '/engineer',
+        label: 'My site work',
+        short: 'Site',
+        icon: 'clipboard',
+        group: 'Operations',
+        show: hasPermission(actor.roles, 'submission.create'),
+      },
+      {
+        href: '/technical',
+        label: 'Review queue',
+        short: 'Review',
+        icon: 'inbox',
+        group: 'Operations',
+        show: hasPermission(actor.roles, 'submission.review'),
+      },
+      {
+        href: '/approvals',
+        label: 'Approvals',
+        short: 'Approve',
+        icon: 'stamp',
+        group: 'Operations',
+        show: hasPermission(actor.roles, 'approval.decide') && actor.roles.includes('director'),
+      },
+      {
+        href: '/technical/documents',
+        label: 'Documents',
+        short: 'Docs',
+        icon: 'file',
+        group: 'Operations',
+        show: hasPermission(actor.roles, 'document.create'),
+      },
+      {
+        href: '/repository',
+        label: 'Repository',
+        short: 'Search',
+        icon: 'search',
+        group: 'Records',
+        show: hasPermission(actor.roles, 'document.view'),
+      },
+      {
+        href: '/technical/clients',
+        label: 'Clients',
+        short: 'Clients',
+        icon: 'building',
+        group: 'Records',
+        show: hasPermission(actor.roles, 'client.manage'),
+      },
+      {
+        href: '/technical/deliveries',
+        label: 'Deliveries',
+        short: 'Deliver',
+        icon: 'truck',
+        group: 'Operations',
+        show: hasPermission(actor.roles, 'delivery.sign'),
+      },
+      {
+        href: '/compliance',
+        label: 'Compliance',
+        short: 'Comply',
+        icon: 'shieldcheck',
+        group: 'Records',
+        show: hasPermission(actor.roles, 'compliance.view'),
+      },
+      {
+        href: '/technical/projects',
+        label: 'Projects',
+        short: 'Projects',
+        icon: 'layers',
+        group: 'Records',
+        show: hasPermission(actor.roles, 'project.view_all'),
+      },
+      {
+        href: '/dashboard',
+        label: 'Overview',
+        short: 'Overview',
+        icon: 'gauge',
+        group: 'Overview',
+        show: hasPermission(actor.roles, 'submission.view_all'),
+      },
+      {
+        href: '/admin/settings',
+        label: 'Company settings',
+        short: 'Settings',
+        icon: 'sliders',
+        group: 'Administration',
+        show: hasPermission(actor.roles, 'config.manage'),
+      },
+      {
+        href: '/admin/assets',
+        label: 'Brand assets',
+        short: 'Brand',
+        icon: 'image',
+        group: 'Administration',
+        // Also reachable by Directors, who are the only people who can upload
+        // their own signature.
+        show:
+          hasPermission(actor.roles, 'asset.manage') ||
+          hasPermission(actor.roles, 'asset.upload_own_signature'),
+      },
+      {
+        href: '/admin/users',
+        label: 'People and roles',
+        short: 'People',
+        icon: 'users',
+        group: 'Administration',
+        show: hasPermission(actor.roles, 'user.manage'),
+      },
+      {
+        href: '/admin/audit',
+        label: 'Audit trail',
+        short: 'Audit',
+        icon: 'shield',
+        group: 'Administration',
+        show: hasPermission(actor.roles, 'audit.view'),
+      },
+    ] satisfies NavItem[]
+  ).filter((item) => item.show)
 
   return (
     <AppNav

@@ -84,7 +84,18 @@ describe('repository completeness', () => {
     try {
       ignored = execFileSync(
         'git',
-        ['ls-files', '--others', '--ignored', '--exclude-standard', '--directory', '--', 'src', 'scripts', 'drizzle', 'tests'],
+        [
+          'ls-files',
+          '--others',
+          '--ignored',
+          '--exclude-standard',
+          '--directory',
+          '--',
+          'src',
+          'scripts',
+          'drizzle',
+          'tests',
+        ],
         { cwd: process.cwd(), encoding: 'utf8' },
       )
     } catch {

@@ -175,7 +175,10 @@ describe('document status transitions', () => {
 
   it.each(legal)('allows %s → %s', async (from, to) => {
     const id = await newDocument(from)
-    await o.query('update documents set status = $1::public.document_status where id = $2', [to, id])
+    await o.query('update documents set status = $1::public.document_status where id = $2', [
+      to,
+      id,
+    ])
     const { rows } = await o.query('select status from documents where id = $1', [id])
     expect(rows[0]!.status).toBe(to)
   })
@@ -256,7 +259,10 @@ describe('approved documents are immutable', () => {
        values ($1, 'Bearing replacement', 2, 500, 1000)`,
       [id],
     )
-    const { rows } = await o.query('select count(*)::int as n from document_lines where document_id = $1', [id])
+    const { rows } = await o.query(
+      'select count(*)::int as n from document_lines where document_id = $1',
+      [id],
+    )
     expect(rows[0]!.n).toBe(1)
   })
 
@@ -329,10 +335,10 @@ describe('the tax invoice gate', () => {
     expect(blocked.message).toMatch(/completion evidence/)
 
     // Verified — now it opens.
-    await o.query('update completion_records set verified_at = now(), verified_by = $1 where id = $2', [
-      officer.id,
-      completionId,
-    ])
+    await o.query(
+      'update completion_records set verified_at = now(), verified_by = $1 where id = $2',
+      [officer.id, completionId],
+    )
 
     await o.query("update documents set status = 'pending_approval' where id = $1", [id])
     const { rows: after } = await o.query('select status from documents where id = $1', [id])
@@ -393,9 +399,10 @@ describe('signatures and stamps', () => {
       ),
     )
 
-    const { rows } = await o.query('select count(*)::int as n from document_seals where document_version_id = $1', [
-      versionId,
-    ])
+    const { rows } = await o.query(
+      'select count(*)::int as n from document_seals where document_version_id = $1',
+      [versionId],
+    )
     expect(rows[0]!.n).toBe(1)
   })
 

@@ -24,12 +24,7 @@ import { AuthorizationError } from '@/lib/errors'
 import { loadDocumentConfig } from '@/lib/finance/config'
 import { isAiConfigured } from '@/lib/ai/provider'
 import { formatAmount } from '@/lib/finance/decimal'
-import {
-  DOCUMENT_STATUS,
-  DOCUMENT_TYPE_LABELS,
-  formatDate,
-  formatDateTime,
-} from '@/lib/display'
+import { DOCUMENT_STATUS, DOCUMENT_TYPE_LABELS, formatDate, formatDateTime } from '@/lib/display'
 
 export const metadata: Metadata = { title: 'Document' }
 
@@ -145,9 +140,11 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
   if (!data) notFound()
 
   const doc = data.doc
-  const status = DOCUMENT_STATUS[doc.status] ?? { label: doc.status, tone: 'neutral' as const }
-  const editable =
-    data.canEdit && (doc.status === 'draft' || doc.status === 'changes_requested')
+  const status = DOCUMENT_STATUS[doc.status] ?? {
+    label: doc.status,
+    tone: 'neutral' as const,
+  }
+  const editable = data.canEdit && (doc.status === 'draft' || doc.status === 'changes_requested')
 
   const approvedVersion = data.versions.find((v) => v.isApprovedVersion)
 
@@ -339,9 +336,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
                 </div>
 
                 <p className="mt-0.5 text-sm text-ink-500">{v.changeSummary}</p>
-                <p className="mt-1 font-mono text-xs text-ink-400">
-                  {v.contentHash.slice(0, 32)}…
-                </p>
+                <p className="mt-1 font-mono text-xs text-ink-400">{v.contentHash.slice(0, 32)}…</p>
 
                 <div className="mt-2 flex flex-wrap gap-3 text-sm">
                   {v.signedPdfStorageKey ? (
@@ -388,7 +383,9 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="text-sm font-medium text-ink-900">
                   {e.action.replace(/_/g, ' ')}
-                  {actorName ? <span className="font-normal text-ink-500"> — {actorName}</span> : null}
+                  {actorName ? (
+                    <span className="font-normal text-ink-500"> — {actorName}</span>
+                  ) : null}
                 </span>
                 <span className="text-xs text-ink-400">{formatDateTime(e.createdAt)}</span>
               </div>

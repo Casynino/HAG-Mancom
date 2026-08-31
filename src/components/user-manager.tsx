@@ -66,7 +66,7 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
           setShowForm((v) => !v)
           if (!showForm) setTempPassword(suggestPassword())
         }}
-        className="tap flex items-center justify-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700 sm:w-auto sm:self-start"
+        className="tap flex items-center justify-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white sm:w-auto sm:self-start"
       >
         <Plus className="size-4" aria-hidden="true" />
         {showForm ? 'Close' : 'Add a person'}
@@ -106,12 +106,7 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
               </Field>
             </div>
 
-            <Field
-              label="Roles"
-              htmlFor="roles"
-              required
-              errors={errorsFor(createState, 'roles')}
-            >
+            <Field label="Roles" htmlFor="roles" required errors={errorsFor(createState, 'roles')}>
               <div className="grid gap-2 sm:grid-cols-2">
                 {APP_ROLES.map((role) => (
                   <label
@@ -176,9 +171,7 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
                     {isSelf ? <Badge tone="neutral">You</Badge> : null}
                     {!p.isActive ? <Badge tone="risk">Deactivated</Badge> : null}
                     {locked ? <Badge tone="warn">Locked</Badge> : null}
-                    {p.mustChangePassword ? (
-                      <Badge tone="warn">Password not yet set</Badge>
-                    ) : null}
+                    {p.mustChangePassword ? <Badge tone="warn">Password not yet set</Badge> : null}
                   </div>
                   <p className="mt-0.5 text-sm text-ink-500">
                     {p.email}
@@ -196,7 +189,9 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
                     )}
                   </div>
                   <p className="mt-1.5 text-xs text-ink-400">
-                    {p.lastLoginAt ? `Last signed in ${relativeTime(p.lastLoginAt)}` : 'Never signed in'}
+                    {p.lastLoginAt
+                      ? `Last signed in ${relativeTime(p.lastLoginAt)}`
+                      : 'Never signed in'}
                   </p>
                 </div>
 
@@ -237,7 +232,10 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
               </div>
 
               {editing === p.id ? (
-                <form action={rolesAction} className="mt-3 rounded border border-ink-200 bg-ink-50 p-3">
+                <form
+                  action={rolesAction}
+                  className="mt-3 rounded border border-ink-200 bg-ink-50 p-3"
+                >
                   <input type="hidden" name="userId" value={p.id} />
                   <p className="mb-2 text-sm font-medium text-ink-800">Roles for {p.fullName}</p>
                   <div className="grid gap-2 sm:grid-cols-2">
@@ -266,7 +264,10 @@ export function UserManager({ people, actorId }: { people: Person[]; actorId: st
               ) : null}
 
               {resetting === p.id ? (
-                <form action={resetAction} className="mt-3 space-y-2 rounded border border-warn-600/25 bg-warn-50 p-3">
+                <form
+                  action={resetAction}
+                  className="mt-3 space-y-2 rounded border border-warn-600/25 bg-warn-50 p-3"
+                >
                   <input type="hidden" name="userId" value={p.id} />
                   <Field
                     label={`New temporary password for ${p.fullName}`}

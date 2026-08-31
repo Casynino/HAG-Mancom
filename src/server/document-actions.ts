@@ -167,7 +167,9 @@ export async function createDocumentAction(
         .limit(1)
 
       if (!project) {
-        throw new ValidationError('Choose a project.', { projectId: ['That project was not found.'] })
+        throw new ValidationError('Choose a project.', {
+          projectId: ['That project was not found.'],
+        })
       }
 
       // Fail before the user invests any work, not at approval time.
@@ -419,9 +421,7 @@ export async function submitDocumentForApprovalAction(
         bodyContent: fresh.bodyContent,
       }
 
-      const contentHash = createHash('sha256')
-        .update(JSON.stringify(snapshot))
-        .digest('hex')
+      const contentHash = createHash('sha256').update(JSON.stringify(snapshot)).digest('hex')
 
       const nextVersion = fresh.currentVersion + 1
 
@@ -680,10 +680,9 @@ export async function createInvoiceFromQuotationAction(
     return {
       ok: true,
       data: result,
-      message:
-        Decimal.from(result.drift).isZero()
-          ? 'Invoice drafted from the quotation.'
-          : `Invoice drafted. Folding the charges into unit prices changes the total by ${result.drift} — check this before submitting.`,
+      message: Decimal.from(result.drift).isZero()
+        ? 'Invoice drafted from the quotation.'
+        : `Invoice drafted. Folding the charges into unit prices changes the total by ${result.drift} — check this before submitting.`,
     }
   } catch (err) {
     return actionError(err)

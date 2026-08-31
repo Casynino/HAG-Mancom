@@ -135,7 +135,10 @@ export function computeDocumentTotals(input: ComputeInput): DocumentTotals {
     const gross = quantity.multiply(unitPrice)
 
     const discountPercent = line.discountPercent ? Decimal.from(line.discountPercent) : null
-    if (discountPercent && (discountPercent.isNegative() || discountPercent.compare(Decimal.from(100)) > 0)) {
+    if (
+      discountPercent &&
+      (discountPercent.isNegative() || discountPercent.compare(Decimal.from(100)) > 0)
+    ) {
       throw new RangeError(`Discount must be between 0 and 100 on line "${line.description}"`)
     }
 

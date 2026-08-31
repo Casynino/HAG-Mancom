@@ -113,9 +113,8 @@ async function main() {
 
     const projectId =
       projectRow.rows[0]?.id ??
-      (
-        await c.query<{ id: string }>("select id from projects where reference = 'HA/PRJ/2026/001'")
-      ).rows[0]!.id
+      (await c.query<{ id: string }>("select id from projects where reference = 'HA/PRJ/2026/001'"))
+        .rows[0]!.id
 
     // Assign the Engineer created through the admin UI, plus the Technical Officer.
     const engineer = await c.query<{ id: string }>(

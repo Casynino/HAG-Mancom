@@ -93,7 +93,12 @@ export function GridCanvas({ className }: { className?: string }) {
           const key = i < c.j ? `${i}-${c.j}` : `${c.j}-${i}`
           if (seen.has(key)) continue
           seen.add(key)
-          edges.push({ a: i, b: c.j, t: rand(), speed: 0.0016 + rand() * 0.0026 })
+          edges.push({
+            a: i,
+            b: c.j,
+            t: rand(),
+            speed: 0.0016 + rand() * 0.0026,
+          })
         }
       })
     }

@@ -2,7 +2,17 @@
 
 import { useActionState, useState } from 'react'
 import { ArrowDown, ArrowUp, Check, PenLine, Stamp, Upload, X } from 'lucide-react'
-import { Badge, EmptyState, Field, Input, Notice, Panel, PanelHeader, Select, Textarea } from '@/components/ui'
+import {
+  Badge,
+  EmptyState,
+  Field,
+  Input,
+  Notice,
+  Panel,
+  PanelHeader,
+  Select,
+  Textarea,
+} from '@/components/ui'
 import { errorsFor, FormResult, SubmitButton } from '@/components/form'
 import { CONFIG_STATE, formatBytes, formatDate } from '@/lib/display'
 import {
@@ -57,11 +67,7 @@ export function AssetManager({
   // A Director who is not an Administrator may upload one thing: their own
   // signature. The select reflects that rather than offering options that
   // would be refused server-side.
-  const availableKinds = isAdmin
-    ? KIND_ORDER
-    : canUploadSignature
-      ? ['signature']
-      : []
+  const availableKinds = isAdmin ? KIND_ORDER : canUploadSignature ? ['signature'] : []
 
   return (
     <>
@@ -71,7 +77,7 @@ export function AssetManager({
         <button
           type="button"
           onClick={() => setShowUpload((v) => !v)}
-          className="tap inline-flex items-center gap-2 rounded bg-brand-600 px-4 text-sm font-medium text-white hover:bg-brand-700 sm:self-start"
+          className="tap inline-flex items-center gap-2 btn-primary rounded-lg px-4 text-sm font-medium text-white sm:self-start"
         >
           <Upload className="size-4" aria-hidden="true" />
           {showUpload ? 'Close' : isAdmin ? 'Upload an asset' : 'Upload my signature'}
@@ -113,7 +119,13 @@ export function AssetManager({
                 htmlFor="displayOrder"
                 hint="Partner marks print left to right in this order."
               >
-                <Input id="displayOrder" name="displayOrder" type="number" min={0} defaultValue={0} />
+                <Input
+                  id="displayOrder"
+                  name="displayOrder"
+                  type="number"
+                  min={0}
+                  defaultValue={0}
+                />
               </Field>
 
               <Field
@@ -176,12 +188,12 @@ export function AssetManager({
           <Panel key={kind}>
             <PanelHeader
               title={KIND_LABELS[kind] ?? kind}
-              description={
-                orderable ? 'Printed left to right in this order.' : undefined
-              }
+              description={orderable ? 'Printed left to right in this order.' : undefined}
               action={
                 rows.some((r) => r.state === 'draft') ? (
-                  <Badge tone="warn">{rows.filter((r) => r.state === 'draft').length} to review</Badge>
+                  <Badge tone="warn">
+                    {rows.filter((r) => r.state === 'draft').length} to review
+                  </Badge>
                 ) : null
               }
             />
@@ -243,8 +255,7 @@ export function AssetManager({
                         <div className="flex items-center gap-1">
                           {[-1, 1].map((delta) => {
                             const index = rows.findIndex((r) => r.id === asset.id)
-                            const disabled =
-                              delta === -1 ? index === 0 : index === rows.length - 1
+                            const disabled = delta === -1 ? index === 0 : index === rows.length - 1
                             return (
                               <form key={delta} action={orderAction}>
                                 <input

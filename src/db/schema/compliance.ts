@@ -119,7 +119,11 @@ export const complianceAlerts = pgTable(
     recipientCount: integer('recipient_count').notNull().default(0),
   },
   (t) => [
-    uniqueIndex('compliance_alerts_once_key').on(t.complianceRecordId, t.expiresOn, t.thresholdDays),
+    uniqueIndex('compliance_alerts_once_key').on(
+      t.complianceRecordId,
+      t.expiresOn,
+      t.thresholdDays,
+    ),
     index('compliance_alerts_record_idx').on(t.complianceRecordId),
   ],
 )

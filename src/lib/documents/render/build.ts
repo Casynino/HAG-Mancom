@@ -128,7 +128,8 @@ export async function buildRenderModel(
         )
         .limit(1)
 
-  if (!address) warnings.push('No approved company address is set, so the letterhead has no address.')
+  if (!address)
+    warnings.push('No approved company address is set, so the letterhead has no address.')
 
   const [bank] = doc.bankAccountId
     ? await db.select().from(bankAccounts).where(eq(bankAccounts.id, doc.bankAccountId)).limit(1)
@@ -141,8 +142,11 @@ export async function buildRenderModel(
     .where(eq(companyAssets.state, 'approved'))
     .orderBy(asc(companyAssets.displayOrder))
 
-  const logoRow = assets.find((a) => a.kind === 'logo' && a.isDefault) ?? assets.find((a) => a.kind === 'logo')
-  const logo = logoRow ? await loadAsset(logoRow.storageKey, logoRow.contentType, logoRow.label) : null
+  const logoRow =
+    assets.find((a) => a.kind === 'logo' && a.isDefault) ?? assets.find((a) => a.kind === 'logo')
+  const logo = logoRow
+    ? await loadAsset(logoRow.storageKey, logoRow.contentType, logoRow.label)
+    : null
   if (!logo) warnings.push('No approved company logo is available, so the letterhead has no mark.')
 
   const partnerMarks: RenderAsset[] = []
@@ -207,7 +211,11 @@ export async function buildRenderModel(
     .limit(1)
 
   const [contact] = doc.clientContactId
-    ? await db.select().from(clientContacts).where(eq(clientContacts.id, doc.clientContactId)).limit(1)
+    ? await db
+        .select()
+        .from(clientContacts)
+        .where(eq(clientContacts.id, doc.clientContactId))
+        .limit(1)
     : await db
         .select()
         .from(clientContacts)
@@ -271,11 +279,13 @@ export async function buildRenderModel(
     typeLabel: layout.label,
     reference: doc.reference,
     documentDate: doc.documentDate
-      ? new Date(doc.documentDate).toLocaleDateString('en-GB', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        }).toUpperCase()
+      ? new Date(doc.documentDate)
+          .toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })
+          .toUpperCase()
       : null,
 
     company: {
@@ -303,8 +313,12 @@ export async function buildRenderModel(
     client: {
       name: client.legalName,
       contactPerson: contact?.fullName ?? client.contactPerson ?? null,
-      addressLines: [client.addressLine1, client.addressLine2, client.postalAddress, client.city]
-        .filter((l): l is string => Boolean(l)),
+      addressLines: [
+        client.addressLine1,
+        client.addressLine2,
+        client.postalAddress,
+        client.city,
+      ].filter((l): l is string => Boolean(l)),
       phone: contact?.phone ?? client.contactPhone ?? null,
       email: contact?.email ?? client.contactEmail ?? null,
       tin: client.tin,

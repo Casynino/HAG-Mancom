@@ -1,17 +1,18 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm'
-import {
-  clients,
-  engineerSubmissions,
-  profiles,
-  projects,
-} from '@/db/schema'
+import { clients, engineerSubmissions, profiles, projects } from '@/db/schema'
 import { Badge, PageHeader, Panel, PanelHeader } from '@/components/ui'
 import { pageContext } from '@/lib/authz/guard'
 import { hasPermission } from '@/lib/authz/roles'
 import { AuthorizationError } from '@/lib/errors'
-import { relativeTime, SUBMISSION_STATUS, URGENCY, type SubmissionStatus, type Urgency } from '@/lib/display'
+import {
+  relativeTime,
+  SUBMISSION_STATUS,
+  URGENCY,
+  type SubmissionStatus,
+  type Urgency,
+} from '@/lib/display'
 
 export const metadata: Metadata = { title: 'Overview' }
 
@@ -83,18 +84,29 @@ export default async function DashboardPage() {
       configPending: Number((configPending.rows[0] as { n: number } | undefined)?.n ?? 0),
       canManageConfig: hasPermission(actor.roles, 'config.manage'),
       totalOpen:
-        (byStatus.submitted ?? 0) + (byStatus.under_review ?? 0) + (byStatus.changes_requested ?? 0),
+        (byStatus.submitted ?? 0) +
+        (byStatus.under_review ?? 0) +
+        (byStatus.changes_requested ?? 0),
     }
   })
 
-  const tiles: Array<{ label: string; value: number; href: string; tone?: 'warn' | 'brand' }> = [
+  const tiles: Array<{
+    label: string
+    value: number
+    href: string
+    tone?: 'warn' | 'brand'
+  }> = [
     {
       label: 'Waiting for review',
       value: data.byStatus.submitted ?? 0,
       href: '/technical',
       tone: (data.byStatus.submitted ?? 0) > 0 ? 'brand' : undefined,
     },
-    { label: 'Being reviewed', value: data.byStatus.under_review ?? 0, href: '/technical' },
+    {
+      label: 'Being reviewed',
+      value: data.byStatus.under_review ?? 0,
+      href: '/technical',
+    },
     {
       label: 'With the Engineer',
       value: data.byStatus.changes_requested ?? 0,
@@ -138,8 +150,8 @@ export default async function DashboardPage() {
           className="block rounded border border-warn-600/25 bg-warn-50 px-4 py-3 hover:bg-warn-50/70"
         >
           <p className="text-sm font-medium text-warn-700">
-            {data.configPending} company setting{data.configPending === 1 ? '' : 's'} awaiting your
-            approval
+            {data.configPending} company setting
+            {data.configPending === 1 ? '' : 's'} awaiting your approval
           </p>
           <p className="mt-0.5 text-sm text-warn-700/80">
             Values extracted from historical documents are inert until approved. Document numbering

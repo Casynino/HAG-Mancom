@@ -178,9 +178,18 @@ export default async function ReviewSubmissionPage({
         <div className="px-4 sm:px-5">
           <DescriptionList
             items={[
-              ['Engineer', `${data.engineerName}${data.engineerPhone ? ` · ${data.engineerPhone}` : ''}`],
-              ['What is wrong', <span className="whitespace-pre-wrap">{s.problemDescription}</span>],
-              ['What needs doing', <span className="whitespace-pre-wrap">{s.recommendedWork}</span>],
+              [
+                'Engineer',
+                `${data.engineerName}${data.engineerPhone ? ` · ${data.engineerPhone}` : ''}`,
+              ],
+              [
+                'What is wrong',
+                <span className="whitespace-pre-wrap">{s.problemDescription}</span>,
+              ],
+              [
+                'What needs doing',
+                <span className="whitespace-pre-wrap">{s.recommendedWork}</span>,
+              ],
               ['Date of visit', formatDate(s.siteVisitDate)],
               [
                 'Location',
@@ -265,7 +274,9 @@ export default async function ReviewSubmissionPage({
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="text-sm font-medium text-ink-900">
                   {e.action.replace(/_/g, ' ')}
-                  {actorName ? <span className="font-normal text-ink-500"> — {actorName}</span> : null}
+                  {actorName ? (
+                    <span className="font-normal text-ink-500"> — {actorName}</span>
+                  ) : null}
                 </span>
                 <span className="text-xs text-ink-400">{formatDateTime(e.createdAt)}</span>
               </div>

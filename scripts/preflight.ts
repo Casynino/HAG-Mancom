@@ -204,7 +204,6 @@ async function checkDatabase() {
     } catch {
       pass('Password hashes are unreadable by the runtime role')
     }
-
   } catch (err) {
     fail('Database checks failed', err instanceof Error ? err.message : String(err))
   } finally {
@@ -251,7 +250,9 @@ async function checkConfiguration() {
     const drifted: string[] = []
     const pending: string[] = []
     for (const f of files) {
-      const sum = createHash('sha256').update(readFileSync(join(dir, f))).digest('hex')
+      const sum = createHash('sha256')
+        .update(readFileSync(join(dir, f)))
+        .digest('hex')
       const known = byName.get(f)
       if (!known) pending.push(f)
       else if (known !== sum) drifted.push(f)

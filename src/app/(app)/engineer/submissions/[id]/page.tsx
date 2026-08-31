@@ -60,10 +60,7 @@ export default async function SubmissionDetailPage({
         .select()
         .from(submissionAttachments)
         .where(
-          and(
-            eq(submissionAttachments.submissionId, id),
-            isNull(submissionAttachments.deletedAt),
-          ),
+          and(eq(submissionAttachments.submissionId, id), isNull(submissionAttachments.deletedAt)),
         )
         .orderBy(asc(submissionAttachments.uploadedAt)),
       db
@@ -168,8 +165,14 @@ export default async function SubmissionDetailPage({
             <div className="px-4 sm:px-5">
               <DescriptionList
                 items={[
-                  ['What is wrong', <span className="whitespace-pre-wrap">{s.problemDescription}</span>],
-                  ['What needs doing', <span className="whitespace-pre-wrap">{s.recommendedWork}</span>],
+                  [
+                    'What is wrong',
+                    <span className="whitespace-pre-wrap">{s.problemDescription}</span>,
+                  ],
+                  [
+                    'What needs doing',
+                    <span className="whitespace-pre-wrap">{s.recommendedWork}</span>,
+                  ],
                   ['Date of visit', formatDate(s.siteVisitDate)],
                   [
                     'Location',

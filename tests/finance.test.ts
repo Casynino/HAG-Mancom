@@ -147,7 +147,9 @@ describe('the arithmetic error in HQ_2670052', () => {
     // The document states qty 13 at 2,221,976.50 giving 26,663,717.95.
     const asPrinted = computeDocumentTotals({
       currency: 'TZS',
-      lines: [{ description: 'June 2026 Associated Overtime', quantity: '13', unitPrice: '2221976.50' }],
+      lines: [
+        { description: 'June 2026 Associated Overtime', quantity: '13', unitPrice: '2221976.50' },
+      ],
       charges: [],
       tax: null,
       rounding: TZS,
@@ -162,7 +164,9 @@ describe('the arithmetic error in HQ_2670052', () => {
   it('shows the printed extension is consistent with a quantity of 12', () => {
     const atTwelve = computeDocumentTotals({
       currency: 'TZS',
-      lines: [{ description: 'June 2026 Associated Overtime', quantity: '12', unitPrice: '2221976.50' }],
+      lines: [
+        { description: 'June 2026 Associated Overtime', quantity: '12', unitPrice: '2221976.50' },
+      ],
       charges: [],
       tax: null,
       rounding: TZS,
@@ -194,7 +198,11 @@ describe('invoice ladder — reproducing HI_2670053', () => {
     const result = computeDocumentTotals({
       currency: 'TZS',
       lines: [
-        { description: 'MAINTANCE SERVICES ( JUNE 2026 )', quantity: '1', unitPrice: '43378362.99' },
+        {
+          description: 'MAINTANCE SERVICES ( JUNE 2026 )',
+          quantity: '1',
+          unitPrice: '43378362.99',
+        },
       ],
       charges: [],
       tax: VAT,
@@ -224,7 +232,9 @@ describe('invoice ladder — reproducing HI_2670053', () => {
   it('matches HI_2670051', () => {
     const result = computeDocumentTotals({
       currency: 'TZS',
-      lines: [{ description: 'MAINTANCE SUPPORT ( MAY 2026 )', quantity: '1', unitPrice: '82012246.15' }],
+      lines: [
+        { description: 'MAINTANCE SUPPORT ( MAY 2026 )', quantity: '1', unitPrice: '82012246.15' },
+      ],
       charges: [],
       tax: VAT,
       rounding: TZS,
@@ -249,7 +259,9 @@ describe('quotation to invoice — the HQ_2670053 → HI_2670052 bridge', () => 
   // against exactly what HA GROUP had in front of them.
   const asPrinted = computeDocumentTotals({
     currency: 'TZS',
-    lines: [{ description: 'July 2026 Maintenance Services', quantity: '8', unitPrice: '1853413.4625' }],
+    lines: [
+      { description: 'July 2026 Maintenance Services', quantity: '8', unitPrice: '1853413.4625' },
+    ],
     charges: [ADMIN],
     tax: VAT,
     rounding: TZS,
@@ -295,7 +307,9 @@ describe('quotation to invoice — the HQ_2670053 → HI_2670052 bridge', () => 
     // the printed invoice inherited an error from its quotation.
     const corrected = computeDocumentTotals({
       currency: 'TZS',
-      lines: [{ description: 'July 2026 Maintenance Services', quantity: '8', unitPrice: '1853413.46' }],
+      lines: [
+        { description: 'July 2026 Maintenance Services', quantity: '8', unitPrice: '1853413.46' },
+      ],
       charges: [ADMIN],
       tax: VAT,
       rounding: TZS,
@@ -389,7 +403,13 @@ describe('rates come from configuration, never from code', () => {
       currency: 'TZS',
       lines: [{ description: 'x', quantity: '1', unitPrice: '1000' }],
       charges: [
-        { code: 'LATE', label: 'Late fee', ratePercent: '10', appliesBeforeVat: false, position: 1 },
+        {
+          code: 'LATE',
+          label: 'Late fee',
+          ratePercent: '10',
+          appliesBeforeVat: false,
+          position: 1,
+        },
       ],
       tax: VAT,
       rounding: TZS,

@@ -58,8 +58,13 @@ export interface NavItem {
   label: string
   short: string
   icon: string
+  /** Sidebar heading this item sits under. Items without one lead the list. */
+  group?: 'Overview' | 'Operations' | 'Records' | 'Administration'
   show?: boolean
 }
+
+/** Fixed order, so the sidebar does not reshuffle as permissions differ. */
+const GROUP_ORDER = ['Overview', 'Operations', 'Records', 'Administration'] as const
 
 function isActive(pathname: string, href: string): boolean {
   if (href === '/engineer') return pathname === '/engineer' || pathname.startsWith('/engineer/')
@@ -94,69 +99,108 @@ export function AppNav({
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
       {/* ---------------- Desktop sidebar ---------------- */}
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-ink-200 bg-panel lg:flex">
-        <div className="border-b border-ink-200 px-5 py-4">
-          <p className="text-[11px] font-semibold tracking-[0.18em] text-brand-600 uppercase">
-            HA GROUP
-          </p>
-          <p className="mt-0.5 text-sm font-semibold text-ink-900">AI Operations</p>
+      <aside className="hidden w-64 shrink-0 flex-col bg-sidebar lg:flex">
+        <div className="flex items-center gap-3 px-5 py-5">
+          {/* The gold mark is the one warm note in the frame, and the fastest
+              thing to find when glancing at a screen across a desk. */}
+          <span className="font-display flex size-10 shrink-0 items-center justify-center rounded-xl bg-live-400 text-sm font-bold text-sidebar">
+            HAG
+          </span>
+          <span className="min-w-0">
+            <span className="font-display block truncate text-sm font-bold tracking-wide text-white">
+              MANCOM
+            </span>
+            <span className="block truncate text-[10px] tracking-[0.14em] text-white/40 uppercase">
+              Operations Platform
+            </span>
+          </span>
         </div>
 
-        <nav className="flex-1 space-y-0.5 p-3" aria-label="Main">
-          {items.map((item) => {
-            const Icon = ICONS[item.icon] ?? ClipboardList
-            const active = isActive(pathname, item.href)
+        <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label="Main">
+          {GROUP_ORDER.map((group) => {
+            const inGroup = items.filter((i) => i.group === group)
+            if (inGroup.length === 0) return null
+
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? 'page' : undefined}
-                className={cn(
-                  'flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors',
-                  active
-                    ? 'bg-brand-50 font-medium text-brand-700'
-                    : 'text-ink-600 hover:bg-ink-50 hover:text-ink-900',
-                )}
-              >
-                <Icon className="size-4 shrink-0" aria-hidden="true" />
-                {item.label}
-              </Link>
+              <div key={group} className="mb-5">
+                <p className="px-3 pb-2 text-[10px] font-semibold tracking-[0.16em] text-white/35 uppercase">
+                  {group}
+                </p>
+
+                {inGroup.map((item) => {
+                  const Icon = ICONS[item.icon] ?? ClipboardList
+                  const active = isActive(pathname, item.href)
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      aria-current={active ? 'page' : undefined}
+                      className={cn(
+                        'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
+                        active
+                          ? 'bg-sidebar-hover font-medium text-white'
+                          : 'text-white/60 hover:bg-sidebar-hover/60 hover:text-white',
+                      )}
+                    >
+                      {active ? (
+                        <span
+                          className="absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-r bg-live-400"
+                          aria-hidden="true"
+                        />
+                      ) : null}
+                      <Icon className="size-4 shrink-0" aria-hidden="true" />
+                      {item.label}
+                    </Link>
+                  )
+                })}
+              </div>
             )
           })}
 
-          <Link
-            href="/notifications"
-            aria-current={pathname === '/notifications' ? 'page' : undefined}
-            className={cn(
-              'flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors',
-              pathname === '/notifications'
-                ? 'bg-brand-50 font-medium text-brand-700'
-                : 'text-ink-600 hover:bg-ink-50 hover:text-ink-900',
-            )}
-          >
-            <Bell className="size-4 shrink-0" aria-hidden="true" />
-            Notifications
-            {unread > 0 ? (
-              <span className="ml-auto rounded bg-brand-600 px-1.5 py-0.5 text-[11px] font-medium text-white tabular">
-                {unread > 99 ? '99+' : unread}
-              </span>
-            ) : null}
-          </Link>
+          <div className="mb-5">
+            <p className="px-3 pb-2 text-[10px] font-semibold tracking-[0.16em] text-white/35 uppercase">
+              System
+            </p>
+            <Link
+              href="/notifications"
+              aria-current={pathname === '/notifications' ? 'page' : undefined}
+              className={cn(
+                'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
+                pathname === '/notifications'
+                  ? 'bg-sidebar-hover font-medium text-white'
+                  : 'text-white/60 hover:bg-sidebar-hover/60 hover:text-white',
+              )}
+            >
+              {pathname === '/notifications' ? (
+                <span
+                  className="absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-r bg-live-400"
+                  aria-hidden="true"
+                />
+              ) : null}
+              <Bell className="size-4 shrink-0" aria-hidden="true" />
+              Notifications
+              {unread > 0 ? (
+                <span className="ml-auto rounded-full bg-live-400 px-1.5 py-0.5 text-[11px] font-semibold text-sidebar tabular">
+                  {unread > 99 ? '99+' : unread}
+                </span>
+              ) : null}
+            </Link>
+          </div>
         </nav>
 
-        <div className="border-t border-ink-200 p-3">
-          <p className="truncate px-3 text-sm font-medium text-ink-900">{user.name}</p>
-          <p className="truncate px-3 text-xs text-ink-500">{user.roles.join(' · ')}</p>
-
-          <div className="mt-3 flex items-center justify-between px-3">
-            <span className="text-xs text-ink-500">Theme</span>
-            <ThemeToggle />
+        <div className="border-t border-white/10 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-[10px] tracking-[0.14em] text-white/35 uppercase">Theme</span>
+            <ThemeToggle tone="shell" />
           </div>
 
-          <form action={signOutAction} className="mt-2">
+          <p className="truncate text-sm font-medium text-white">{user.name}</p>
+          <p className="truncate text-xs text-white/45">{user.roles.join(' · ')}</p>
+
+          <form action={signOutAction} className="mt-3">
             <button
               type="submit"
-              className="flex w-full items-center gap-2.5 rounded px-3 py-2 text-sm text-ink-600 hover:bg-ink-50 hover:text-ink-900"
+              className="flex w-full items-center gap-2.5 rounded-lg py-2 text-sm text-white/55 transition-colors hover:text-white"
             >
               <LogOut className="size-4" aria-hidden="true" />
               Sign out
