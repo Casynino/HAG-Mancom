@@ -80,9 +80,41 @@ describe('permission matrix', () => {
   it('routes each role to where their work is', () => {
     expect(defaultRouteFor(['engineer'])).toBe('/engineer')
     expect(defaultRouteFor(['technical_officer'])).toBe('/technical')
-    expect(defaultRouteFor(['director'])).toBe('/dashboard')
+    // A Director's work is the approval inbox, not a dashboard to read.
+    expect(defaultRouteFor(['director'])).toBe('/approvals')
     expect(defaultRouteFor(['administrator'])).toBe('/admin')
     expect(defaultRouteFor([])).toBe('/dashboard')
+  })
+
+  it('gives a Director approval authority but never editing authority', () => {
+    // An approver who can rewrite what they approve is not an approver.
+    expect(hasPermission(['director'], 'document.approve')).toBe(true)
+    expect(hasPermission(['director'], 'document.edit')).toBe(false)
+    expect(hasPermission(['director'], 'document.create')).toBe(false)
+  })
+
+  it('gives a Technical Officer document authorship but not approval', () => {
+    expect(hasPermission(['technical_officer'], 'document.create')).toBe(true)
+    expect(hasPermission(['technical_officer'], 'document.edit')).toBe(true)
+    expect(hasPermission(['technical_officer'], 'document.submit')).toBe(true)
+    expect(hasPermission(['technical_officer'], 'document.approve')).toBe(false)
+  })
+
+  it('lets an Engineer see documents on their projects but change nothing', () => {
+    expect(hasPermission(['engineer'], 'document.view')).toBe(true)
+    expect(hasPermission(['engineer'], 'document.create')).toBe(false)
+    expect(hasPermission(['engineer'], 'document.edit')).toBe(false)
+    expect(hasPermission(['engineer'], 'po.manage')).toBe(false)
+    expect(hasPermission(['engineer'], 'efd.manage')).toBe(false)
+    // But they do sign for handover on site.
+    expect(hasPermission(['engineer'], 'delivery.sign')).toBe(true)
+  })
+
+  it('keeps EFD recording away from Engineers and Directors', () => {
+    expect(hasPermission(['technical_officer'], 'efd.manage')).toBe(true)
+    expect(hasPermission(['administrator'], 'efd.manage')).toBe(true)
+    expect(hasPermission(['director'], 'efd.manage')).toBe(false)
+    expect(hasPermission(['engineer'], 'efd.manage')).toBe(false)
   })
 })
 

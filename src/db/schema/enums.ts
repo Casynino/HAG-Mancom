@@ -127,4 +127,99 @@ export const notificationKindEnum = pgEnum('notification_kind', [
   'config_pending_approval',
   'config_approved',
   'config_rejected',
+  'document_pending_approval',
+  'document_approved',
+  'document_rejected',
+  'document_changes_requested',
+  'document_issued',
+  'delivery_awaiting_signature',
+  'delivery_confirmed',
+  'compliance_expiring',
+  'compliance_expired',
+  'efd_receipt_required',
+])
+
+/* ---------------------------------------------------------------------------
+ * Stage 2 onward
+ * ------------------------------------------------------------------------ */
+
+/** Lifecycle of a client Purchase Order as HA GROUP works against it. */
+export const poStatusEnum = pgEnum('po_status', [
+  'open',
+  'partially_fulfilled',
+  'fulfilled',
+  'closed',
+  'cancelled',
+])
+
+/**
+ * Document lifecycle. Mirrors the submission machine in shape but is stricter
+ * after approval: an approved document is immutable, and a correction produces
+ * a new version rather than an edit.
+ */
+export const documentStatusEnum = pgEnum('document_status', [
+  'draft',
+  'pending_review',
+  'pending_approval',
+  'changes_requested',
+  'approved',
+  'rejected',
+  'issued',
+  'archived',
+  'cancelled',
+])
+
+/** What a line on a priced document represents. Drives cost reporting later. */
+export const lineKindEnum = pgEnum('line_kind', [
+  'material',
+  'labour',
+  'equipment',
+  'service',
+  'transport',
+  'other',
+])
+
+export const deliveryStatusEnum = pgEnum('delivery_status', [
+  'draft',
+  'pending_signatures',
+  'confirmed',
+  'cancelled',
+])
+
+/**
+ * Where completion evidence came from. HA GROUP issues its own certificate;
+ * clients often return their own acceptance form signed by the engineer.
+ */
+export const completionSourceEnum = pgEnum('completion_source', [
+  'ha_group_certificate',
+  'client_acceptance',
+])
+
+/**
+ * EFD receipt state. `not_integrated` is the honest default: until an approved
+ * TRA integration and credentials exist, the platform records the receipt a
+ * human obtained rather than pretending to have issued one.
+ */
+export const efdStatusEnum = pgEnum('efd_status', [
+  'not_required',
+  'awaiting_receipt',
+  'recorded',
+  'failed',
+])
+
+export const emailStatusEnum = pgEnum('email_status', [
+  'queued',
+  'sent',
+  'delivered',
+  'failed',
+  'bounced',
+])
+
+/** Result of running document analysis over an uploaded training asset. */
+export const analysisStatusEnum = pgEnum('analysis_status', [
+  'pending',
+  'running',
+  'completed',
+  'failed',
+  'skipped',
 ])

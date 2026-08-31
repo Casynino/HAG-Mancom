@@ -52,6 +52,24 @@ export const PERMISSIONS = [
   'config.manage',
   'config.approve',
 
+  // Documents
+  'document.view',
+  'document.create',
+  'document.edit',
+  'document.submit',
+  'document.approve',
+  'document.issue',
+  'document.send',
+
+  // Operations
+  'po.manage',
+  'delivery.manage',
+  'delivery.sign',
+  'completion.manage',
+  'efd.manage',
+  'compliance.view',
+  'compliance.manage',
+
   // Oversight
   'audit.view',
   'user.manage',
@@ -73,6 +91,10 @@ const ENGINEER: Permission[] = [
   'submission.view_own',
   'project.view_assigned',
   'client.view',
+  // Engineers see documents on their own projects, and sign for handover on
+  // site, but never price, submit or approve anything.
+  'document.view',
+  'delivery.sign',
 ]
 
 const TECHNICAL_OFFICER: Permission[] = [
@@ -89,6 +111,18 @@ const TECHNICAL_OFFICER: Permission[] = [
   'project.assign_members',
   'config.view',
   'approval.decide',
+  'document.view',
+  'document.create',
+  'document.edit',
+  'document.submit',
+  'document.send',
+  'po.manage',
+  'delivery.manage',
+  'delivery.sign',
+  'completion.manage',
+  'efd.manage',
+  'compliance.view',
+  'compliance.manage',
 ]
 
 const DIRECTOR: Permission[] = [
@@ -99,6 +133,12 @@ const DIRECTOR: Permission[] = [
   'audit.view',
   'approval.decide',
   'asset.upload_own_signature',
+  'document.view',
+  // The Director's authority over documents: approve and issue. Not edit —
+  // an approver who can rewrite what they approve is not an approver.
+  'document.approve',
+  'document.issue',
+  'compliance.view',
 ]
 
 const ADMINISTRATOR: Permission[] = [
@@ -116,6 +156,12 @@ const ADMINISTRATOR: Permission[] = [
   'user.manage',
   'asset.manage',
   'asset.upload_own_signature',
+  'document.view',
+  'document.issue',
+  'po.manage',
+  'compliance.view',
+  'compliance.manage',
+  'efd.manage',
 ]
 
 export const ROLE_PERMISSIONS: Record<AppRole, readonly Permission[]> = {
@@ -174,7 +220,8 @@ export function canApplyStamp(roles: readonly AppRole[]): boolean {
  */
 export function defaultRouteFor(roles: readonly AppRole[]): string {
   if (roles.includes('technical_officer')) return '/technical'
-  if (roles.includes('director')) return '/dashboard'
+  // A Director's work is the approval inbox, not a dashboard.
+  if (roles.includes('director')) return '/approvals'
   if (roles.includes('administrator')) return '/admin'
   if (roles.includes('engineer')) return '/engineer'
   return '/dashboard'

@@ -1,0 +1,1 @@
+ALTER TABLE "entity_addresses" ADD COLUMN "notes" text;

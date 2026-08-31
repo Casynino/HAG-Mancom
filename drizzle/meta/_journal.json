@@ -15,6 +15,27 @@
       "when": 1788173820940,
       "tag": "0001_bank_account_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788177507487,
+      "tag": "0002_stage2_commercial",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788177590174,
+      "tag": "0003_entity_address_notes",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788178127693,
+      "tag": "0004_document_engine",
+      "breakpoints": true
     }
   ]
 }

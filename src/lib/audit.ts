@@ -50,6 +50,41 @@ export type AuditAction =
   | 'config.rejected'
   | 'asset.uploaded'
   | 'asset.replaced'
+  // Documents
+  | 'document.created'
+  | 'document.updated'
+  | 'document.submitted_for_approval'
+  | 'document.approved'
+  | 'document.rejected'
+  | 'document.changes_requested'
+  | 'document.issued'
+  | 'document.cancelled'
+  | 'document.rendered'
+  | 'document.downloaded'
+  | 'document.signature_applied'
+  | 'document.stamp_applied'
+  | 'document.emailed'
+  // Commercial and operations
+  | 'purchase_order.recorded'
+  | 'purchase_order.updated'
+  | 'purchase_order.cancelled'
+  | 'delivery.created'
+  | 'delivery.signed'
+  | 'delivery.confirmed'
+  | 'completion.recorded'
+  | 'completion.verified'
+  | 'efd.recorded'
+  | 'contact.created'
+  | 'contact.updated'
+  | 'compliance.type_created'
+  | 'compliance.recorded'
+  | 'compliance.renewed'
+  | 'compliance.alert_sent'
+  // AI
+  | 'ai.draft_generated'
+  | 'brand.asset_uploaded'
+  | 'brand.analysis_completed'
+  | 'brand.profile_proposed'
 
 export interface AuditInput {
   action: AuditAction
@@ -103,6 +138,16 @@ export interface NotificationInput {
     | 'config_pending_approval'
     | 'config_approved'
     | 'config_rejected'
+    | 'document_pending_approval'
+    | 'document_approved'
+    | 'document_rejected'
+    | 'document_changes_requested'
+    | 'document_issued'
+    | 'delivery_awaiting_signature'
+    | 'delivery_confirmed'
+    | 'compliance_expiring'
+    | 'compliance_expired'
+    | 'efd_receipt_required'
   title: string
   body?: string | null
   entityType?: string | null

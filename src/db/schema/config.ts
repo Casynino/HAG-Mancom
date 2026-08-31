@@ -96,6 +96,7 @@ export const entityAddresses = pgTable(
     isDefault: boolean('is_default').notNull().default(false),
     displayOrder: integer('display_order').notNull().default(0),
     state: configStateEnum('state').notNull().default('draft'),
+    notes: text('notes'),
 
     createdBy: uuid('created_by').references(() => profiles.id, { onDelete: 'set null' }),
     approvedBy: uuid('approved_by').references(() => profiles.id, { onDelete: 'set null' }),

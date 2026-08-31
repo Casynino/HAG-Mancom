@@ -143,3 +143,38 @@ export function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
+
+export const DOCUMENT_STATUS: Record<string, { label: string; tone: Tone }> = {
+  draft: { label: 'Draft', tone: 'neutral' },
+  pending_review: { label: 'In review', tone: 'brand' },
+  pending_approval: { label: 'Awaiting approval', tone: 'warn' },
+  changes_requested: { label: 'Correction requested', tone: 'warn' },
+  approved: { label: 'Approved', tone: 'ok' },
+  rejected: { label: 'Rejected', tone: 'risk' },
+  issued: { label: 'Issued', tone: 'ok' },
+  archived: { label: 'Archived', tone: 'neutral' },
+  cancelled: { label: 'Cancelled', tone: 'risk' },
+}
+
+export const COMPLIANCE_STATUS: Record<string, { label: string; tone: Tone }> = {
+  valid: { label: 'Valid', tone: 'ok' },
+  expiring_soon: { label: 'Expiring soon', tone: 'warn' },
+  renewal_pending: { label: 'Renewal in progress', tone: 'brand' },
+  expired: { label: 'Expired', tone: 'risk' },
+  unknown: { label: 'Not recorded', tone: 'neutral' },
+}
+
+export const PO_STATUS: Record<string, { label: string; tone: Tone }> = {
+  open: { label: 'Open', tone: 'brand' },
+  partially_fulfilled: { label: 'Part fulfilled', tone: 'brand' },
+  fulfilled: { label: 'Fulfilled', tone: 'ok' },
+  closed: { label: 'Closed', tone: 'neutral' },
+  cancelled: { label: 'Cancelled', tone: 'risk' },
+}
+
+export const DELIVERY_STATUS: Record<string, { label: string; tone: Tone }> = {
+  draft: { label: 'Draft', tone: 'neutral' },
+  pending_signatures: { label: 'Awaiting signatures', tone: 'warn' },
+  confirmed: { label: 'Confirmed', tone: 'ok' },
+  cancelled: { label: 'Cancelled', tone: 'risk' },
+}

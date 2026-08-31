@@ -7,13 +7,17 @@ import {
   Bell,
   Building2,
   ClipboardList,
+  FileText,
   Gauge,
   Inbox,
   Layers,
   LogOut,
   Menu,
+  Search,
   Shield,
+  ShieldCheck,
   SlidersHorizontal,
+  Stamp,
   Users,
   X,
   type LucideIcon,
@@ -38,6 +42,10 @@ const ICONS: Record<string, LucideIcon> = {
   sliders: SlidersHorizontal,
   users: Users,
   shield: Shield,
+  stamp: Stamp,
+  file: FileText,
+  search: Search,
+  shieldcheck: ShieldCheck,
 }
 
 export interface NavItem {
@@ -51,8 +59,11 @@ export interface NavItem {
 function isActive(pathname: string, href: string): boolean {
   if (href === '/engineer') return pathname === '/engineer' || pathname.startsWith('/engineer/')
   if (href === '/technical') {
-    // "Review queue" must not light up while on Clients or Projects.
+    // "Review queue" must not light up while on Clients, Projects or Documents.
     return pathname === '/technical' || pathname.startsWith('/technical/submissions')
+  }
+  if (href === '/technical/documents') {
+    return pathname.startsWith('/technical/documents')
   }
   return pathname === href || pathname.startsWith(href + '/')
 }
