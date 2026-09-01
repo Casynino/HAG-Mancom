@@ -11,6 +11,22 @@ export const metadata: Metadata = {
   title: 'Sign in',
 }
 
+/**
+ * Where HA GROUP is incorporated, as the company states it on its own About
+ * page. Written out under the form because the globe shows the offices turning
+ * and somebody reading rather than looking should get the same answer.
+ */
+const COUNTRIES = [
+  'Tanzania',
+  'Zimbabwe',
+  'Zambia',
+  'Malawi',
+  'Mozambique',
+  'Botswana',
+  'South Africa',
+  'United Kingdom',
+]
+
 export default async function SignInPage() {
   const actor = await getActor()
   if (actor) redirect(actor.mustChangePassword ? '/change-password' : defaultRouteFor(actor.roles))
@@ -23,19 +39,31 @@ export default async function SignInPage() {
        * the business, drawn rather than photographed, so it cannot be mistaken
        * for a site the company has worked on.
        */}
-      {/* A deep field behind everything, so the navy is not flat. */}
+      {/*
+       * The ground. A flat navy read as a browser default with a form on it, so
+       * this is three lights instead: a teal one low and left where the arcs
+       * begin, the company's gold behind the globe, and a deep indigo filling
+       * the rest. Dark enough that white type sits on it without a scrim, warm
+       * enough that it does not look like a terminal.
+       */}
+      <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[#0b1220]" />
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_75%_35%,#1b2a4a_0%,#141d33_45%,#0d1424_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_70%_at_70%_28%,rgba(58,92,160,0.55)_0%,rgba(26,42,78,0.35)_42%,transparent_72%)]"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_60%_at_12%_88%,rgba(24,120,132,0.30)_0%,transparent_62%)]"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_55%_at_78%_62%,rgba(226,178,96,0.16)_0%,transparent_65%)]"
       />
       <AfricaNetwork className="pointer-events-none absolute inset-0 size-full" />
+      {/* A vignette, so the corners fall away and the eye goes to the middle. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 -left-32 size-[38rem] rounded-full bg-brand-600/25 blur-[120px]"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-40 -bottom-40 size-[32rem] rounded-full bg-live-500/15 blur-[120px]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_100%_at_50%_50%,transparent_45%,rgba(4,8,16,0.55)_100%)]"
       />
       {/* A faint grid, the way a drawing is set out before anything is drawn on
           it. It is the one nod to what the company actually does. */}
@@ -107,9 +135,17 @@ export default async function SignInPage() {
           repeated failed attempts lock the account for 15 minutes.
         </p>
 
-        <p className="mt-8 text-[10px] tracking-[0.14em] text-white/25 uppercase">
-          Turnkey electrical engineering across Africa
-        </p>
+        {/*
+         * The countries, written out. The globe shows them turning; this says
+         * them, for anybody who reads before they look — and it is HA GROUP's
+         * own claim, from the company profile, not a flourish.
+         */}
+        <div className="mt-8 border-t border-white/10 pt-5">
+          <p className="text-[10px] font-semibold tracking-[0.16em] text-live-400/70 uppercase">
+            Turnkey electrical engineering across Africa
+          </p>
+          <p className="mt-2 text-xs leading-relaxed text-white/40">{COUNTRIES.join(' · ')}</p>
+        </div>
       </div>
     </main>
   )

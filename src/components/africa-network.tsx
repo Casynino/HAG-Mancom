@@ -26,17 +26,24 @@ import { useEffect, useRef } from 'react'
  * a phone battery.
  */
 
-/** Where HA GROUP actually is. Degrees, north and east positive. */
-const SITES: Array<{ name: string; lat: number; lon: number; home?: boolean }> = [
-  { name: 'Dar es Salaam', lat: -6.79, lon: 39.21, home: true },
-  { name: 'Morogoro', lat: -6.82, lon: 37.66, home: true },
-  { name: 'Harare', lat: -17.83, lon: 31.05 },
-  { name: 'Lusaka', lat: -15.39, lon: 28.32 },
-  { name: 'Lilongwe', lat: -13.96, lon: 33.79 },
-  { name: 'Tete', lat: -16.16, lon: 33.59 },
-  { name: 'Gaborone', lat: -24.65, lon: 25.91 },
-  { name: 'Johannesburg', lat: -26.2, lon: 28.05 },
-  { name: 'Southend-on-Sea', lat: 51.54, lon: 0.71 },
+/**
+ * Where HA GROUP actually is. Degrees, north and east positive.
+ *
+ * The country is carried alongside the city because that is what somebody
+ * recognises at a glance — "Tanzania" lands where "Morogoro" needs a moment —
+ * and because the company describes itself by the countries it is incorporated
+ * in rather than by its street addresses.
+ */
+const SITES: Array<{ name: string; country: string; lat: number; lon: number; home?: boolean }> = [
+  { name: 'Dar es Salaam', country: 'Tanzania', lat: -6.79, lon: 39.21, home: true },
+  { name: 'Morogoro', country: 'Tanzania', lat: -6.82, lon: 37.66, home: true },
+  { name: 'Harare', country: 'Zimbabwe', lat: -17.83, lon: 31.05 },
+  { name: 'Lusaka', country: 'Zambia', lat: -15.39, lon: 28.32 },
+  { name: 'Lilongwe', country: 'Malawi', lat: -13.96, lon: 33.79 },
+  { name: 'Tete', country: 'Mozambique', lat: -16.16, lon: 33.59 },
+  { name: 'Gaborone', country: 'Botswana', lat: -24.65, lon: 25.91 },
+  { name: 'Johannesburg', country: 'South Africa', lat: -26.2, lon: 28.05 },
+  { name: 'Southend-on-Sea', country: 'United Kingdom', lat: 51.54, lon: 0.71 },
 ]
 
 /** Every office joins the Tanzanian pair; the two Tanzanian offices join too. */
@@ -70,6 +77,7 @@ export function AfricaNetwork({ className }: { className?: string }) {
     let cx = 0
     let cy = 0
     let R = 0
+    let labels = false
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -88,6 +96,8 @@ export function AfricaNetwork({ className }: { className?: string }) {
       R = Math.min(w, h) * 0.42
       cx = w > 900 ? w * 0.72 : w * 0.5
       cy = h * 0.5
+      // Names need room beside the sphere. On a phone there is none.
+      labels = w >= 900 && h >= 480
     }
 
     /** Lat/lon to screen, plus how far towards the viewer the point faces. */
@@ -105,7 +115,17 @@ export function AfricaNetwork({ className }: { className?: string }) {
     }
 
     const draw = (t: number) => {
-      const spin = reduced ? -32 : (-32 + t / 90) % 360
+      /*
+       * A slow sway around Africa rather than a full rotation.
+       *
+       * Spinning the globe took HA GROUP's own offices behind it for most of
+       * every minute, which is an odd thing for a company's sign-in screen to
+       * do — the one region that should always be visible was the one that kept
+       * leaving. It rocks about twenty degrees either side of the African
+       * meridian now, so the cluster is always facing the viewer and the labels
+       * stay legible, while the movement still says the thing is alive.
+       */
+      const spin = reduced ? -32 : -32 + Math.sin(t / 7000) * 20
 
       ctx.clearRect(0, 0, w, h)
 
@@ -149,6 +169,39 @@ export function AfricaNetwork({ className }: { className?: string }) {
 
       const pts = SITES.map((s) => project(s.lat, s.lon, spin))
 
+      /*
+       * Labels already placed this frame, so the next one can be skipped if it
+       * would land on top. Seven of the nine offices sit within a few hundred
+       * miles of each other in southern Africa, so at this scale their names
+       * pile into an unreadable smear — which is worse than showing fewer.
+       * Nearest-to-the-viewer wins, because that is the one the eye is on.
+       */
+      const placed: Array<{ x: number; y: number; w: number; h: number }> = []
+      const order = SITES.map((_, i) => i).sort((a, b) => pts[b]!.z - pts[a]!.z)
+      const labelled = new Set<number>()
+      if (labels) {
+        ctx.font =
+          '500 11px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+        for (const i of order) {
+          const p = pts[i]!
+          if (p.z <= 0.55) continue
+          const text = SITES[i]!.country
+          const box = {
+            x: p.x + 10,
+            y: p.y - 8,
+            w: ctx.measureText(text).width + 6,
+            h: 26,
+          }
+          const clash = placed.some(
+            (q) =>
+              box.x < q.x + q.w && box.x + box.w > q.x && box.y < q.y + q.h && box.y + box.h > q.y,
+          )
+          if (clash) continue
+          placed.push(box)
+          labelled.add(i)
+        }
+      }
+
       // Links, faded by whichever end faces further away.
       for (const [a, b] of LINKS) {
         const pa = pts[a]!
@@ -191,6 +244,25 @@ export function AfricaNetwork({ className }: { className?: string }) {
           ? `rgba(240, 200, 130, ${0.5 + near * 0.5})`
           : `rgba(180, 205, 245, ${0.35 + near * 0.45})`
         ctx.fill()
+
+        /*
+         * The country, written beside the point — but only where the point is
+         * genuinely facing the viewer. Labels on the limb of a sphere sit on
+         * top of the meridians and read as noise, and a name on the far side is
+         * a lie about where it is. Suppressed entirely on a narrow canvas,
+         * where there is no room for them beside a globe that small.
+         */
+        if (labelled.has(i)) {
+          const alpha = Math.min(1, (near - 0.55) / 0.25)
+          ctx.font =
+            '500 11px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
+          ctx.textBaseline = 'middle'
+          ctx.fillStyle = `rgba(255, 255, 255, ${0.62 * alpha})`
+          ctx.fillText(site.country, p.x + r + 8, p.y)
+          ctx.font = '400 9px ui-sans-serif, system-ui, sans-serif'
+          ctx.fillStyle = `rgba(226, 178, 96, ${0.55 * alpha})`
+          ctx.fillText(site.name.toUpperCase(), p.x + r + 8, p.y + 12)
+        }
       })
     }
 
