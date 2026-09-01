@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { AfricaNetwork } from '@/components/africa-network'
+import { hagPhotos } from '@/lib/company/imagery'
 import type { Metadata } from 'next'
 import { getActor } from '@/lib/authz/guard'
 import { defaultRouteFor } from '@/lib/authz/roles'
@@ -49,13 +50,14 @@ export default async function SignInPage() {
        * enough that it does not look like a terminal.
        */}
       <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[#0b1220]" />
+
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_70%_at_70%_28%,rgba(58,92,160,0.55)_0%,rgba(26,42,78,0.35)_42%,transparent_72%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_70%_at_70%_28%,rgba(58,92,160,0.34)_0%,rgba(26,42,78,0.18)_42%,transparent_72%)]"
       />
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_60%_at_12%_88%,rgba(24,120,132,0.30)_0%,transparent_62%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_60%_at_12%_88%,rgba(24,120,132,0.22)_0%,transparent_62%)]"
       />
       <span
         aria-hidden="true"
@@ -88,11 +90,63 @@ export default async function SignInPage() {
         />
       </span>
 
+      {/* Darkens the left, where the form is, and leaves the right to the globe. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b1220]/92 via-[#0b1220]/58 to-transparent lg:via-[#0b1220]/38"
+      />
+
+      {/*
+       * HA GROUP's own cable reticulation, on the right where the globe is.
+       *
+       * Full-bleed behind everything was the wrong composition and I tried it
+       * three times: held down far enough not to fight the form, the photograph
+       * disappeared; brought up far enough to see, it fought the form. Giving
+       * it half the frame solves both — it is plainly a photograph on the right
+       * and the left stays clean for the type, which is how the home page is
+       * built too.
+       *
+       * Masked so its left edge dissolves rather than ending on a line.
+       */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[58%] lg:block"
+        style={{
+          maskImage: 'linear-gradient(to right, transparent 0%, black 45%, black 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 45%, black 100%)',
+        }}
+      >
+        <Image
+          src={hagPhotos.cableReticulation.src}
+          alt=""
+          fill
+          priority
+          sizes="60vw"
+          /*
+             One layer and one number, after four attempts that each added a
+             reasonable-looking overlay and together came to near-opaque. The
+             photograph is simply held at just over half strength and slightly
+             cooled; nothing else is painted on top of it.
+           */
+          className="object-cover object-[60%_center] opacity-[0.45] saturate-[0.5]"
+        />
+      </div>
+
+      {/* On a phone there is no room for a side panel, so it sits behind the
+          whole frame, held right down. */}
+      <Image
+        src={hagPhotos.cableReticulation.src}
+        alt=""
+        fill
+        sizes="100vw"
+        className="pointer-events-none object-cover opacity-[0.30] saturate-[0.5] lg:hidden"
+      />
+
       <AfricaNetwork className="pointer-events-none absolute inset-0 size-full" />
       {/* A vignette, so the corners fall away and the eye goes to the middle. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_100%_at_50%_50%,transparent_45%,rgba(4,8,16,0.55)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_100%_at_50%_50%,transparent_62%,rgba(4,8,16,0.32)_100%)]"
       />
       {/* A faint grid, the way a drawing is set out before anything is drawn on
           it. It is the one nod to what the company actually does. */}
@@ -104,11 +158,6 @@ export default async function SignInPage() {
             'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
           backgroundSize: '56px 56px',
         }}
-      />
-      {/* Darkens the left, where the form is, and leaves the right to the globe. */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-sidebar via-sidebar/85 to-transparent lg:via-sidebar/60"
       />
 
       <div className="relative w-full max-w-sm lg:ml-[8vw] xl:ml-[12vw]">
