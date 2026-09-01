@@ -1,4 +1,6 @@
 import Image from 'next/image'
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { AfricaNetwork } from '@/components/africa-network'
 import type { Metadata } from 'next'
@@ -59,6 +61,33 @@ export default async function SignInPage() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_55%_at_78%_62%,rgba(226,178,96,0.16)_0%,transparent_65%)]"
       />
+      {/*
+       * The company's mark, large and barely there, breathing on a thirty
+       * second cycle. It sits behind the globe and under the type at five to
+       * eight percent, which is enough to be felt and not enough to compete —
+       * somebody entering a password should not be watching something move.
+       */}
+      <span
+        aria-hidden="true"
+        /*
+         * Centred on the globe rather than on the page. Sitting in the middle
+         * of the viewport it was half-hidden behind the form and read as a
+         * stray ghost; over the sphere the mark and the globe are one object,
+         * which is what a watermark is for.
+         */
+        className="breathe pointer-events-none absolute top-1/2 left-1/2 w-[86vmin] max-w-none -translate-x-1/2 -translate-y-1/2 lg:left-[72%]"
+      >
+        <Image
+          src="/brand/ha-group-logo-transparent.png"
+          alt=""
+          width={301}
+          height={254}
+          priority
+          className="w-full"
+          style={{ filter: 'brightness(0) invert(1)' }}
+        />
+      </span>
+
       <AfricaNetwork className="pointer-events-none absolute inset-0 size-full" />
       {/* A vignette, so the corners fall away and the eye goes to the middle. */}
       <span
@@ -83,6 +112,20 @@ export default async function SignInPage() {
       />
 
       <div className="relative w-full max-w-sm lg:ml-[8vw] xl:ml-[12vw]">
+        {/*
+         * The way back. Somebody who lands here from the public site, or who
+         * opens it by habit and is not signing in, had no route out except the
+         * browser's back button — and on a phone opened from a link there is no
+         * back button to press.
+         */}
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-1.5 text-sm text-white/50 transition-colors hover:text-white"
+        >
+          <ArrowLeft className="size-3.5" aria-hidden="true" />
+          Back to hagroup.africa
+        </Link>
+
         <div className="mb-8 flex items-center gap-3">
           <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/10">
             <Image

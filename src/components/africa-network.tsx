@@ -60,6 +60,15 @@ const LINKS: Array<[number, number]> = [
   [3, 4],
 ]
 
+/** Deterministic PRNG — the same sky every load, on server and client. */
+function seeded(seed: number) {
+  let x = seed
+  return () => {
+    x = (x * 1664525 + 1013904223) % 4294967296
+    return x / 4294967296
+  }
+}
+
 export function AfricaNetwork({ className }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement | null>(null)
 
@@ -78,6 +87,12 @@ export function AfricaNetwork({ className }: { className?: string }) {
     let cy = 0
     let R = 0
     let labels = false
+    /*
+     * The sky behind the globe. Fixed positions from a fixed seed, so it does
+     * not reshuffle on every resize — a star field that jumps when you turn
+     * your phone reads as a fault rather than as a sky.
+     */
+    let stars: Array<{ x: number; y: number; r: number; a: number; phase: number }> = []
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -98,6 +113,16 @@ export function AfricaNetwork({ className }: { className?: string }) {
       cy = h * 0.5
       // Names need room beside the sphere. On a phone there is none.
       labels = w >= 900 && h >= 480
+
+      const rnd = seeded(20260901)
+      const count = Math.round((w * h) / 9000)
+      stars = Array.from({ length: count }, () => ({
+        x: rnd() * w,
+        y: rnd() * h,
+        r: 0.4 + rnd() * 1.1,
+        a: 0.12 + rnd() * 0.5,
+        phase: rnd() * Math.PI * 2,
+      }))
     }
 
     /** Lat/lon to screen, plus how far towards the viewer the point faces. */
@@ -129,6 +154,26 @@ export function AfricaNetwork({ className }: { className?: string }) {
 
       ctx.clearRect(0, 0, w, h)
 
+      // The sky first, so everything else sits in front of it.
+      for (const st of stars) {
+        const twinkle = reduced ? 1 : 0.65 + 0.35 * Math.sin(t / 1800 + st.phase)
+        ctx.beginPath()
+        ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(214, 228, 255, ${st.a * twinkle})`
+        ctx.fill()
+      }
+
+      // A soft halo behind the sphere, so it sits in front of the sky rather
+      // than being drawn on top of it.
+      const halo = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 1.35)
+      halo.addColorStop(0, 'rgba(46, 82, 150, 0.30)')
+      halo.addColorStop(0.7, 'rgba(30, 56, 108, 0.12)')
+      halo.addColorStop(1, 'rgba(10, 20, 40, 0)')
+      ctx.fillStyle = halo
+      ctx.beginPath()
+      ctx.arc(cx, cy, R * 1.35, 0, Math.PI * 2)
+      ctx.fill()
+
       // Meridians and parallels. Only the near half is drawn, so the sphere
       // reads as solid without any fill.
       ctx.lineWidth = 1
@@ -146,7 +191,7 @@ export function AfricaNetwork({ className }: { className?: string }) {
             started = true
           } else ctx.lineTo(p.x, p.y)
         }
-        ctx.strokeStyle = 'rgba(148, 176, 235, 0.20)'
+        ctx.strokeStyle = 'rgba(160, 190, 245, 0.30)'
         ctx.stroke()
       }
       for (let lat = -60; lat <= 60; lat += 20) {
@@ -163,7 +208,7 @@ export function AfricaNetwork({ className }: { className?: string }) {
             started = true
           } else ctx.lineTo(p.x, p.y)
         }
-        ctx.strokeStyle = 'rgba(148, 176, 235, 0.16)'
+        ctx.strokeStyle = 'rgba(160, 190, 245, 0.24)'
         ctx.stroke()
       }
 

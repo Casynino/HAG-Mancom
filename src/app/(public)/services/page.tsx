@@ -140,8 +140,8 @@ export default function ServicesPage() {
       {/* A full-bleed band, so ten sections do not run into the footer flat. */}
       <section className="relative isolate overflow-hidden bg-shell py-24 text-shell-fg sm:py-28">
         <Image
-          src={photos.powerPlant.src}
-          alt={photos.powerPlant.alt}
+          src={photos.mining.src}
+          alt={photos.mining.alt}
           fill
           sizes="100vw"
           className="pointer-events-none object-cover opacity-30"

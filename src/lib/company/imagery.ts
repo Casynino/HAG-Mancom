@@ -81,8 +81,13 @@ export const photos = {
     src: '/imagery/electrician.jpeg',
     alt: 'An electrician working on a control panel',
   },
+  /*
+   * Filed as a power plant; it is a close-up of a compact fluorescent bulb on
+   * black. Same fault as the three below — chosen on filename, never opened.
+   */
   powerPlant: {
     src: '/imagery/band-power-plant.jpeg',
+    offBrand: 'A compact fluorescent bulb on black, not a power plant.',
     alt: 'A power generation plant at scale',
   },
   team: {

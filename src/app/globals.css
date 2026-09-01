@@ -447,3 +447,34 @@
     animation: none;
   }
 }
+
+/*
+ * The mark breathing behind the sign-in screen.
+ *
+ * Very slow — thirty seconds a cycle — and very small in amplitude, because it
+ * sits behind a form somebody is typing into. Anything faster reads as a
+ * distraction rather than as the page being alive, and a person entering a
+ * password should not be watching something move.
+ */
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.05;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.085;
+    transform: scale(1.035);
+  }
+}
+
+.breathe {
+  animation: breathe 30s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breathe {
+    animation: none;
+    opacity: 0.06;
+  }
+}
