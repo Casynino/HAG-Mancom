@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { company, countries, divisions, partners, values } from '@/lib/company/profile'
-import { IMAGERY_NOTE, photos } from '@/lib/company/imagery'
+import { IMAGERY_NOTE, hagPhotos, photos } from '@/lib/company/imagery'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -15,7 +15,7 @@ export default function AboutPage() {
     <>
       <header className="relative isolate overflow-hidden border-b border-shell-fg/10 bg-shell text-shell-fg">
         <Image
-          src={photos.electrician.src}
+          src={hagPhotos.plantInstallation.src}
           alt=""
           fill
           priority

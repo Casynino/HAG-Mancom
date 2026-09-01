@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Check } from 'lucide-react'
 import { services, SOURCE_NOTE, verticals } from '@/lib/company/profile'
-import { IMAGERY_NOTE, photos, servicePhotos } from '@/lib/company/imagery'
+import { IMAGERY_NOTE, hagPhotos, photos, servicePhotos } from '@/lib/company/imagery'
 
 export const metadata: Metadata = {
   title: 'Services',
@@ -22,7 +22,7 @@ export default function ServicesPage() {
     <>
       <header className="relative isolate overflow-hidden border-b border-shell-fg/10 bg-shell text-shell-fg">
         <Image
-          src={photos.manufacturing.src}
+          src={hagPhotos.driveRefurbishment.src}
           alt=""
           fill
           priority

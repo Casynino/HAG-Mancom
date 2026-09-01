@@ -4,7 +4,7 @@ import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { GridCanvas } from '@/components/public/grid-canvas'
 import { NetworkMap } from '@/components/public/network-map'
 import { Counter, Reveal } from '@/components/public/motion'
-import { IMAGERY_NOTE, photos } from '@/lib/company/imagery'
+import { IMAGERY_NOTE, hagPhotos, photos } from '@/lib/company/imagery'
 import {
   company,
   countries,
@@ -58,7 +58,7 @@ export default function HomePage() {
             high-voltage transmission — without competing with the type, and the
             live network is drawn on top of it. */}
         <Image
-          src={photos.mining.src}
+          src={hagPhotos.streetLightingNight.src}
           alt=""
           fill
           priority

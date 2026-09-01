@@ -391,11 +391,247 @@ export interface Project {
   title: string
   client: string
   country: string
-  year: number
+  /** Stated period, as written in the profile. Some entries give a range. */
+  period: string
   category: 'Solar' | 'Fabrication' | 'Construction' | 'Electricals' | 'Installations'
   summary: string
+  /** The scope, as the profile lists it. */
+  scope: string[]
+  /** Contract value where the profile states one. Many entries do not. */
+  value?: string
   /** Paths under /public. Photographs HA GROUP owns; never stock imagery. */
   images: string[]
 }
 
-export const projects: Project[] = []
+/**
+ * HA GROUP's own project register.
+ *
+ * Taken verbatim from section 6 of the HPC Africa SA pictorial profile 2024,
+ * "SOME PROJECTS (POWER/NON POWER) AND REFERENCES IN SOUTHERN AFRICA". These
+ * are named clients with stated scope, and where the profile gives a contract
+ * value it is reproduced exactly and where it does not the field is absent —
+ * inventing a figure for a project reference is the one thing that would make
+ * the whole list worthless.
+ *
+ * The client contact names, emails and telephone numbers printed alongside each
+ * entry in the profile are deliberately NOT carried across. A pictorial profile
+ * handed to a prospective client is a different thing from a public web page,
+ * and publishing a named individual's direct email on one is a decision for
+ * HA GROUP and for that individual, not something to infer from a PDF.
+ *
+ * Photographs are HA GROUP's own, extracted from the same profiles.
+ */
+export const PROJECTS_SOURCE =
+  'HPC Africa SA Pty Ltd pictorial business profile 2024, section 6; and the ' +
+  'HPC Africa Zimbabwe pictorial profile. Supplied by HA GROUP.'
+
+export const projects: Project[] = [
+  {
+    slug: 'zetdc-substation-programme',
+    title: 'National substation construction and refurbishment',
+    client: 'Zimbabwe Electricity Transmission and Distribution Company (ZETDC)',
+    country: 'Zimbabwe',
+    period: '2015–2016',
+    category: 'Electricals',
+    value: 'US$3,490,352.94',
+    summary:
+      'A national programme of substation construction and refurbishment for Zimbabwe’s ' +
+      'transmission and distribution utility, covering protection on both sides of the ' +
+      'transformer, earthing, and feeder replacement.',
+    scope: [
+      'Transformer protection — HT side (D-Fuse / breakers / RMU)',
+      'Transformer protection — LT side (fuse / breakers)',
+      'Substation earthing mat and earth rods',
+      'Copper replacement, 32–11kV feeders',
+    ],
+    images: ['/imagery/hag/cable-reticulation.jpg'],
+  },
+  {
+    slug: 'marep-rural-electrification',
+    title: 'Malawi Rural Electrification Programme',
+    client: 'MAREP — subcontract to Mota-Engil',
+    country: 'Malawi',
+    period: 'Programme',
+    category: 'Construction',
+    value: 'US$2,129,397.95',
+    summary:
+      'Line and substation construction under Malawi’s national rural electrification ' +
+      'programme, delivered as a subcontract to Mota-Engil.',
+    scope: ['32kV line construction', 'Substation construction', '11kV line construction'],
+    images: ['/imagery/hag/lighting-poles.jpg'],
+  },
+  {
+    slug: 'zimbabwe-military-academy',
+    title: '33kV/11kV substation and building electrification',
+    client: 'Zimbabwe Military Academy',
+    country: 'Zimbabwe',
+    period: '2016–2018',
+    category: 'Electricals',
+    value: 'US$577,800.00',
+    summary:
+      'Substation construction and the complete electrical fit-out of new buildings, from the ' +
+      'incoming main through to security lighting and telephony.',
+    scope: [
+      '32kV/11kV substation construction, 2017–2018',
+      'Installation of incomer main for new buildings',
+      'Switchgear and DB board installation and wiring',
+      'Security lighting and telephone system installation',
+    ],
+    images: ['/imagery/hag/plant-installation.jpg'],
+  },
+  {
+    slug: 'zpc-33kv-line',
+    title: '117.6km 33kV line and customer substation',
+    client: 'Zimbabwe Power Company (ZPC)',
+    country: 'Zimbabwe',
+    period: 'Contract',
+    category: 'Construction',
+    summary:
+      'Overhead line construction at scale, terminating in a substation built at the customer ' +
+      'point and its HT cabling.',
+    scope: [
+      'Construction of 117.6km of 33kV line',
+      'Construction of substation at customer point',
+      'HT cabling and termination',
+    ],
+    images: ['/imagery/hag/lighting-poles.jpg'],
+  },
+  {
+    slug: 'blantyre-street-lighting',
+    title: 'City street lighting — HPS and LED',
+    client: 'Blantyre City Council',
+    country: 'Malawi',
+    period: 'Contract',
+    category: 'Solar',
+    summary:
+      'Supply, installation and commissioning of city street lighting, in both high-pressure ' +
+      'sodium and LED.',
+    scope: [
+      'Street lighting supply, installation and commissioning (HPS)',
+      'Street lighting supply, installation and commissioning (LED)',
+    ],
+    images: [
+      '/imagery/hag/street-lighting-night.jpg',
+      '/imagery/hag/street-lighting-day.jpg',
+      '/imagery/hag/solar-luminaire.jpg',
+    ],
+  },
+  {
+    slug: 'carlsberg-malawi-plant',
+    title: 'Brewery plant relocation, installation and commissioning',
+    client: 'Carlsberg Malawi Limited',
+    country: 'Malawi',
+    period: '2017',
+    category: 'Installations',
+    summary:
+      'A year of plant work across Carlsberg’s Malawi breweries — moving, installing and ' +
+      'commissioning process plant, and decommissioning what it replaced.',
+    scope: [
+      'Decommission, relocate, install and commission Lilongwe BBT tanks at Blantyre Brewery',
+      'Install and commission crate crusher and washing plant',
+      'Install and commission Daw plant',
+      'Decommission, pack and relocate decanter at Blantyre plant',
+      'Decommission, install and commission filtration plant',
+    ],
+    images: ['/imagery/hag/plant-installation.jpg'],
+  },
+  {
+    slug: 'chibuku-products-plants',
+    title: 'Electro-mechanical refurbishment across three plants',
+    client: 'Chibuku Products Limited',
+    country: 'Malawi',
+    period: '2016–2018',
+    category: 'Installations',
+    summary:
+      'Refurbishment, installation and commissioning at Chibuku’s Mzuzu, Lilongwe and Blantyre ' +
+      'plants over three years.',
+    scope: ['Mzuzu plant, 2016', 'Lilongwe plant, 2017', 'Blantyre plant, 2017–2018'],
+    images: ['/imagery/hag/drive-refurbishment.jpg'],
+  },
+  {
+    slug: 'delta-beverages-plants',
+    title: 'Eleven beverage plants — substations, drives and automation',
+    client: 'Delta Beverages',
+    country: 'Zimbabwe',
+    period: 'Ongoing',
+    category: 'Electricals',
+    summary:
+      'Standing work across eleven of Delta’s beverage plants, from substation and generator ' +
+      'installation through to condition monitoring of the drives.',
+    scope: [
+      'Substation, transformer and generator installations',
+      'Power factor and regulation solutions',
+      'Maintenance of SEW motors and gearboxes',
+      'Supply of SEW gearmotors and motors',
+      'Electro-mechanical installation',
+      'Automation and condition monitoring',
+      'Grinding mills, geared motors, tanks and boiler repairs',
+    ],
+    images: ['/imagery/hag/drive-refurbishment.jpg'],
+  },
+  {
+    slug: 'alliance-one-tobacco',
+    title: 'Tobacco processing plant — installation and maintenance',
+    client: 'Alliance One',
+    country: 'Zimbabwe, Malawi and Tanzania',
+    period: 'Ongoing',
+    category: 'Installations',
+    summary:
+      'Work across Alliance One’s operations in three countries, including the loose-leaf plant ' +
+      'construction and the manufacture of agro racks.',
+    scope: [
+      'Substation repairs and installation',
+      'Electro-mechanical plant installation and maintenance',
+      'Electro-mechanical refurbishments',
+      'Manufacture and refurbishment of agro racks',
+      'Loose-leaf plant electro-mechanical construction',
+      'Schneider Electric automation spares and installation',
+      'Schneider Electric switchgear supply and installation',
+    ],
+    images: ['/imagery/hag/cable-reticulation.jpg'],
+  },
+  {
+    slug: 'zpc-harare-power-plant',
+    title: 'Harare Power Plant maintenance',
+    client: 'Zimbabwe Power Company',
+    country: 'Zimbabwe',
+    period: 'Two-year contract',
+    category: 'Electricals',
+    summary:
+      'A two-year maintenance contract at Harare Power Plant, with equipment supplied against it.',
+    scope: [
+      'Harare Power Plant maintenance — two-year contract',
+      'Supply of plant maintenance equipment',
+    ],
+    images: ['/imagery/hag/drive-refurbishment.jpg'],
+  },
+  {
+    slug: 'lafarge-plant-refurbishment',
+    title: 'Cement plant electro-mechanical refurbishment',
+    client: 'Lafarge',
+    country: 'Zimbabwe',
+    period: 'Contract',
+    category: 'Installations',
+    summary: 'Plant refurbishment with drives and transmission supplied against it.',
+    scope: [
+      'Plant electro-mechanical refurbishment',
+      'Supply of industrial gear units, gearmotors and motors',
+      'Supply of Optibelt transmission V-belts and pulleys',
+    ],
+    images: ['/imagery/hag/drive-refurbishment.jpg'],
+  },
+  {
+    slug: 'zimplats-drives',
+    title: 'Platinum mine — gear unit repair and transmission supply',
+    client: 'Zimplats',
+    country: 'Zimbabwe',
+    period: 'Contract',
+    category: 'Fabrication',
+    summary: 'Repair and supply of SEW industrial gear units, and Optibelt transmission.',
+    scope: [
+      'SEW industrial gear unit repairs and supplies',
+      'Supply of Optibelt transmission V-belts',
+    ],
+    images: ['/imagery/hag/drive-refurbishment.jpg'],
+  },
+]

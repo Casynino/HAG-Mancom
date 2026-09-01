@@ -457,19 +457,22 @@
  * password should not be watching something move.
  */
 @keyframes breathe {
-  0%,
-  100% {
-    opacity: 0.05;
-    transform: scale(1);
+  0% {
+    opacity: 0.045;
+    transform: translate3d(-2%, 1%, 0) scale(1) rotate(-2.5deg);
   }
   50% {
-    opacity: 0.085;
-    transform: scale(1.035);
+    opacity: 0.075;
+    transform: translate3d(2%, -1.5%, 0) scale(1.05) rotate(2.5deg);
+  }
+  100% {
+    opacity: 0.045;
+    transform: translate3d(-2%, 1%, 0) scale(1) rotate(-2.5deg);
   }
 }
 
 .breathe {
-  animation: breathe 30s ease-in-out infinite;
+  animation: breathe 26s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

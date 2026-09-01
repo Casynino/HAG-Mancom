@@ -28,8 +28,62 @@
  * ./profile.ts with a named client and year, and it should replace these.
  */
 
+/**
+ * HA GROUP's own photographs, from their pictorial business profiles.
+ *
+ * These are the real thing: their crews, their installations, their plant. They
+ * are not stock and carry no `offBrand` escape hatch, because there is nothing
+ * to escape — the alt text can say what the work is and who did it, which is
+ * exactly what the stock set below cannot do.
+ *
+ * Prefer these everywhere. The stock set exists only to fill positions these do
+ * not yet cover.
+ */
+export const hagPhotos = {
+  streetLightingNight: {
+    src: '/imagery/hag/street-lighting-night.jpg',
+    alt: 'A dual carriageway lit at night by HA GROUP street lighting, the run of poles curving into the distance',
+  },
+  streetLightingDay: {
+    src: '/imagery/hag/street-lighting-day.jpg',
+    alt: 'The same carriageway by day, showing the installed lighting columns along the central reservation',
+  },
+  cableReticulation: {
+    src: '/imagery/hag/cable-reticulation.jpg',
+    alt: 'Banks of power cable dressed onto tray and turned down a column inside a processing plant',
+  },
+  driveRefurbishment: {
+    src: '/imagery/hag/drive-refurbishment.jpg',
+    alt: 'A refurbished gearbox and motor drive train, repainted and assembled on its base frame in the workshop',
+  },
+  plantInstallation: {
+    src: '/imagery/hag/plant-installation.jpg',
+    alt: 'Process plant being craned into position while a rigger works from the steelwork above',
+  },
+  solarLuminaire: {
+    src: '/imagery/hag/solar-luminaire.jpg',
+    alt: 'An HA GROUP technician holding an all-in-one solar street light before it is raised',
+  },
+  lightingPoles: {
+    src: '/imagery/hag/lighting-poles.jpg',
+    alt: 'Cast concrete lighting columns laid out on site ready for erection',
+  },
+} as const satisfies Record<string, { src: string; alt: string }>
+
+export const HAG_IMAGERY_NOTE =
+  'Photographs of HA GROUP’s own work, from the company’s pictorial business profiles.'
+
+/*
+ * This note was written when every photograph on the site was stock. It is not
+ * true any more: the hero, the headers and the whole projects page are now
+ * HA GROUP's own work, from their pictorial profiles. It says which is which,
+ * because "some of these are ours" is a claim a client will check and the wrong
+ * blanket disclaimer devalues the real ones.
+ */
 export const IMAGERY_NOTE =
-  'Photography is illustrative stock imagery, not photographs of HA GROUP projects.'
+  'Photographs of HA GROUP’s own projects come from the company’s pictorial business ' +
+  'profiles. Where a page shows an industry scene rather than a project, it is ' +
+  'illustrative stock imagery and is not a site HA GROUP has worked on.'
 
 export interface Photo {
   src: string

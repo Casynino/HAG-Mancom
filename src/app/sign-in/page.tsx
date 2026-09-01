@@ -75,7 +75,7 @@ export default async function SignInPage() {
          * stray ghost; over the sphere the mark and the globe are one object,
          * which is what a watermark is for.
          */
-        className="breathe pointer-events-none absolute top-1/2 left-1/2 w-[86vmin] max-w-none -translate-x-1/2 -translate-y-1/2 lg:left-[72%]"
+        className="breathe pointer-events-none absolute top-1/2 left-1/2 w-[42vmin] max-w-none -translate-x-1/2 -translate-y-1/2 lg:left-[72%]"
       >
         <Image
           src="/brand/ha-group-logo-transparent.png"
