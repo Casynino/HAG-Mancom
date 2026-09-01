@@ -68,6 +68,18 @@ export const hagPhotos = {
     src: '/imagery/hag/lighting-poles.jpg',
     alt: 'Cast concrete lighting columns laid out on site ready for erection',
   },
+  switchboardInstalled: {
+    src: '/imagery/hag/switchboard-installed.jpg',
+    alt: 'An installed motor control centre on a plant floor, its cable bank rising to the roof steel',
+  },
+  panelWiring: {
+    src: '/imagery/hag/panel-wiring.jpg',
+    alt: 'Numbered terminal rails inside a control panel, every core colour-coded and dressed',
+  },
+  streetLightingRoadside: {
+    src: '/imagery/hag/street-lighting-roadside.jpg',
+    alt: 'Installed lighting columns running along a busy roadside market',
+  },
 } as const satisfies Record<string, { src: string; alt: string }>
 
 export const HAG_IMAGERY_NOTE =

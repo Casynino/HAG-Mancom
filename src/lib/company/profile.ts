@@ -397,8 +397,6 @@ export interface Project {
   summary: string
   /** The scope, as the profile lists it. */
   scope: string[]
-  /** Contract value where the profile states one. Many entries do not. */
-  value?: string
   /** Paths under /public. Photographs HA GROUP owns; never stock imagery. */
   images: string[]
 }
@@ -433,7 +431,6 @@ export const projects: Project[] = [
     country: 'Zimbabwe',
     period: '2015–2016',
     category: 'Electricals',
-    value: 'US$3,490,352.94',
     summary:
       'A national programme of substation construction and refurbishment for Zimbabwe’s ' +
       'transmission and distribution utility, covering protection on both sides of the ' +
@@ -444,7 +441,11 @@ export const projects: Project[] = [
       'Substation earthing mat and earth rods',
       'Copper replacement, 32–11kV feeders',
     ],
-    images: ['/imagery/hag/cable-reticulation.jpg'],
+    images: [
+      '/imagery/hag/cable-reticulation.jpg',
+      '/imagery/hag/panel-wiring.jpg',
+      '/imagery/hag/switchboard-installed.jpg',
+    ],
   },
   {
     slug: 'marep-rural-electrification',
@@ -453,12 +454,15 @@ export const projects: Project[] = [
     country: 'Malawi',
     period: 'Programme',
     category: 'Construction',
-    value: 'US$2,129,397.95',
     summary:
       'Line and substation construction under Malawi’s national rural electrification ' +
       'programme, delivered as a subcontract to Mota-Engil.',
     scope: ['32kV line construction', 'Substation construction', '11kV line construction'],
-    images: ['/imagery/hag/lighting-poles.jpg'],
+    images: [
+      '/imagery/hag/lighting-poles.jpg',
+      '/imagery/hag/street-lighting-roadside.jpg',
+      '/imagery/hag/solar-luminaire.jpg',
+    ],
   },
   {
     slug: 'zimbabwe-military-academy',
@@ -467,7 +471,6 @@ export const projects: Project[] = [
     country: 'Zimbabwe',
     period: '2016–2018',
     category: 'Electricals',
-    value: 'US$577,800.00',
     summary:
       'Substation construction and the complete electrical fit-out of new buildings, from the ' +
       'incoming main through to security lighting and telephony.',
@@ -477,7 +480,11 @@ export const projects: Project[] = [
       'Switchgear and DB board installation and wiring',
       'Security lighting and telephone system installation',
     ],
-    images: ['/imagery/hag/plant-installation.jpg'],
+    images: [
+      '/imagery/hag/plant-installation.jpg',
+      '/imagery/hag/switchboard-installed.jpg',
+      '/imagery/hag/panel-wiring.jpg',
+    ],
   },
   {
     slug: 'zpc-33kv-line',
@@ -494,7 +501,7 @@ export const projects: Project[] = [
       'Construction of substation at customer point',
       'HT cabling and termination',
     ],
-    images: ['/imagery/hag/lighting-poles.jpg'],
+    images: ['/imagery/hag/lighting-poles.jpg', '/imagery/hag/cable-reticulation.jpg'],
   },
   {
     slug: 'blantyre-street-lighting',
@@ -513,6 +520,7 @@ export const projects: Project[] = [
     images: [
       '/imagery/hag/street-lighting-night.jpg',
       '/imagery/hag/street-lighting-day.jpg',
+      '/imagery/hag/street-lighting-roadside.jpg',
       '/imagery/hag/solar-luminaire.jpg',
     ],
   },
@@ -533,7 +541,11 @@ export const projects: Project[] = [
       'Decommission, pack and relocate decanter at Blantyre plant',
       'Decommission, install and commission filtration plant',
     ],
-    images: ['/imagery/hag/plant-installation.jpg'],
+    images: [
+      '/imagery/hag/plant-installation.jpg',
+      '/imagery/hag/drive-refurbishment.jpg',
+      '/imagery/hag/switchboard-installed.jpg',
+    ],
   },
   {
     slug: 'chibuku-products-plants',
@@ -546,7 +558,11 @@ export const projects: Project[] = [
       'Refurbishment, installation and commissioning at Chibuku’s Mzuzu, Lilongwe and Blantyre ' +
       'plants over three years.',
     scope: ['Mzuzu plant, 2016', 'Lilongwe plant, 2017', 'Blantyre plant, 2017–2018'],
-    images: ['/imagery/hag/drive-refurbishment.jpg'],
+    images: [
+      '/imagery/hag/drive-refurbishment.jpg',
+      '/imagery/hag/switchboard-installed.jpg',
+      '/imagery/hag/cable-reticulation.jpg',
+    ],
   },
   {
     slug: 'delta-beverages-plants',
@@ -567,7 +583,12 @@ export const projects: Project[] = [
       'Automation and condition monitoring',
       'Grinding mills, geared motors, tanks and boiler repairs',
     ],
-    images: ['/imagery/hag/drive-refurbishment.jpg'],
+    images: [
+      '/imagery/hag/switchboard-installed.jpg',
+      '/imagery/hag/drive-refurbishment.jpg',
+      '/imagery/hag/panel-wiring.jpg',
+      '/imagery/hag/cable-reticulation.jpg',
+    ],
   },
   {
     slug: 'alliance-one-tobacco',
@@ -588,7 +609,11 @@ export const projects: Project[] = [
       'Schneider Electric automation spares and installation',
       'Schneider Electric switchgear supply and installation',
     ],
-    images: ['/imagery/hag/cable-reticulation.jpg'],
+    images: [
+      '/imagery/hag/cable-reticulation.jpg',
+      '/imagery/hag/panel-wiring.jpg',
+      '/imagery/hag/plant-installation.jpg',
+    ],
   },
   {
     slug: 'zpc-harare-power-plant',
@@ -603,7 +628,7 @@ export const projects: Project[] = [
       'Harare Power Plant maintenance — two-year contract',
       'Supply of plant maintenance equipment',
     ],
-    images: ['/imagery/hag/drive-refurbishment.jpg'],
+    images: ['/imagery/hag/drive-refurbishment.jpg', '/imagery/hag/panel-wiring.jpg'],
   },
   {
     slug: 'lafarge-plant-refurbishment',
@@ -618,7 +643,7 @@ export const projects: Project[] = [
       'Supply of industrial gear units, gearmotors and motors',
       'Supply of Optibelt transmission V-belts and pulleys',
     ],
-    images: ['/imagery/hag/drive-refurbishment.jpg'],
+    images: ['/imagery/hag/drive-refurbishment.jpg', '/imagery/hag/switchboard-installed.jpg'],
   },
   {
     slug: 'zimplats-drives',
@@ -632,6 +657,6 @@ export const projects: Project[] = [
       'SEW industrial gear unit repairs and supplies',
       'Supply of Optibelt transmission V-belts',
     ],
-    images: ['/imagery/hag/drive-refurbishment.jpg'],
+    images: ['/imagery/hag/drive-refurbishment.jpg', '/imagery/hag/panel-wiring.jpg'],
   },
 ]
